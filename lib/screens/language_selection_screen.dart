@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
 import '../utils/auth_storage.dart';
@@ -27,6 +28,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     {'code': 'or', 'name': 'ଓଡ଼ିଆ'},
     {'code': 'te', 'name': 'తెలుగు'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Hide status bar on language selection
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
 
   void _continue() async {
     if (_selectedLanguage == null) {

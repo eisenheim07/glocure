@@ -56,5 +56,42 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        
+        <!-- UPI Payment Apps - Required for Android 11+ (API 30+) package visibility -->
+        <!-- Google Pay -->
+        <package android:name="com.google.android.apps.nbu.paisa.user" />
+        
+        <!-- PhonePe -->
+        <package android:name="com.phonepe.app" />
+        
+        <!-- Paytm -->
+        <package android:name="net.one97.paytm" />
+        
+        <!-- Amazon Pay -->
+        <package android:name="in.amazon.mShop.android.shopping" />
+        
+        <!-- BHIM UPI -->
+        <package android:name="in.org.npci.upiapp" />
+        
+        <!-- BHIM Axis Pay -->
+        <package android:name="com.upi.axispay" />
+        
+        <!-- BHIM SBI Pay -->
+        <package android:name="com.sbi.upi" />
+        
+        <!-- BHIM ICICI Pay -->
+        <package android:name="com.csam.icici.bank.imobile" />
+        
+        <!-- BHIM HDFC Pay -->
+        <package android:name="com.snapwork.hdfc" />
+        
+        <!-- WhatsApp (for WhatsApp Pay) -->
+        <package android:name="com.whatsapp" />
+        
+        <!-- Generic UPI intent for any UPI app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="upi" />
+        </intent>
     </queries>
 </manifest>

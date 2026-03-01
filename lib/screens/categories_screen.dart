@@ -24,8 +24,8 @@ class CategoriesScreen extends StatefulWidget {
 class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   void initState() {
-    context.read<CategoriesCubit>().fetchAll();
     super.initState();
+    context.read<CategoriesCubit>().fetchAll();
   }
 
   @override

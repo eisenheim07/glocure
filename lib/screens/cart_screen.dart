@@ -375,7 +375,7 @@ class _CartScreenState extends State<CartScreen> {
                 children: [
                   Icon(
                     Icons.shopping_cart_outlined,
-                    size: 100,
+                    size: 80,
                     color: Colors.grey.shade300,
                   ),
                   const SizedBox(height: 16),
@@ -384,15 +384,38 @@ class _CartScreenState extends State<CartScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.shade700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Add items to get started',
+                    'Add products to get started',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.shade500,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5C9A),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Start Shopping',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

@@ -45,36 +45,39 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       effectiveLeadingWidth = leadingWidth ?? 140.h;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1,
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.shade200,
+              width: 1,
+            ),
           ),
         ),
-      ),
-      child: AppBar(
-        leadingWidth: effectiveLeadingWidth,
-        toolbarHeight: toolbarHeight ?? 60.h,
-        backgroundColor: Colors.transparent,
-        foregroundColor: foregroundColor,
-        scrolledUnderElevation: 0.0,
-        elevation: 0,
-        title: title,
-        centerTitle: centerTitle,
-        titleSpacing: titleSpacing ?? (showDefaultLogo && leading == null ? 0 : null),
-        leading: leadingWidget,
-        automaticallyImplyLeading: leading == null && !showDefaultLogo,
-        actions: actions != null
-            ? [
-                Padding(
-                  padding: EdgeInsets.only(right: 16.h),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: actions!),
-                ),
-              ]
-            : null,
+        child: AppBar(
+          leadingWidth: effectiveLeadingWidth,
+          toolbarHeight: toolbarHeight ?? 60.h,
+          backgroundColor: Colors.transparent,
+          foregroundColor: foregroundColor,
+          scrolledUnderElevation: 0.0,
+          elevation: 0,
+          title: title,
+          centerTitle: centerTitle,
+          titleSpacing: titleSpacing ?? (showDefaultLogo && leading == null ? 0 : null),
+          leading: leadingWidget,
+          automaticallyImplyLeading: leading == null && !showDefaultLogo,
+          actions: actions != null
+              ? [
+                  Padding(
+                    padding: EdgeInsets.only(right: 16.h),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: actions!),
+                  ),
+                ]
+              : null,
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:glocure/screens/login_screen.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
@@ -18,6 +19,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // Hide status bar on splash
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _navigateToNextScreen();
   }
 

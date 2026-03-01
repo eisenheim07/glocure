@@ -33,7 +33,7 @@ class ProductDetailsScreen extends StatefulWidget {
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreen> with SingleTickerProviderStateMixin {
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> with TickerProviderStateMixin {
   late TopProduct _product;
   bool _isLoading = true;
   int _currentImageIndex = 0;
@@ -49,6 +49,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Single
   // Animation controller for heart icon
   late AnimationController _heartAnimationController;
   late Animation<double> _heartScaleAnimation;
+  
+  // Animation controller for cart icon
+  late AnimationController _cartAnimationController;
+  late Animation<double> _cartScaleAnimation;
 
   @override
   void initState() {
@@ -75,6 +79,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Single
         weight: 50,
       ),
     ]).animate(_heartAnimationController);
+    
+    // Initialize cart animation
+    _cartAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _cartScaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.3)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.3, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50,
+      ),
+    ]).animate(_cartAnimationController);
 
     // Fetch discover products using handle (default to "top-products" if null)
     discoverHandle = widget.handle ?? 'top-products';
@@ -197,6 +220,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Single
   void dispose() {
     _pageController.dispose();
     _heartAnimationController.dispose();
+    _cartAnimationController.dispose();
     super.dispose();
   }
 
@@ -349,6 +373,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Single
 
   /// Add product to cart
   Future<void> _addToCart() async {
+    // Trigger cart animation
+    _cartAnimationController.forward(from: 0.0);
+    
     try {
       // Get cart ID from preferences
       final cartId = await AuthStorage.getCartId();
@@ -1694,14 +1721,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Single
                   width: 1,
                 ),
               ),
-              child: IconButton(
-                onPressed: _addToCart,
-                icon: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Color(0xFFFF5C9A),
-                  size: 22,
+              child: ScaleTransition(
+                scale: _cartScaleAnimation,
+                child: IconButton(
+                  onPressed: _addToCart,
+                  icon: const Icon(
+                    Icons.shopping_cart_outlined,
+                    color: Color(0xFFFF5C9A),
+                    size: 22,
+                  ),
+                  padding: EdgeInsets.zero,
                 ),
-                padding: EdgeInsets.zero,
               ),
             ),
 

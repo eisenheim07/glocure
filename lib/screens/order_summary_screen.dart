@@ -5,12 +5,17 @@ import 'dart:convert';
 import '../models/customer_model.dart';
 import '../models/cart_model.dart';
 import '../services/api_service.dart';
+import '../services/order_service.dart';
 import '../utils/auth_storage.dart';
 import '../utils/format_utils.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
+import '../widgets/payment_selection_bottom_sheet.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
+import '../screens/payu_payment_screen.dart';
+import '../screens/payment_status_screen.dart';
+import '../models/order_model.dart';
 
 class OrderSummaryScreen extends StatefulWidget {
   final Customer? customer;
@@ -178,6 +183,158 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     }
   }
 
+  void _handleProceedToPay(BuildContext context, Cart cart) {
+    // Validate customer and address
+    if (_customer == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please login to continue'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final defaultAddress = _customer?.defaultAddress;
+    if (defaultAddress == null || defaultAddress.zip == null || defaultAddress.zip!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please add a delivery address with pincode'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate cart
+    if (cart.lines.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your cart is empty'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Show payment selection bottom sheet
+    PaymentSelectionBottomSheet.show(
+      context,
+      pincode: defaultAddress.zip!,
+      cart: cart,
+      customer: _customer!,
+      onPaymentSelected: (paymentMethod) async {
+        debugPrint('Payment method selected: $paymentMethod');
+        // Show loading state on order summary screen
+        setState(() => _isLoading = true);
+        
+        try {
+          // Create order
+          debugPrint('📦 Creating $paymentMethod order...');
+          final order = await OrderService().createOrder(
+            cart: cart,
+            customer: _customer!,
+            paymentMethod: paymentMethod,
+          );
+          
+          debugPrint('✅ Order created: ${order.id}');
+          
+          // Hide loading
+          if (mounted) {
+            setState(() => _isLoading = false);
+          }
+          
+          // Handle based on payment method
+          if (paymentMethod == 'Pre-paid') {
+            // Navigate to PayU
+            if (mounted) {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PayUPaymentScreen(
+                    order: order,
+                    customer: _customer!,
+                  ),
+                ),
+              );
+              
+              _handlePaymentResult(result, order);
+            }
+          } else {
+            // COD success - navigate to payment status screen
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentStatusScreen(
+                    status: 'success',
+                    order: order,
+                  ),
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          debugPrint('❌ Order creation error: $e');
+          if (mounted) {
+            setState(() => _isLoading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to create order: $e'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+        }
+      },
+    );
+  }
+
+  void _handlePaymentResult(dynamic result, OrderModel order) async {
+    if (result == null || !mounted) return;
+    
+    final status = result['status']?.toString().toLowerCase() ?? 'cancelled';
+    
+    // Show shimmer loading on order summary screen
+    setState(() => _isLoading = true);
+    
+    if (status == 'success') {
+      // Payment successful - update order status
+      debugPrint('✅ Payment successful!');
+      
+      OrderService().updateOrderStatus(
+        orderId: order.id!,
+        financialStatus: 'paid',
+      ).then((_) {
+        debugPrint('✅ Order status updated to paid');
+      }).catchError((e) {
+        debugPrint('⚠️ Failed to update order status: $e');
+      });
+    }
+    
+    // Wait for 2 seconds with shimmer showing
+    await Future.delayed(const Duration(seconds: 2));
+    
+    // Navigate to payment status screen (shimmer will close in background)
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaymentStatusScreen(
+            status: status,
+            order: order,
+          ),
+        ),
+      ).then((_) {
+        // Close shimmer in background after navigation
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -332,10 +489,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement payment flow
-                  debugPrint('Proceed to Pay tapped');
-                },
+                onPressed: () => _handleProceedToPay(context, cart),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,

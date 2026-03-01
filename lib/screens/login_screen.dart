@@ -70,6 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    // Hide status bar on login
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     // Start at a high number to allow infinite backward scrolling if needed
     _pageController = PageController(initialPage: 1000);
     _currentPage = 1000;

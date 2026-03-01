@@ -42,6 +42,15 @@ dependencies:
   geolocator: ^10.1.0
   geocoding: ^2.1.1
 
+  # URL Launcher for UPI apps
+  url_launcher: ^6.2.2
+
+  # Crypto for hash generation
+  crypto: ^3.0.3
+
+  # WebView for PayU payment page
+  webview_flutter: ^4.4.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

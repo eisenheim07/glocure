@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/screens/splash_screen.dart';
 import 'package:glocure/screens/login_screen.dart';
@@ -21,12 +22,6 @@ import 'package:glocure/services/api_service.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
-  // Set up token expiration callback
-  ApiService.onTokenExpired = () {
-    // Show session expired dialog
-    _showSessionExpiredDialog();
-  };
-
   runApp(const MyApp());
 }
 
@@ -78,7 +73,7 @@ void _showSessionExpiredDialog() {
                 onPressed: () {
                   // Close dialog
                   Navigator.of(dialogContext).pop();
-                  
+
                   // Navigate to login screen
                   navigatorKey.currentState?.pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),

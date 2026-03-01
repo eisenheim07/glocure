@@ -15,7 +15,7 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   DateTime? _lastBackPressTime;
 
@@ -26,6 +26,49 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const _OrdersScreen(), // Placeholder for Orders screen
     const _AccountScreen(), // Placeholder for Account screen
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Show status bar on home screen with multiple attempts
+    _showStatusBar();
+    
+    // Try again after a short delay
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _showStatusBar();
+    });
+    
+    // And once more after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showStatusBar();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Show status bar when app comes to foreground
+      _showStatusBar();
+    }
+  }
+
+  void _showStatusBar() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+  }
 
   void _onNavItemTapped(int index) {
     // Handle Scan button separately (index 2)
