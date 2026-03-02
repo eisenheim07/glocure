@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shimmer/shimmer.dart';
@@ -11,10 +12,14 @@ import 'order_summary_screen.dart';
 
 class AddressScreen extends StatefulWidget {
   final Customer? customer;
+  final bool isAddingNew;
+  final CustomerAddress? existingAddress;
 
   const AddressScreen({
     super.key,
     this.customer,
+    this.isAddingNew = false,
+    this.existingAddress,
   });
 
   @override
@@ -25,18 +30,18 @@ class _AddressScreenState extends State<AddressScreen> {
   bool _isLoading = true;
   bool _isFetchingLocation = false;
   Customer? _customer;
-  
+
   // Location data
   String _currentLocationName = '';
   String _currentLocationAddress = '';
   Placemark? _currentPlacemark; // Store placemark for address population
-  
+
   // Track if address was populated from geolocation
   bool _isAddressFromGeolocation = false;
-  
+
   // Track if address is being saved
   bool _isSavingAddress = false;
-  
+
   // Text controllers
   final _fullNameController = TextEditingController();
   final _firstNameController = TextEditingController();
@@ -50,13 +55,13 @@ class _AddressScreenState extends State<AddressScreen> {
   final _zipController = TextEditingController();
   final _companyController = TextEditingController();
   final _phoneController = TextEditingController();
-  
+
   // Checkbox state
   bool _isDefaultAddress = false;
-  
+
   // Form validation state
   bool _isFormValid = false;
-  
+
   // Error messages for each field
   String? _address1Error;
   String? _address2Error;
@@ -65,10 +70,10 @@ class _AddressScreenState extends State<AddressScreen> {
   String? _countryError;
   String? _zipError;
   String? _phoneError;
-  
+
   // Scroll controller
   final ScrollController _scrollController = ScrollController();
-  
+
   // Focus nodes for each field
   final FocusNode _address1FocusNode = FocusNode();
   final FocusNode _address2FocusNode = FocusNode();
@@ -82,7 +87,7 @@ class _AddressScreenState extends State<AddressScreen> {
   void initState() {
     super.initState();
     _initializeScreen();
-    
+
     // Add listeners to all editable fields for validation
     _address1Controller.addListener(_validateForm);
     _address2Controller.addListener(_validateForm);
@@ -91,7 +96,7 @@ class _AddressScreenState extends State<AddressScreen> {
     _countryController.addListener(_validateForm);
     _zipController.addListener(_validateForm);
     _phoneController.addListener(_validateForm);
-    
+
     // Add listeners to clear errors when user starts typing
     _address1Controller.addListener(() => _clearFieldError('address1'));
     _address2Controller.addListener(() => _clearFieldError('address2'));
@@ -101,7 +106,7 @@ class _AddressScreenState extends State<AddressScreen> {
     _zipController.addListener(() => _clearFieldError('zip'));
     _phoneController.addListener(() => _clearFieldError('phone'));
   }
-  
+
   void _clearFieldError(String fieldName) {
     // Clear error only if there's an error for this field
     switch (fieldName) {
@@ -142,7 +147,7 @@ class _AddressScreenState extends State<AddressScreen> {
         break;
     }
   }
-  
+
   void _validateForm() {
     final address1 = _address1Controller.text.trim();
     final address2 = _address2Controller.text.trim();
@@ -151,7 +156,7 @@ class _AddressScreenState extends State<AddressScreen> {
     final country = _countryController.text.trim();
     final zip = _zipController.text.trim();
     final phone = _phoneController.text.trim();
-    
+
     // Validation rules
     final isAddress1Valid = address1.isNotEmpty && address1.length <= 100;
     final isAddress2Valid = address2.isNotEmpty && address2.length <= 100;
@@ -160,22 +165,16 @@ class _AddressScreenState extends State<AddressScreen> {
     final isCountryValid = country.isNotEmpty && country.length <= 30;
     final isZipValid = zip.isNotEmpty && zip.length == 6;
     final isPhoneValid = phone.isNotEmpty && phone.length == 10;
-    
-    final isValid = isAddress1Valid &&
-                    isAddress2Valid &&
-                    isCityValid &&
-                    isProvinceValid &&
-                    isCountryValid &&
-                    isZipValid &&
-                    isPhoneValid;
-    
+
+    final isValid = isAddress1Valid && isAddress2Valid && isCityValid && isProvinceValid && isCountryValid && isZipValid && isPhoneValid;
+
     if (_isFormValid != isValid) {
       setState(() {
         _isFormValid = isValid;
       });
     }
   }
-  
+
   void _handleAddAddress() {
     if (_isFormValid) {
       // If address is from geolocation, show confirmation dialog
@@ -190,7 +189,7 @@ class _AddressScreenState extends State<AddressScreen> {
       _showValidationErrors();
     }
   }
-  
+
   void _showGeolocationConfirmationDialog() {
     showDialog(
       context: context,
@@ -261,7 +260,7 @@ class _AddressScreenState extends State<AddressScreen> {
       },
     );
   }
-  
+
   void _proceedWithAddAddress() async {
     try {
       // Show shimmer loading state
@@ -301,30 +300,55 @@ class _AddressScreenState extends State<AddressScreen> {
         addressData['company'] = company;
       }
 
-      debugPrint('✅ Creating address with data:');
-      debugPrint(jsonEncode(addressData));
+      Customer? updatedCustomer;
 
-      // Create address
-      final updatedCustomer = await ApiService().customerAddressCreate(
-        customerAccessToken: token,
-        address: addressData,
-      );
+      // Check if we're updating an existing address or creating a new one
+      if (widget.existingAddress != null) {
+        // Update existing address
+        debugPrint('✅ Updating address with data:');
+        debugPrint(jsonEncode(addressData));
 
-      if (updatedCustomer == null) {
-        throw Exception('Failed to create address');
+        updatedCustomer = await ApiService().customerAddressUpdate(
+          customerAccessToken: token,
+          addressId: widget.existingAddress!.id!,
+          address: addressData,
+        );
+
+        debugPrint('✅ Address updated successfully');
+      } else {
+        // Create new address
+        debugPrint('✅ Creating address with data:');
+        debugPrint(jsonEncode(addressData));
+
+        updatedCustomer = await ApiService().customerAddressCreate(
+          customerAccessToken: token,
+          address: addressData,
+        );
+
+        debugPrint('✅ Address created successfully');
       }
 
-      debugPrint('✅ Address created successfully');
+      if (updatedCustomer == null) {
+        throw Exception(widget.existingAddress != null ? 'Failed to update address' : 'Failed to create address');
+      }
 
       // If "Make this my default address" is checked, update default address
-      if (_isDefaultAddress && updatedCustomer.addresses.isNotEmpty) {
-        // Get the newly created address (last one in the list)
-        final newAddressId = updatedCustomer.addresses.last.id;
-        if (newAddressId != null) {
-          debugPrint('🔄 Setting as default address: $newAddressId');
+      if (_isDefaultAddress) {
+        String? addressIdToSetDefault;
+
+        if (widget.existingAddress != null) {
+          // Use the existing address ID
+          addressIdToSetDefault = widget.existingAddress!.id;
+        } else if (updatedCustomer.addresses.isNotEmpty) {
+          // Get the newly created address (last one in the list)
+          addressIdToSetDefault = updatedCustomer.addresses.last.id;
+        }
+
+        if (addressIdToSetDefault != null) {
+          debugPrint('🔄 Setting as default address: $addressIdToSetDefault');
           await ApiService().customerDefaultAddressUpdate(
             customerAccessToken: token,
-            addressId: newAddressId,
+            addressId: addressIdToSetDefault,
           );
           debugPrint('✅ Default address updated successfully');
         }
@@ -335,35 +359,41 @@ class _AddressScreenState extends State<AddressScreen> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Address added successfully'),
+          SnackBar(
+            content: Text(widget.existingAddress != null ? 'Address updated successfully' : 'Address added successfully'),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
 
-        // Navigate to OrderSummaryScreen and remove both address and cart screens from stack
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderSummaryScreen(
-              customer: updatedCustomer,
+        // Navigate based on source
+        if (widget.isAddingNew || widget.existingAddress != null) {
+          // Coming from address list screen - go back to address list
+          Navigator.pop(context, true); // Return true to indicate success
+        } else {
+          // Coming from cart screen - navigate to order summary
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSummaryScreen(
+                customer: updatedCustomer,
+              ),
             ),
-          ),
-          (route) => route.isFirst, // Keep only the first route (home screen)
-        );
+            (route) => route.isFirst, // Keep only the first route (home screen)
+          );
+        }
       }
     } catch (e) {
-      debugPrint('❌ Error adding address: $e');
-      
+      debugPrint('❌ Error ${widget.existingAddress != null ? 'updating' : 'adding'} address: $e');
+
       if (mounted) {
         setState(() => _isSavingAddress = false);
 
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to add address: ${e.toString()}'),
+            content: Text('Failed to ${widget.existingAddress != null ? 'update' : 'add'} address: ${e.toString()}'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
@@ -372,7 +402,7 @@ class _AddressScreenState extends State<AddressScreen> {
       }
     }
   }
-  
+
   void _showValidationErrors() {
     final address1 = _address1Controller.text.trim();
     final address2 = _address2Controller.text.trim();
@@ -381,9 +411,9 @@ class _AddressScreenState extends State<AddressScreen> {
     final country = _countryController.text.trim();
     final zip = _zipController.text.trim();
     final phone = _phoneController.text.trim();
-    
+
     FocusNode? firstErrorFocusNode;
-    
+
     setState(() {
       // Validate Address Line 1
       if (address1.isEmpty) {
@@ -395,7 +425,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _address1Error = null;
       }
-      
+
       // Validate Address Line 2
       if (address2.isEmpty) {
         _address2Error = 'Address Line 2 is required';
@@ -406,7 +436,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _address2Error = null;
       }
-      
+
       // Validate City
       if (city.isEmpty) {
         _cityError = 'City is required';
@@ -417,7 +447,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _cityError = null;
       }
-      
+
       // Validate Province
       if (province.isEmpty) {
         _provinceError = 'State/Province is required';
@@ -425,7 +455,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _provinceError = null;
       }
-      
+
       // Validate Country
       if (country.isEmpty) {
         _countryError = 'Country is required';
@@ -436,7 +466,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _countryError = null;
       }
-      
+
       // Validate ZIP
       if (zip.isEmpty) {
         _zipError = 'ZIP/Postal Code is required';
@@ -447,7 +477,7 @@ class _AddressScreenState extends State<AddressScreen> {
       } else {
         _zipError = null;
       }
-      
+
       // Validate Phone
       if (phone.isEmpty) {
         _phoneError = 'Phone number is required';
@@ -459,7 +489,7 @@ class _AddressScreenState extends State<AddressScreen> {
         _phoneError = null;
       }
     });
-    
+
     // Focus on first error field and scroll to it
     if (firstErrorFocusNode != null) {
       firstErrorFocusNode?.requestFocus();
@@ -470,7 +500,7 @@ class _AddressScreenState extends State<AddressScreen> {
       );
     }
   }
-  
+
   @override
   void dispose() {
     _fullNameController.dispose();
@@ -498,11 +528,11 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Future<void> _initializeScreen() async {
     setState(() => _isLoading = true);
-    
+
     try {
       // Fetch current location first
       await _fetchCurrentLocation();
-      
+
       // If customer object is passed, use it
       if (widget.customer != null) {
         _customer = widget.customer;
@@ -513,36 +543,40 @@ class _AddressScreenState extends State<AddressScreen> {
           'lastName': _customer?.lastName,
           'email': _customer?.email,
           'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null ? {
-            'id': _customer?.defaultAddress?.id,
-            'name': _customer?.defaultAddress?.name,
-            'firstName': _customer?.defaultAddress?.firstName,
-            'lastName': _customer?.defaultAddress?.lastName,
-            'address1': _customer?.defaultAddress?.address1,
-            'address2': _customer?.defaultAddress?.address2,
-            'city': _customer?.defaultAddress?.city,
-            'province': _customer?.defaultAddress?.province,
-            'country': _customer?.defaultAddress?.country,
-            'zip': _customer?.defaultAddress?.zip,
-            'company': _customer?.defaultAddress?.company,
-            'phone': _customer?.defaultAddress?.phone,
-          } : null,
-          'addresses': _customer?.addresses.map((addr) => {
-            'id': addr.id,
-            'name': addr.name,
-            'firstName': addr.firstName,
-            'lastName': addr.lastName,
-            'address1': addr.address1,
-            'address2': addr.address2,
-            'city': addr.city,
-            'province': addr.province,
-            'country': addr.country,
-            'zip': addr.zip,
-            'company': addr.company,
-            'phone': addr.phone,
-          }).toList(),
+          'defaultAddress': _customer?.defaultAddress != null
+              ? {
+                  'id': _customer?.defaultAddress?.id,
+                  'name': _customer?.defaultAddress?.name,
+                  'firstName': _customer?.defaultAddress?.firstName,
+                  'lastName': _customer?.defaultAddress?.lastName,
+                  'address1': _customer?.defaultAddress?.address1,
+                  'address2': _customer?.defaultAddress?.address2,
+                  'city': _customer?.defaultAddress?.city,
+                  'province': _customer?.defaultAddress?.province,
+                  'country': _customer?.defaultAddress?.country,
+                  'zip': _customer?.defaultAddress?.zip,
+                  'company': _customer?.defaultAddress?.company,
+                  'phone': _customer?.defaultAddress?.phone,
+                }
+              : null,
+          'addresses': _customer?.addresses
+              .map((addr) => {
+                    'id': addr.id,
+                    'name': addr.name,
+                    'firstName': addr.firstName,
+                    'lastName': addr.lastName,
+                    'address1': addr.address1,
+                    'address2': addr.address2,
+                    'city': addr.city,
+                    'province': addr.province,
+                    'country': addr.country,
+                    'zip': addr.zip,
+                    'company': addr.company,
+                    'phone': addr.phone,
+                  })
+              .toList(),
         }));
-        
+
         // Populate fields
         _populateFields();
       } else {
@@ -570,7 +604,7 @@ class _AddressScreenState extends State<AddressScreen> {
       }
 
       _customer = await ApiService().getCustomer(token);
-      
+
       if (_customer != null) {
         debugPrint('Customer object from API:');
         debugPrint(jsonEncode({
@@ -579,36 +613,40 @@ class _AddressScreenState extends State<AddressScreen> {
           'lastName': _customer?.lastName,
           'email': _customer?.email,
           'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null ? {
-            'id': _customer?.defaultAddress?.id,
-            'name': _customer?.defaultAddress?.name,
-            'firstName': _customer?.defaultAddress?.firstName,
-            'lastName': _customer?.defaultAddress?.lastName,
-            'address1': _customer?.defaultAddress?.address1,
-            'address2': _customer?.defaultAddress?.address2,
-            'city': _customer?.defaultAddress?.city,
-            'province': _customer?.defaultAddress?.province,
-            'country': _customer?.defaultAddress?.country,
-            'zip': _customer?.defaultAddress?.zip,
-            'company': _customer?.defaultAddress?.company,
-            'phone': _customer?.defaultAddress?.phone,
-          } : null,
-          'addresses': _customer?.addresses.map((addr) => {
-            'id': addr.id,
-            'name': addr.name,
-            'firstName': addr.firstName,
-            'lastName': addr.lastName,
-            'address1': addr.address1,
-            'address2': addr.address2,
-            'city': addr.city,
-            'province': addr.province,
-            'country': addr.country,
-            'zip': addr.zip,
-            'company': addr.company,
-            'phone': addr.phone,
-          }).toList(),
+          'defaultAddress': _customer?.defaultAddress != null
+              ? {
+                  'id': _customer?.defaultAddress?.id,
+                  'name': _customer?.defaultAddress?.name,
+                  'firstName': _customer?.defaultAddress?.firstName,
+                  'lastName': _customer?.defaultAddress?.lastName,
+                  'address1': _customer?.defaultAddress?.address1,
+                  'address2': _customer?.defaultAddress?.address2,
+                  'city': _customer?.defaultAddress?.city,
+                  'province': _customer?.defaultAddress?.province,
+                  'country': _customer?.defaultAddress?.country,
+                  'zip': _customer?.defaultAddress?.zip,
+                  'company': _customer?.defaultAddress?.company,
+                  'phone': _customer?.defaultAddress?.phone,
+                }
+              : null,
+          'addresses': _customer?.addresses
+              .map((addr) => {
+                    'id': addr.id,
+                    'name': addr.name,
+                    'firstName': addr.firstName,
+                    'lastName': addr.lastName,
+                    'address1': addr.address1,
+                    'address2': addr.address2,
+                    'city': addr.city,
+                    'province': addr.province,
+                    'country': addr.country,
+                    'zip': addr.zip,
+                    'company': addr.company,
+                    'phone': addr.phone,
+                  })
+              .toList(),
         }));
-        
+
         // Populate fields
         _populateFields();
       }
@@ -621,43 +659,79 @@ class _AddressScreenState extends State<AddressScreen> {
       }
     }
   }
-  
+
   void _populateFields() {
     if (_customer == null) return;
-    
+
     final firstName = _customer!.firstName ?? '';
     final lastName = _customer!.lastName ?? '';
     final fullName = '$firstName $lastName'.trim();
-    
+
     // Populate user info fields
     _fullNameController.text = fullName;
     _firstNameController.text = firstName;
     _lastNameController.text = lastName;
     _emailController.text = _customer!.email ?? '';
-    
+
+    // If editing an existing address, populate with that address data
+    if (widget.existingAddress != null) {
+      debugPrint('ℹ️ Editing existing address - populating fields');
+      final addr = widget.existingAddress!;
+
+      _address1Controller.text = addr.address1 ?? '';
+      _address2Controller.text = addr.address2 ?? '';
+      _cityController.text = addr.city ?? '';
+      _provinceController.text = addr.province ?? '';
+      _countryController.text = addr.country ?? '';
+      _zipController.text = addr.zip ?? '';
+      _companyController.text = addr.company ?? '';
+      _phoneController.text = _extractLast10Digits(addr.phone);
+
+      // Check if this is the default address
+      final isDefault = addr.id == _customer!.defaultAddress?.id;
+
+      setState(() {
+        _isDefaultAddress = isDefault;
+        _isAddressFromGeolocation = false;
+      });
+
+      // Validate form after populating fields
+      _validateForm();
+      return;
+    }
+
+    // If this is for adding a new address, leave all address fields empty
+    if (widget.isAddingNew) {
+      debugPrint('ℹ️ Adding new address - leaving address fields empty');
+      setState(() {
+        _isDefaultAddress = false;
+        _isAddressFromGeolocation = false;
+      });
+      return;
+    }
+
     // Check if default address exists
     final defaultAddr = _customer!.defaultAddress;
-    
+
     // If defaultAddress is null, use geolocation
     if (defaultAddr == null) {
       debugPrint('ℹ️ Default address is null, using geolocation');
       _populateFromGeolocation();
-      
+
       setState(() {
         _isDefaultAddress = false;
         _isAddressFromGeolocation = true;
       });
       return;
     }
-    
+
     // Check if default address has valid data for the 5 key fields
-    final hasValidDefaultAddress = 
-        _isAddressFieldValid(defaultAddr.address1) &&
+    final hasValidDefaultAddress = _isAddressFieldValid(defaultAddr.address1) &&
         _isAddressFieldValid(defaultAddr.address2) &&
         _isAddressFieldValid(defaultAddr.city) &&
         _isAddressFieldValid(defaultAddr.province) &&
         _isAddressFieldValid(defaultAddr.zip);
-    
+
     if (hasValidDefaultAddress) {
       // Populate from default address
       _address1Controller.text = defaultAddr.address1 ?? '';
@@ -667,8 +741,8 @@ class _AddressScreenState extends State<AddressScreen> {
       _countryController.text = defaultAddr.country ?? '';
       _zipController.text = defaultAddr.zip ?? '';
       _companyController.text = defaultAddr.company ?? '';
-      _phoneController.text = defaultAddr.phone ?? '';
-      
+      _phoneController.text = _extractLast10Digits(defaultAddr.phone);
+
       // Set checkbox to true if there's a default address
       setState(() {
         _isDefaultAddress = true;
@@ -677,70 +751,85 @@ class _AddressScreenState extends State<AddressScreen> {
     } else {
       // Populate from geolocation if available
       _populateFromGeolocation();
-      
+
       // Set checkbox to false since we're creating a new address
       setState(() {
         _isDefaultAddress = false;
         _isAddressFromGeolocation = true; // Address from geolocation
       });
     }
-    
+
     // Validate form after populating fields
     _validateForm();
   }
-  
+
   /// Check if an address field has valid (non-null, non-empty) value
   bool _isAddressFieldValid(String? value) {
     return value != null && value.trim().isNotEmpty;
   }
-  
+
+  /// Extract last 10 digits from phone number (removes country code like +91)
+  String _extractLast10Digits(String? phone) {
+    if (phone == null || phone.isEmpty) return '';
+
+    // Remove all non-numeric characters
+    final numericOnly = phone.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Return last 10 digits
+    if (numericOnly.length >= 10) {
+      return numericOnly.substring(numericOnly.length - 10);
+    }
+
+    return numericOnly;
+  }
+
   /// Populate address fields from geolocation data
   void _populateFromGeolocation() {
     if (_currentPlacemark == null) {
       debugPrint('No geolocation data available for address population');
       return;
     }
-    
+
     final place = _currentPlacemark!;
-    
+
     // Populate Address Line 1 (street)
     if (place.street != null && place.street!.isNotEmpty) {
       _address1Controller.text = place.street!;
     }
-    
+
     // Populate Address Line 2 (subLocality or thoroughfare)
     if (place.subLocality != null && place.subLocality!.isNotEmpty) {
       _address2Controller.text = place.subLocality!;
     } else if (place.thoroughfare != null && place.thoroughfare!.isNotEmpty) {
       _address2Controller.text = place.thoroughfare!;
     }
-    
+
     // Populate City (locality)
     if (place.locality != null && place.locality!.isNotEmpty) {
       _cityController.text = place.locality!;
     }
-    
+
     // Populate State/Province (administrativeArea)
     if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
       _provinceController.text = place.administrativeArea!;
     }
-    
+
     // Populate Country
     if (place.country != null && place.country!.isNotEmpty) {
       _countryController.text = place.country!;
     }
-    
+
     // Populate ZIP/Postal Code
     if (place.postalCode != null && place.postalCode!.isNotEmpty) {
       _zipController.text = place.postalCode!;
     }
-    
+
     debugPrint('✅ Address fields populated from geolocation');
   }
 
   Future<void> _fetchCurrentLocation() async {
     setState(() => _isFetchingLocation = true);
-    
+
     try {
       // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -789,13 +878,13 @@ class _AddressScreenState extends State<AddressScreen> {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        
+
         // Store placemark for later use
         _currentPlacemark = place;
-        
+
         // Extract location name (area/locality)
         _currentLocationName = place.subLocality ?? place.locality ?? 'Current Location';
-        
+
         // Build full address
         List<String> addressParts = [];
         if (place.street != null && place.street!.isNotEmpty) {
@@ -810,9 +899,9 @@ class _AddressScreenState extends State<AddressScreen> {
         if (place.postalCode != null && place.postalCode!.isNotEmpty) {
           addressParts.add(place.postalCode!);
         }
-        
+
         _currentLocationAddress = addressParts.join(', ');
-        
+
         if (_currentLocationAddress.isEmpty) {
           _currentLocationAddress = '${position.latitude}, ${position.longitude}';
         }
@@ -837,9 +926,9 @@ class _AddressScreenState extends State<AddressScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: const CustomAppBar(
+        appBar: CustomAppBar(
           type: AppBarType.simple,
-          title: 'Add Address',
+          title: widget.existingAddress != null ? 'Update Address' : 'Add Address',
         ),
         body: _isLoading || _isSavingAddress
             ? _buildLoadingShimmer()
@@ -852,12 +941,12 @@ class _AddressScreenState extends State<AddressScreen> {
                       child: Column(
                         children: [
                           const SizedBox(height: 8),
-                          
+
                           // Current Location Section
                           _buildCurrentLocationSection(),
-                          
+
                           const SizedBox(height: 8),
-                          
+
                           // User Information Form
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -893,9 +982,9 @@ class _AddressScreenState extends State<AddressScreen> {
                                   keyboardType: TextInputType.emailAddress,
                                   enabled: false,
                                 ),
-                                
+
                                 const SizedBox(height: 24),
-                                
+
                                 // Address Information Section
                                 _buildTextField(
                                   controller: _address1Controller,
@@ -961,14 +1050,17 @@ class _AddressScreenState extends State<AddressScreen> {
                                   controller: _phoneController,
                                   label: 'Phone',
                                   hint: 'Enter phone number',
-                                  keyboardType: TextInputType.phone,
+                                  keyboardType: TextInputType.number,
                                   maxLength: 10,
                                   focusNode: _phoneFocusNode,
                                   errorText: _phoneError,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                 ),
-                                
+
                                 const SizedBox(height: 24),
-                                
+
                                 // Make Default Address Checkbox
                                 Row(
                                   children: [
@@ -994,7 +1086,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                     ),
                                   ],
                                 ),
-                                
+
                                 const SizedBox(height: 24),
                               ],
                             ),
@@ -1003,7 +1095,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Fixed bottom button
                   _buildBottomButton(),
                 ],
@@ -1033,9 +1125,7 @@ class _AddressScreenState extends State<AddressScreen> {
           child: ElevatedButton(
             onPressed: _handleAddAddress,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isFormValid 
-                  ? const Color(0xFFFF5C9A) 
-                  : const Color(0xFFFF5C9A).withValues(alpha: 0.4),
+              backgroundColor: _isFormValid ? const Color(0xFFFF5C9A) : const Color(0xFFFF5C9A).withValues(alpha: 0.4),
               foregroundColor: Colors.white,
               disabledBackgroundColor: const Color(0xFFFF5C9A).withValues(alpha: 0.4),
               disabledForegroundColor: Colors.white.withValues(alpha: 0.6),
@@ -1044,9 +1134,9 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
               elevation: 0,
             ),
-            child: const Text(
-              'Add Address',
-              style: TextStyle(
+            child: Text(
+              widget.existingAddress != null ? 'Update Address' : 'Add Address',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
@@ -1066,6 +1156,7 @@ class _AddressScreenState extends State<AddressScreen> {
     int? maxLength,
     FocusNode? focusNode,
     String? errorText,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1085,6 +1176,7 @@ class _AddressScreenState extends State<AddressScreen> {
           enabled: enabled,
           maxLength: maxLength,
           focusNode: focusNode,
+          inputFormatters: inputFormatters,
           textCapitalization: TextCapitalization.words,
           buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
             // Hide counter
@@ -1178,9 +1270,9 @@ class _AddressScreenState extends State<AddressScreen> {
                     size: 24,
                   ),
                 ),
-                
+
                 const SizedBox(width: 12),
-                
+
                 // Location Details
                 Expanded(
                   child: _isFetchingLocation
@@ -1210,9 +1302,7 @@ class _AddressScreenState extends State<AddressScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _currentLocationName.isNotEmpty
-                                  ? _currentLocationName
-                                  : 'Fetching location...',
+                              _currentLocationName.isNotEmpty ? _currentLocationName : 'Fetching location...',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -1221,9 +1311,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _currentLocationAddress.isNotEmpty
-                                  ? _currentLocationAddress
-                                  : 'Please wait...',
+                              _currentLocationAddress.isNotEmpty ? _currentLocationAddress : 'Please wait...',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey.shade600,
@@ -1234,17 +1322,15 @@ class _AddressScreenState extends State<AddressScreen> {
                           ],
                         ),
                 ),
-                
+
                 const SizedBox(width: 12),
-                
+
                 // Retry Button
                 IconButton(
                   onPressed: _isFetchingLocation ? null : _fetchCurrentLocation,
                   icon: Icon(
                     Icons.refresh,
-                    color: _isFetchingLocation 
-                        ? Colors.grey.shade400 
-                        : const Color(0xFFFF5C9A),
+                    color: _isFetchingLocation ? Colors.grey.shade400 : const Color(0xFFFF5C9A),
                     size: 24,
                   ),
                   tooltip: 'Refresh location',
@@ -1252,7 +1338,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
               ],
             ),
-            
+
             // Use this location text
             if (_currentPlacemark != null && !_isFetchingLocation) ...[
               const SizedBox(height: 12),
@@ -1298,7 +1384,7 @@ class _AddressScreenState extends State<AddressScreen> {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          
+
           // Location card shimmer
           Padding(
             padding: const EdgeInsets.all(16),
@@ -1315,9 +1401,9 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Form fields shimmer
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1355,7 +1441,7 @@ class _AddressScreenState extends State<AddressScreen> {
               }),
             ),
           ),
-          
+
           // Checkbox shimmer
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1385,9 +1471,9 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Button shimmer
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1404,7 +1490,7 @@ class _AddressScreenState extends State<AddressScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
         ],
       ),

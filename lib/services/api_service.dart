@@ -1867,6 +1867,84 @@ class ApiService {
     }
   }
 
+  /// Update an existing customer address
+  /// [customerAccessToken] - The customer access token
+  /// [addressId] - The ID of the address to update
+  /// [address] - Map containing updated address fields
+  Future<Customer?> customerAddressUpdate({
+    required String customerAccessToken,
+    required String addressId,
+    required Map<String, dynamic> address,
+  }) async {
+    try {
+      _log('📝 Updating customer address...');
+      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      _log('Address ID: $addressId');
+      _log('Address data: $address');
+
+      const query = r'''
+        mutation customerAddressUpdate($customerAccessToken: String!, $id: ID!, $address: MailingAddressInput!) {
+          customerAddressUpdate(customerAccessToken: $customerAccessToken, id: $id, address: $address) {
+            customerAddress {
+              id
+              firstName
+              lastName
+              address1
+              address2
+              city
+              province
+              country
+              zip
+              phone
+              company
+            }
+            customerUserErrors {
+              field
+              message
+            }
+          }
+        }
+      ''';
+
+      final variables = {
+        'customerAccessToken': customerAccessToken,
+        'id': addressId,
+        'address': address,
+      };
+
+      final responseData = await _makeGraphQLRequest(
+        query,
+        variables: variables,
+        skipTokenValidation: false,
+      );
+
+      // Check for user errors
+      final customerAddressUpdate = responseData['data']?['customerAddressUpdate'];
+      final userErrors = customerAddressUpdate?['customerUserErrors'] as List<dynamic>? ?? [];
+
+      if (userErrors.isNotEmpty) {
+        final errorMessage = userErrors.map((e) => e['message']).join(', ');
+        _log('❌ Update address failed: $errorMessage');
+        throw Exception(errorMessage);
+      }
+
+      final customerAddress = customerAddressUpdate?['customerAddress'];
+      if (customerAddress == null) {
+        _log('❌ No customer address received');
+        throw Exception('Failed to update address');
+      }
+
+      _log('✅ Successfully updated address: ${customerAddress['id']}');
+
+      // Fetch updated customer data to return
+      final updatedCustomer = await getCustomer(customerAccessToken);
+      return updatedCustomer;
+    } catch (e) {
+      _log('❌ Failed to update address: $e');
+      rethrow;
+    }
+  }
+
   /// Update customer default address
   /// [customerAccessToken] - The customer access token
   /// [addressId] - The address ID to set as default
