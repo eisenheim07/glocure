@@ -259,7 +259,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Image.asset(ImageConstant.imgGlocureLogo,
-            height: 40.h, fit: BoxFit.contain),
+            height: 40, fit: BoxFit.contain),
         actions: [
           SmartImage(
               source: ImageConstant.imgGlocureGif,
@@ -509,7 +509,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 12.h,
                             mainAxisSpacing: 14.h,
-                            childAspectRatio: 0.68,
+                            childAspectRatio: 0.70,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {

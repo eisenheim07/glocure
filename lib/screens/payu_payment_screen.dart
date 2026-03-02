@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../services/payu_service.dart';
 import '../models/order_model.dart';
@@ -31,7 +32,26 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
   @override
   void initState() {
     super.initState();
+    // Ensure status bar is visible
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
     _initializeWebView();
+  }
+
+  @override
+  void dispose() {
+    // Ensure status bar remains visible when leaving this screen
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
+    super.dispose();
   }
 
   void _initializeWebView() {
@@ -239,6 +259,14 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
   void _handlePaymentSuccess() {
     if (!mounted) return;
     
+    // Ensure status bar is visible before popping
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
+    
     Navigator.pop(context, {
       'status': 'success',
       'orderId': widget.order.id,
@@ -249,6 +277,14 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
   void _handlePaymentFailure() {
     if (!mounted) return;
     
+    // Ensure status bar is visible before popping
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
+    
     Navigator.pop(context, {
       'status': 'failed',
       'orderId': widget.order.id,
@@ -258,6 +294,14 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _handlePaymentCancelled() {
     if (!mounted) return;
+    
+    // Ensure status bar is visible before popping
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
     
     Navigator.pop(context, {
       'status': 'cancelled',

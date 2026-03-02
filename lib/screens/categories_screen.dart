@@ -36,9 +36,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         showDefaultLogo: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Navigate to home tab in MainNavigationScreen
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
         ),
-        title: Image.asset(ImageConstant.imgGlocureLogo, height: 40.h, fit: BoxFit.contain),
+        title: Image.asset(ImageConstant.imgGlocureLogo, height: 40, fit: BoxFit.contain),
         actions: [
           SmartImage(source: ImageConstant.imgGlocureGif, width: 60, height: 28, onTap: () {}),
           const SizedBox(width: 4),
