@@ -6,13 +6,10 @@ import '../cubits/categories/categories_cubit.dart';
 import '../cubits/categories/categories_state.dart';
 import '../models/category_menu_model.dart';
 import '../models/home_top_banner_model.dart';
-import '../utils/image_constant.dart';
-import '../widgets/app_image.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
-import 'cart_screen.dart';
 import 'category_products.dart';
-import 'wishlist_screen.dart';
+import 'main_navigation_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -33,38 +30,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        showDefaultLogo: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Navigate to home tab in MainNavigationScreen
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          },
-        ),
-        title: Image.asset(ImageConstant.imgGlocureLogo, height: 40, fit: BoxFit.contain),
-        actions: [
-          SmartImage(source: ImageConstant.imgGlocureGif, width: 60, height: 28, onTap: () {}),
-          const SizedBox(width: 4),
-          SmartImage(source: ImageConstant.icNotifications, width: 60, height: 28, onTap: () {}),
-          const SizedBox(width: 12),
-          SmartImage(source: ImageConstant.icWishlist, width: 60, height: 28, onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const WishlistScreen(),
-              ),
-            );
-          }),
-          const SizedBox(width: 12),
-          SmartImage(source: ImageConstant.icCart, width: 60, height: 28, onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CartScreen(),
-              ),
-            );
-          }),
-        ],
+        type: AppBarType.full,
+        showBackButton: true,
+        onBackPressed: () {
+          // Navigate to home tab in MainNavigationScreen
+          MainNavigationScreen.navigateToHome(context);
+        },
       ),
       body: SafeArea(
         child: BlocBuilder<CategoriesCubit, CategoriesState>(

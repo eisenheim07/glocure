@@ -339,21 +339,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        showDefaultLogo: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Order Summary',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: false,
+      appBar: const CustomAppBar(
+        type: AppBarType.simple,
+        title: 'Order Summary',
       ),
       body: _isLoading || _isRefreshing
           ? _buildLoadingShimmer()

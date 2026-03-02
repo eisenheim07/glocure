@@ -14,10 +14,16 @@ class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
   @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+  State<MainNavigationScreen> createState() => MainNavigationScreenState();
+  
+  /// Static method to navigate to home from anywhere in the widget tree
+  static void navigateToHome(BuildContext context) {
+    final state = context.findAncestorStateOfType<MainNavigationScreenState>();
+    state?.navigateToHome();
+  }
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
+class MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   DateTime? _lastBackPressTime;
 
@@ -28,6 +34,15 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     const OrderScreen(),
     const AccountScreen(),
   ];
+  
+  /// Public method to navigate to home tab
+  void navigateToHome() {
+    if (_currentIndex != 0) {
+      setState(() {
+        _currentIndex = 0;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -104,7 +119,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
         if (didPop) return;
         
         // If not on Home tab, navigate to Home

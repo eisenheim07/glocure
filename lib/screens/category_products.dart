@@ -11,13 +11,9 @@ import '../models/top_products_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
 import '../widgets/custom_app_bar.dart';
-import '../utils/image_constant.dart';
-import '../widgets/app_image.dart';
 import '../widgets/network_image_loader.dart';
-import 'cart_screen.dart';
 import 'filter_screen.dart';
 import 'product_details_screen.dart';
-import 'wishlist_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Sort option model
@@ -93,20 +89,16 @@ class _CategoryProductsState extends State<CategoryProducts> {
   ];
 
   /// Active sort options list based on mode
-  List<_SortOption> get _activeSortOptions =>
-      widget.isDiscounted ? _discountedSortOptions : _sortOptions;
+  List<_SortOption> get _activeSortOptions => widget.isDiscounted ? _discountedSortOptions : _sortOptions;
 
   bool get _isSortApplied => _selectedSortIndex >= 0;
 
   bool get _isFilterApplied => _appliedFilters.isNotEmpty;
 
-  String get _sortLabel => _isSortApplied
-      ? _activeSortOptions[_selectedSortIndex].label
-      : 'No filter applied';
+  String get _sortLabel => _isSortApplied ? _activeSortOptions[_selectedSortIndex].label : 'No filter applied';
 
-  String get _filterLabel => _isFilterApplied
-      ? '${_appliedFilters.length} filter${_appliedFilters.length > 1 ? 's' : ''} applied'
-      : 'No filter applied';
+  String get _filterLabel =>
+      _isFilterApplied ? '${_appliedFilters.length} filter${_appliedFilters.length > 1 ? 's' : ''} applied' : 'No filter applied';
 
   @override
   void initState() {
@@ -114,8 +106,8 @@ class _CategoryProductsState extends State<CategoryProducts> {
     if (widget.isDiscounted) {
       // Pass showAllProducts parameter to control filtering
       context.read<CategoryProductsCubit>().fetchDiscountedProducts(
-        applyDiscountFilter: !widget.showAllProducts,
-      );
+            applyDiscountFilter: !widget.showAllProducts,
+          );
     } else {
       context.read<CategoryProductsCubit>().fetchProducts(widget.handle!);
     }
@@ -130,8 +122,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       context.read<CategoryProductsCubit>().loadMore();
     }
   }
@@ -146,12 +137,10 @@ class _CategoryProductsState extends State<CategoryProducts> {
 
     if (widget.isDiscounted) {
       return context.read<CategoryProductsCubit>().fetchDiscountedProducts(
-        applyDiscountFilter: !widget.showAllProducts,
-      );
+            applyDiscountFilter: !widget.showAllProducts,
+          );
     } else {
-      return context
-          .read<CategoryProductsCubit>()
-          .fetchProducts(widget.handle!);
+      return context.read<CategoryProductsCubit>().fetchProducts(widget.handle!);
     }
   }
 
@@ -181,9 +170,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
   void _openFilterScreen() async {
     if (widget.isDiscounted) {
       final cubit = context.read<CategoryProductsCubit>();
-      context
-          .read<FilterCubit>()
-          .loadFiltersFromProducts(cubit.allDiscountedProducts);
+      context.read<FilterCubit>().loadFiltersFromProducts(cubit.allDiscountedProducts);
     } else {
       context.read<FilterCubit>().loadFilters(widget.handle!);
     }
@@ -205,23 +192,15 @@ class _CategoryProductsState extends State<CategoryProducts> {
 
       if (widget.isDiscounted) {
         context.read<CategoryProductsCubit>().applyDiscountedSortAndFilter(
-              sortKey: _isSortApplied
-                  ? _activeSortOptions[_selectedSortIndex].sortKey
-                  : null,
-              reverse: _isSortApplied
-                  ? _activeSortOptions[_selectedSortIndex].reverse
-                  : null,
+              sortKey: _isSortApplied ? _activeSortOptions[_selectedSortIndex].sortKey : null,
+              reverse: _isSortApplied ? _activeSortOptions[_selectedSortIndex].reverse : null,
               filters: result.isNotEmpty ? result : null,
             );
       } else {
         context.read<CategoryProductsCubit>().fetchProducts(
               widget.handle!,
-              sortKey: _isSortApplied
-                  ? _activeSortOptions[_selectedSortIndex].sortKey
-                  : null,
-              reverse: _isSortApplied
-                  ? _activeSortOptions[_selectedSortIndex].reverse
-                  : null,
+              sortKey: _isSortApplied ? _activeSortOptions[_selectedSortIndex].sortKey : null,
+              reverse: _isSortApplied ? _activeSortOptions[_selectedSortIndex].reverse : null,
               filters: result.isNotEmpty ? result : null,
             );
       }
@@ -252,53 +231,9 @@ class _CategoryProductsState extends State<CategoryProducts> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        showDefaultLogo: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Image.asset(ImageConstant.imgGlocureLogo,
-            height: 40, fit: BoxFit.contain),
-        actions: [
-          SmartImage(
-              source: ImageConstant.imgGlocureGif,
-              width: 60,
-              height: 28,
-              onTap: () {}),
-          const SizedBox(width: 4),
-          SmartImage(
-              source: ImageConstant.icNotifications,
-              width: 60,
-              height: 28,
-              onTap: () {}),
-          const SizedBox(width: 12),
-          SmartImage(
-              source: ImageConstant.icWishlist,
-              width: 60,
-              height: 28,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const WishlistScreen(),
-                  ),
-                );
-              }),
-          const SizedBox(width: 12),
-          SmartImage(
-              source: ImageConstant.icCart,
-              width: 60,
-              height: 28,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CartScreen(),
-                  ),
-                );
-              }),
-        ],
+      appBar: const CustomAppBar(
+        type: AppBarType.full,
+        showBackButton: true,
       ),
       body: BlocBuilder<CategoryProductsCubit, CategoryProductsState>(
         builder: (context, state) {
@@ -313,8 +248,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 48, color: Colors.red),
+                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
                     const SizedBox(height: 12),
                     Text(
                       state.message,
@@ -323,9 +257,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                     ),
                     const SizedBox(height: 12),
                     TextButton(
-                      onPressed: () => context
-                          .read<CategoryProductsCubit>()
-                          .fetchProducts(widget.handle.toString()),
+                      onPressed: () => context.read<CategoryProductsCubit>().fetchProducts(widget.handle.toString()),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -370,8 +302,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                   Center(
                     child: Column(
                       children: [
-                        Icon(Icons.inventory_2_outlined,
-                            size: 64, color: Colors.grey[300]),
+                        Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[300]),
                         const SizedBox(height: 16),
                         const Text(
                           'No products found',
@@ -442,15 +373,12 @@ class _CategoryProductsState extends State<CategoryProducts> {
                             height: 38,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               itemCount: _filterTabs.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 8),
+                              separatorBuilder: (_, __) => const SizedBox(width: 8),
                               itemBuilder: (context, index) {
                                 final tab = _filterTabs[index];
-                                final isSelected =
-                                    index == _selectedFilterIndex;
+                                final isSelected = index == _selectedFilterIndex;
                                 return GestureDetector(
                                   onTap: () {
                                     setState(() {
@@ -458,36 +386,25 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color(0xFFFFE9F0)
-                                          : Colors.white,
+                                      color: isSelected ? const Color(0xFFFFE9F0) : Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: isSelected
-                                            ? const Color(0xFFFF5C9A)
-                                            : const Color(0xFFE0E0E0),
+                                        color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0),
                                       ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(tab.icon,
-                                            style:
-                                                const TextStyle(fontSize: 13)),
+                                        Text(tab.icon, style: const TextStyle(fontSize: 13)),
                                         const SizedBox(width: 4),
                                         Text(
                                           tab.label,
                                           style: TextStyle(
                                             fontSize: 13,
-                                            fontWeight: isSelected
-                                                ? FontWeight.w600
-                                                : FontWeight.w500,
-                                            color: isSelected
-                                                ? const Color(0xFFFF5C9A)
-                                                : const Color(0xFF7A7A7A),
+                                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                            color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF7A7A7A),
                                           ),
                                         ),
                                       ],
@@ -504,8 +421,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         sliver: SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 12.h,
                             mainAxisSpacing: 14.h,
@@ -631,8 +547,7 @@ class _SortBottomSheet extends StatelessWidget {
                         InkWell(
                           onTap: () => onSelected(index),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                             child: Row(
                               children: [
                                 Expanded(
@@ -640,9 +555,7 @@ class _SortBottomSheet extends StatelessWidget {
                                     option.label,
                                     style: TextStyle(
                                       fontSize: 15,
-                                      fontWeight: isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
+                                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                       color: Colors.black,
                                     ),
                                   ),
@@ -652,12 +565,7 @@ class _SortBottomSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (index < options.length - 1)
-                          const Divider(
-                              height: 1,
-                              thickness: 0.5,
-                              indent: 20,
-                              endIndent: 20),
+                        if (index < options.length - 1) const Divider(height: 1, thickness: 0.5, indent: 20, endIndent: 20),
                       ],
                     );
                   }),
@@ -752,13 +660,11 @@ class _BottomSortBar extends StatelessWidget {
               child: InkWell(
                 onTap: onSortTap,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.swap_vert,
-                          size: 20, color: Colors.black),
+                      const Icon(Icons.swap_vert, size: 20, color: Colors.black),
                       const SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -779,9 +685,7 @@ class _BottomSortBar extends StatelessWidget {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: isSortApplied
-                                      ? const Color(0xFFFF5C9A)
-                                      : Colors.grey[400],
+                                  color: isSortApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -810,8 +714,7 @@ class _BottomSortBar extends StatelessWidget {
               child: InkWell(
                 onTap: onFilterTap,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -836,9 +739,7 @@ class _BottomSortBar extends StatelessWidget {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: isFilterApplied
-                                      ? const Color(0xFFFF5C9A)
-                                      : Colors.grey[400],
+                                  color: isFilterApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -899,11 +800,8 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = _imageUrl();
     final discount = _discountPercent();
-    final currentPrice = product.variants.isNotEmpty
-        ? formatIndianCurrency(product.variants.first.priceV2.amount)
-        : '';
-    final originalPrice = product.variants.isNotEmpty &&
-            product.variants.first.compareAtPriceV2 != null
+    final currentPrice = product.variants.isNotEmpty ? formatIndianCurrency(product.variants.first.priceV2.amount) : '';
+    final originalPrice = product.variants.isNotEmpty && product.variants.first.compareAtPriceV2 != null
         ? formatIndianCurrency(product.variants.first.compareAtPriceV2!.amount)
         : '';
 
@@ -955,8 +853,7 @@ class _ProductCard extends StatelessWidget {
                           : Container(
                               color: Colors.grey[200],
                               child: const Center(
-                                child: Icon(Icons.image_outlined,
-                                    color: Colors.grey),
+                                child: Icon(Icons.image_outlined, color: Colors.grey),
                               ),
                             ),
                     ),
@@ -966,8 +863,7 @@ class _ProductCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
                           borderRadius: BorderRadius.circular(12),
@@ -988,84 +884,83 @@ class _ProductCard extends StatelessWidget {
 
             // Product info
             Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      product.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
+              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    product.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      product.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF777777),
-                      ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    product.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF777777),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          currentPrice,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (originalPrice.isNotEmpty) ...[
+                        const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            currentPrice,
+                            originalPrice,
                             style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              fontSize: 12,
+                              color: Color(0xFF999999),
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Color(0xFF999999),
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (originalPrice.isNotEmpty) ...[
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              originalPrice,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF999999),
-                                decoration: TextDecoration.lineThrough,
-                                decorationColor: Color(0xFF999999),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                        if (discount > 0) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '-$discount%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
-                  ],
-                ),
+                      if (discount > 0) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '-$discount%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
               ),
+            ),
           ],
         ),
       ),

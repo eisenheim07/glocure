@@ -296,21 +296,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        showDefaultLogo: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Wishlist',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
+      appBar: const CustomAppBar(
+        type: AppBarType.simple,
+        title: 'Wishlist',
       ),
       body: _isLoading || _isRefreshing
           ? _buildShimmerLoading()

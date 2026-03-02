@@ -27,20 +27,9 @@ class PaymentStatusScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
-          showDefaultLogo: false,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => _navigateToHome(context),
-          ),
-          title: const Text(
-            'Payment Status',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          centerTitle: false,
+          type: AppBarType.simple,
+          title: 'Payment Status',
+          onBackPressed: () => _navigateToHome(context),
         ),
         body: SafeArea(
           child: Column(

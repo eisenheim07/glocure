@@ -109,22 +109,9 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
         backgroundColor: Colors.white,
         appBar: widget.showAppBar
             ? CustomAppBar(
-                showDefaultLogo: false,
-                leading: IconButton(
-                  onPressed: _handleAppBarBack,
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                  ),
-                ),
-                title: Text(
-                  widget.title,
-                  style: TextStyle(
-                    fontSize: 18.fSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
+                type: AppBarType.simple,
+                title: widget.title,
+                onBackPressed: _handleAppBarBack,
               )
             : null,
         body: Stack(

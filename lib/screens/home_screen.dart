@@ -110,44 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        actions: [
-          SmartImage(source: ImageConstant.imgGlocureGif, width: 60, height: 28, onTap: () {}),
-          const SizedBox(width: 4),
-          SmartImage(source: ImageConstant.icNotifications, width: 60, height: 28, onTap: () {}),
-          const SizedBox(width: 12),
-          SmartImage(
-              source: ImageConstant.icWishlist,
-              width: 60,
-              height: 28,
-              onTap: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const WishlistScreen(),
-                  ),
-                );
-                // Refresh the home screen after returning from wishlist
-                if (mounted) {
-                  setState(() {
-                    _wishlistRefreshKey++; // Increment to force refresh
-                  });
-                }
-              }),
-          const SizedBox(width: 12),
-          SmartImage(
-              source: ImageConstant.icCart,
-              width: 60,
-              height: 28,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CartScreen(),
-                  ),
-                );
-              }),
-        ],
+      appBar: const CustomAppBar(
+        type: AppBarType.full,
       ),
       body: Column(
         children: [

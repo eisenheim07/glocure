@@ -1,50 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/utils/size_utils.dart';
-
 import '../utils/image_constant.dart';
+import '../widgets/app_image.dart';
+import '../screens/cart_screen.dart';
+import '../screens/wishlist_screen.dart';
+
+/// Custom App Bar with two predefined types:
+/// Type 1 (Full): Logo + Elite Glow GIF + Notifications + Wishlist + Cart
+/// Type 2 (Simple): Back arrow + Title
+enum AppBarType { full, simple }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
+    this.type = AppBarType.full,
     this.title,
-    this.actions,
-    this.leading,
+    this.onBackPressed,
+    this.showBackButton = false, // Show back arrow in full type
     this.backgroundColor = Colors.white,
-    this.foregroundColor,
-    this.showDefaultLogo = true,
-    this.centerTitle = false,
-    this.titleSpacing,
-    this.leadingWidth,
     this.toolbarHeight,
   });
 
-  final Widget? title;
-  final List<Widget>? actions;
-  final Widget? leading;
+  final AppBarType type;
+  final String? title; // Used only for simple type
+  final VoidCallback? onBackPressed; // Custom back action
+  final bool showBackButton; // Show back arrow in full type (except home)
   final Color? backgroundColor;
-  final Color? foregroundColor;
-  final bool showDefaultLogo;
-  final bool centerTitle;
-  final double? titleSpacing;
-  final double? leadingWidth;
   final double? toolbarHeight;
 
   @override
   Widget build(BuildContext context) {
-    Widget? leadingWidget;
-    double? effectiveLeadingWidth;
-
-    if (leading != null) {
-      leadingWidget = leading;
-      effectiveLeadingWidth = leadingWidth ?? 56.h;
-    } else if (showDefaultLogo) {
-      leadingWidget = Container(
-        margin: EdgeInsets.only(left: 16.h),
-        child: Image(image: AssetImage(ImageConstant.imgGlocureLogo), fit: BoxFit.contain),
-      );
-      effectiveLeadingWidth = leadingWidth ?? 140.h;
-    }
-
     return SafeArea(
       bottom: false,
       child: Container(
@@ -57,28 +42,112 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
-        child: AppBar(
-          leadingWidth: effectiveLeadingWidth,
-          toolbarHeight: toolbarHeight ?? 60.h,
-          backgroundColor: Colors.transparent,
-          foregroundColor: foregroundColor,
-          scrolledUnderElevation: 0.0,
-          elevation: 0,
-          title: title,
-          centerTitle: centerTitle,
-          titleSpacing: titleSpacing ?? (showDefaultLogo && leading == null ? 0 : null),
-          leading: leadingWidget,
-          automaticallyImplyLeading: leading == null && !showDefaultLogo,
-          actions: actions != null
-              ? [
-                  Padding(
-                    padding: EdgeInsets.only(right: 16.h),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: actions!),
-                  ),
-                ]
-              : null,
+        child: type == AppBarType.full ? _buildFullAppBar(context) : _buildSimpleAppBar(context),
+      ),
+    );
+  }
+
+  /// Type 1: Full AppBar with logo and action icons
+  Widget _buildFullAppBar(BuildContext context) {
+    return AppBar(
+      leadingWidth: showBackButton ? 56.h : 140.h,
+      toolbarHeight: toolbarHeight ?? 60.h,
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0.0,
+      elevation: 0,
+      titleSpacing: showBackButton ? 0 : 0,
+      leading: showBackButton
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: onBackPressed ?? () => Navigator.pop(context),
+            )
+          : Container(
+              margin: EdgeInsets.only(left: 16.h),
+              child: Image(
+                image: AssetImage(ImageConstant.imgGlocureLogo),
+                fit: BoxFit.contain,
+              ),
+            ),
+      title: showBackButton
+          ? Image.asset(
+              ImageConstant.imgGlocureLogo,
+              height: 40,
+              fit: BoxFit.contain,
+            )
+          : null,
+      automaticallyImplyLeading: false,
+      actions: [
+        SmartImage(
+          source: ImageConstant.imgGlocureGif,
+          width: 60,
+          height: 28,
+          onTap: () {
+            // Elite Glow GIF tap action (currently no action)
+          },
+        ),
+        const SizedBox(width: 4),
+        SmartImage(
+          source: ImageConstant.icNotifications,
+          width: 60,
+          height: 34,
+          onTap: () {
+            // Notifications tap action (currently no action)
+          },
+        ),
+        const SizedBox(width: 12),
+        SmartImage(
+          source: ImageConstant.icWishlist,
+          width: 60,
+          height: 34,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WishlistScreen(),
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 12),
+        SmartImage(
+          source: ImageConstant.icCart,
+          width: 60,
+          height: 34,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CartScreen(),
+              ),
+            );
+          },
+        ),
+        SizedBox(width: 16.h),
+      ],
+    );
+  }
+
+  /// Type 2: Simple AppBar with back arrow and title
+  Widget _buildSimpleAppBar(BuildContext context) {
+    return AppBar(
+      leadingWidth: 56.h,
+      toolbarHeight: toolbarHeight ?? 60.h,
+      backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0.0,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: onBackPressed ?? () => Navigator.pop(context),
+      ),
+      title: Text(
+        title ?? '',
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
         ),
       ),
+      centerTitle: false,
     );
   }
 
