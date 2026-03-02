@@ -9,6 +9,7 @@ import '../models/discounted_products_model.dart';
 import '../models/category_menu_model.dart';
 import '../models/filter_model.dart';
 import '../models/customer_model.dart';
+import '../models/page_model.dart';
 import '../utils/auth_storage.dart';
 
 /// API Service class
@@ -1999,6 +2000,55 @@ class ApiService {
       return updatedCustomer;
     } catch (e) {
       _log('❌ Failed to update default address: $e');
+      rethrow;
+    }
+  }
+
+  /// Get pages (Privacy Policy, Terms & Conditions, etc.)
+  /// Returns a list of pages from Shopify
+  Future<PagesResponse> getPages({int first = 50}) async {
+    try {
+      _log('📄 Fetching pages...');
+
+      const query = r'''
+        query getPages($first: Int!) {
+          pages(first: $first) {
+            edges {
+              node {
+                id
+                title
+                handle
+                body
+                bodySummary
+                createdAt
+                updatedAt
+                onlineStoreUrl
+              }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      ''';
+
+      final variables = {
+        'first': first,
+      };
+
+      final responseData = await _makeGraphQLRequest(
+        query,
+        variables: variables,
+        skipTokenValidation: true, // Public API, no token needed
+      );
+
+      final pagesResponse = PagesResponse.fromJson(responseData['data']);
+      _log('✅ Successfully fetched ${pagesResponse.pages.length} pages');
+
+      return pagesResponse;
+    } catch (e) {
+      _log('❌ Failed to fetch pages: $e');
       rethrow;
     }
   }

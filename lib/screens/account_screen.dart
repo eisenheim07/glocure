@@ -3,6 +3,7 @@ import 'package:glocure/widgets/custom_app_bar.dart';
 import '../utils/auth_storage.dart';
 import '../utils/wishlist_storage.dart';
 import 'address_list_screen.dart';
+import 'disclaimer_screen.dart';
 import 'login_screen.dart';
 import 'main_navigation_screen.dart';
 import 'profile_screen.dart';
@@ -276,19 +277,6 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Privacy Policy
-                _AccountMenuItem(
-                  icon: Icons.lock_outline,
-                  title: 'Privacy Policy',
-                  onTap: () {
-                    // TODO: Navigate to privacy policy screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Privacy Policy - Coming Soon')),
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
-
                 // Help Center
                 _AccountMenuItem(
                   icon: Icons.help_outline,
@@ -297,6 +285,21 @@ class _AccountScreenState extends State<AccountScreen> {
                     // TODO: Navigate to help center screen
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Help Center - Coming Soon')),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+
+                // GloCure Disclaimer
+                _AccountMenuItem(
+                  icon: Icons.lock_outline,
+                  title: 'GloCure Disclaimer',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const DisclaimerScreen(),
+                      ),
                     );
                   },
                 ),

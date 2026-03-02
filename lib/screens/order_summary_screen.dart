@@ -16,6 +16,7 @@ import '../cubits/cart/cart_state.dart';
 import '../screens/payu_payment_screen.dart';
 import '../screens/payment_status_screen.dart';
 import '../models/order_model.dart';
+import 'address_list_screen.dart';
 
 class OrderSummaryScreen extends StatefulWidget {
   final Customer? customer;
@@ -34,7 +35,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   bool _isRefreshing = false; // Track refresh state
   Customer? _customer;
   bool _showAllProducts = false; // Track if user wants to see all products
-  
+
   // Related products state
   bool _isLoadingRelatedProducts = false;
   List<Map<String, dynamic>> _relatedProducts = [];
@@ -227,7 +228,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         debugPrint('Payment method selected: $paymentMethod');
         // Show loading state on order summary screen
         setState(() => _isLoading = true);
-        
+
         try {
           // Create order
           debugPrint('📦 Creating $paymentMethod order...');
@@ -236,14 +237,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             customer: _customer!,
             paymentMethod: paymentMethod,
           );
-          
+
           debugPrint('✅ Order created: ${order.id}');
-          
+
           // Hide loading
           if (mounted) {
             setState(() => _isLoading = false);
           }
-          
+
           // Handle based on payment method
           if (paymentMethod == 'Pre-paid') {
             // Navigate to PayU
@@ -257,7 +258,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   ),
                 ),
               );
-              
+
               _handlePaymentResult(result, order);
             }
           } else {
@@ -293,29 +294,31 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
   void _handlePaymentResult(dynamic result, OrderModel order) async {
     if (result == null || !mounted) return;
-    
+
     final status = result['status']?.toString().toLowerCase() ?? 'cancelled';
-    
+
     // Show shimmer loading on order summary screen
     setState(() => _isLoading = true);
-    
+
     if (status == 'success') {
       // Payment successful - update order status
       debugPrint('✅ Payment successful!');
-      
-      OrderService().updateOrderStatus(
+
+      OrderService()
+          .updateOrderStatus(
         orderId: order.id!,
         financialStatus: 'paid',
-      ).then((_) {
+      )
+          .then((_) {
         debugPrint('✅ Order status updated to paid');
       }).catchError((e) {
         debugPrint('⚠️ Failed to update order status: $e');
       });
     }
-    
+
     // Wait for 2 seconds with shimmer showing
     await Future.delayed(const Duration(seconds: 2));
-    
+
     // Navigate to payment status screen (shimmer will close in background)
     if (mounted) {
       Navigator.pushReplacement(
@@ -355,10 +358,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                         Expanded(
                           child: _buildContent(),
                         ),
-                        
+
                         // Fixed bottom section with total and button
-                        if (cartState is CartSuccess)
-                          _buildBottomSection(cartState.cart),
+                        if (cartState is CartSuccess) _buildBottomSection(cartState.cart),
                       ],
                     );
                   },
@@ -370,10 +372,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
         // Fetch related products when cart is loaded
-        if (cartState is CartSuccess && 
-            !_isLoadingRelatedProducts && 
-            _relatedProducts.isEmpty &&
-            cartState.cart.lines.isNotEmpty) {
+        if (cartState is CartSuccess && !_isLoadingRelatedProducts && _relatedProducts.isEmpty && cartState.cart.lines.isNotEmpty) {
           // Get first product ID from cart
           final firstProduct = cartState.cart.lines.first.merchandise?.product;
           if (firstProduct != null) {
@@ -403,19 +402,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 const SizedBox(height: 16),
 
                 // Cart Products Card
-                if (cartState is CartSuccess)
-                  _buildCartProductsCard(cartState.cart),
+                if (cartState is CartSuccess) _buildCartProductsCard(cartState.cart),
 
-                if (cartState is CartLoading)
-                  _buildCartProductsShimmer(),
+                if (cartState is CartLoading) _buildCartProductsShimmer(),
 
                 const SizedBox(height: 16),
 
                 // Related Products Section
-                if (_isLoadingRelatedProducts)
-                  _buildRelatedProductsShimmer()
-                else if (_relatedProducts.isNotEmpty)
-                  _buildRelatedProductsSection(),
+                if (_isLoadingRelatedProducts) _buildRelatedProductsShimmer() else if (_relatedProducts.isNotEmpty) _buildRelatedProductsSection(),
 
                 const SizedBox(height: 16),
               ],
@@ -574,16 +568,30 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     color: Colors.white,
                     size: 20,
                   ),
-                  onPressed: () {
-                    // TODO: Navigate to edit address screen
-                    debugPrint('Edit address tapped');
+                  onPressed: () async {
+                    // Navigate to address list screen
+                    final updatedCustomer = await Navigator.push<Customer>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddressListScreen(
+                          customer: _customer,
+                          returnSelectedAddress: true,
+                        ),
+                      ),
+                    );
+
+                    // If customer was updated, refresh the screen
+                    if (updatedCustomer != null && mounted) {
+                      setState(() {
+                        _customer = updatedCustomer;
+                      });
+                    }
                   },
                   padding: EdgeInsets.zero,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
           Text(
             fullAddress.isNotEmpty ? fullAddress : 'Address not available',
             style: TextStyle(
@@ -618,10 +626,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Contact Information',
                 style: TextStyle(
                   fontSize: 16,
@@ -629,30 +637,29 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   color: Colors.black,
                 ),
               ),
-              // Edit button
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF5C9A),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.edit_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  onPressed: () {
-                    // TODO: Navigate to edit contact screen
-                    debugPrint('Edit contact tapped');
-                  },
-                  padding: EdgeInsets.zero,
-                ),
-              ),
+              // Edit button for contact info
+              // Container(
+              //   width: 40,
+              //   height: 40,
+              //   decoration: const BoxDecoration(
+              //     color: Color(0xFFFF5C9A),
+              //     shape: BoxShape.circle,
+              //   ),
+              //   child: IconButton(
+              //     icon: const Icon(
+              //       Icons.edit_outlined,
+              //       color: Colors.white,
+              //       size: 20,
+              //     ),
+              //     onPressed: () {
+              //       // TODO: Navigate to edit contact screen
+              //       debugPrint('Edit contact tapped');
+              //     },
+              //     padding: EdgeInsets.zero,
+              //   ),
+              // ),
             ],
           ),
-          const SizedBox(height: 12),
           if (phone.isNotEmpty) ...[
             Text(
               phone,
@@ -662,7 +669,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 4),
           ],
           if (email.isNotEmpty)
             Text(
@@ -772,9 +778,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        _showAllProducts
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
+                        _showAllProducts ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         size: 20,
                       ),
                     ],
@@ -793,9 +797,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     final product = merchandise.product;
     final currentPrice = formatIndianCurrency(merchandise.priceV2.amount);
-    final originalPrice = merchandise.compareAtPriceV2 != null
-        ? formatIndianCurrency(merchandise.compareAtPriceV2!.amount)
-        : '';
+    final originalPrice = merchandise.compareAtPriceV2 != null ? formatIndianCurrency(merchandise.compareAtPriceV2!.amount) : '';
     final discount = _discountPercent(cartLine);
 
     return Container(
@@ -894,8 +896,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     if (discount > 0) ...[
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
                           borderRadius: BorderRadius.circular(3),
@@ -981,7 +982,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     final productId = product['id']?.toString() ?? '';
     final price = product['price'] ?? 0;
     final compareAtPrice = product['compare_at_price'];
-    
+
     // Get image URL - try multiple possible fields
     String imageUrl = '';
     if (product['featured_image'] != null && product['featured_image'].toString().isNotEmpty) {
@@ -991,7 +992,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     } else if (product['images'] != null && product['images'] is List && (product['images'] as List).isNotEmpty) {
       imageUrl = (product['images'] as List).first.toString();
     }
-    
+
     // Ensure image URL is absolute
     if (imageUrl.isNotEmpty && !imageUrl.startsWith('http')) {
       imageUrl = 'https:$imageUrl';
@@ -1001,9 +1002,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     // Format prices
     final currentPrice = formatIndianCurrency((price / 100).toString());
-    final originalPrice = compareAtPrice != null
-        ? formatIndianCurrency((compareAtPrice / 100).toString())
-        : '';
+    final originalPrice = compareAtPrice != null ? formatIndianCurrency((compareAtPrice / 100).toString()) : '';
 
     // Calculate discount
     int discountPercent = 0;
@@ -1282,8 +1281,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -1439,4 +1437,3 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 }
-
