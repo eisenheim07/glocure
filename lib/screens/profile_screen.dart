@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/customer_model.dart';
-import '../services/api_service.dart';
-import '../utils/auth_storage.dart';
+import '../cubits/customer/customer_cubit.dart';
+import '../cubits/customer/customer_state.dart';
 import '../utils/size_utils.dart';
 import '../widgets/custom_app_bar.dart';
 
@@ -14,54 +15,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isLoading = true;
-  Customer? _customer;
-  String? _errorMessage;
-
   @override
   void initState() {
     super.initState();
-    _fetchCustomerData();
-  }
-
-  /// Fetch customer data from API
-  Future<void> _fetchCustomerData() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final token = await AuthStorage.getToken();
-      if (token == null || token.isEmpty) {
-        setState(() {
-          _errorMessage = 'No authentication token found';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final customer = await ApiService().getCustomer(token);
-
-      if (customer == null) {
-        setState(() {
-          _errorMessage = 'Failed to load customer data';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      setState(() {
-        _customer = customer;
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('❌ Error fetching customer data: $e');
-      setState(() {
-        _errorMessage = 'Error: ${e.toString()}';
-        _isLoading = false;
-      });
-    }
+    // Fetch customer data on init
+    context.read<CustomerCubit>().fetchCustomer();
   }
 
   @override
@@ -72,11 +30,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         type: AppBarType.simple,
         title: 'My Profile',
       ),
-      body: _isLoading
-          ? _buildLoadingState()
-          : _errorMessage != null
-              ? _buildErrorState()
-              : _buildProfileContent(),
+      body: BlocBuilder<CustomerCubit, CustomerState>(
+        builder: (context, state) {
+          if (state is CustomerLoading) {
+            return _buildLoadingState();
+          } else if (state is CustomerError) {
+            return _buildErrorState(state.message);
+          } else if (state is CustomerSuccess) {
+            return _buildProfileContent(state.customer);
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
@@ -181,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   /// Build error state
-  Widget _buildErrorState() {
+  Widget _buildErrorState(String errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -195,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _errorMessage ?? 'An error occurred',
+              errorMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -204,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _fetchCustomerData,
+              onPressed: () => context.read<CustomerCubit>().fetchCustomer(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
@@ -222,13 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   /// Build profile content
-  Widget _buildProfileContent() {
-    if (_customer == null) {
-      return const Center(
-        child: Text('No customer data available'),
-      );
-    }
-
+  Widget _buildProfileContent(Customer customer) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -239,82 +198,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // First Name
         _buildTextField(
           label: 'First Name',
-          value: _customer!.firstName,
+          value: customer.firstName,
         ),
         const SizedBox(height: 16),
 
         // Last Name
         _buildTextField(
           label: 'Last Name',
-          value: _customer!.lastName,
+          value: customer.lastName,
         ),
         const SizedBox(height: 16),
 
         // Email
         _buildTextField(
           label: 'Email',
-          value: _customer!.email,
+          value: customer.email,
         ),
         const SizedBox(height: 24),
 
         // Address Information Section (only if defaultAddress exists)
-        if (_customer!.defaultAddress != null) ...[
+        if (customer.defaultAddress != null) ...[
           _buildSectionTitle('Address Information'),
           const SizedBox(height: 16),
 
           // Address Line 1
           _buildTextField(
             label: 'Address Line 1',
-            value: _customer!.defaultAddress!.address1,
+            value: customer.defaultAddress!.address1,
           ),
           const SizedBox(height: 16),
 
           // Address Line 2
           _buildTextField(
             label: 'Address Line 2',
-            value: _customer!.defaultAddress!.address2,
+            value: customer.defaultAddress!.address2,
           ),
           const SizedBox(height: 16),
 
           // City
           _buildTextField(
             label: 'City',
-            value: _customer!.defaultAddress!.city,
+            value: customer.defaultAddress!.city,
           ),
           const SizedBox(height: 16),
 
           // Country
           _buildTextField(
             label: 'Country',
-            value: _customer!.defaultAddress!.country,
+            value: customer.defaultAddress!.country,
           ),
           const SizedBox(height: 16),
 
           // ZIP Code
           _buildTextField(
             label: 'ZIP Code',
-            value: _customer!.defaultAddress!.zip,
+            value: customer.defaultAddress!.zip,
           ),
           const SizedBox(height: 16),
 
           // Company
           _buildTextField(
             label: 'Company',
-            value: _customer!.defaultAddress!.company,
+            value: customer.defaultAddress!.company,
           ),
           const SizedBox(height: 16),
 
           // Province/State
           _buildTextField(
             label: 'Province/State',
-            value: _customer!.defaultAddress!.province,
+            value: customer.defaultAddress!.province,
           ),
           const SizedBox(height: 16),
 
           // Phone
           _buildTextField(
             label: 'Phone',
-            value: _customer!.defaultAddress!.phone,
+            value: customer.defaultAddress!.phone,
           ),
         ],
       ],

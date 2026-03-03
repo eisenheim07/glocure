@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/customer_model.dart';
 import '../services/api_service.dart';
 import '../utils/auth_storage.dart';
 import '../widgets/custom_app_bar.dart';
+import '../cubits/customer/customer_cubit.dart';
+import '../cubits/customer/customer_state.dart';
 import 'address_screen.dart';
 
 class AddressListScreen extends StatefulWidget {
@@ -21,68 +24,25 @@ class AddressListScreen extends StatefulWidget {
 }
 
 class _AddressListScreenState extends State<AddressListScreen> {
-  bool _isLoading = true;
-  Customer? _customer;
-  String? _errorMessage;
   String? _selectedAddressId;
   bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
-    // If customer object is passed, use it directly
+    // If customer object is passed, update cubit with it
     if (widget.customer != null) {
-      _customer = widget.customer;
-      _selectedAddressId = _customer!.defaultAddress?.id;
-      setState(() {
-        _isLoading = false;
-      });
+      context.read<CustomerCubit>().updateCustomer(widget.customer!);
+      _selectedAddressId = widget.customer!.defaultAddress?.id;
     } else {
       // Otherwise fetch from API
-      _fetchCustomerAddresses();
+      context.read<CustomerCubit>().fetchCustomer();
     }
   }
 
-  /// Fetch customer data and addresses from API
-  Future<void> _fetchCustomerAddresses() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final token = await AuthStorage.getToken();
-      if (token == null || token.isEmpty) {
-        setState(() {
-          _errorMessage = 'No authentication token found';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final customer = await ApiService().getCustomer(token);
-
-      if (customer == null) {
-        setState(() {
-          _errorMessage = 'Failed to load customer data';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      setState(() {
-        _customer = customer;
-        // Set default address as selected
-        _selectedAddressId = customer.defaultAddress?.id;
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('❌ Error fetching customer addresses: $e');
-      setState(() {
-        _errorMessage = 'Error: ${e.toString()}';
-        _isLoading = false;
-      });
-    }
+  /// Refresh customer data from API
+  Future<void> _refreshCustomerData() async {
+    await context.read<CustomerCubit>().refreshCustomer();
   }
 
   /// Delete address with confirmation
@@ -243,7 +203,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
       }
 
       // Refresh address list
-      await _fetchCustomerAddresses();
+      await context.read<CustomerCubit>().fetchCustomer();
     } catch (e) {
       debugPrint('❌ Error deleting address: $e');
       if (mounted) {
@@ -272,14 +232,26 @@ class _AddressListScreenState extends State<AddressListScreen> {
         type: AppBarType.simple,
         title: 'My Addresses',
       ),
-      body: Stack(
-        children: [
-          _isLoading || _isDeleting
-              ? _buildLoadingState()
-              : _errorMessage != null
-                  ? _buildErrorState()
-                  : _buildAddressListContent(),
-        ],
+      body: BlocBuilder<CustomerCubit, CustomerState>(
+        builder: (context, state) {
+          if (_isDeleting || state is CustomerLoading) {
+            return _buildLoadingState();
+          }
+
+          if (state is CustomerError) {
+            return _buildErrorState(state.message);
+          }
+
+          if (state is CustomerSuccess) {
+            // Update selected address ID when customer data changes
+            if (_selectedAddressId == null) {
+              _selectedAddressId = state.customer.defaultAddress?.id;
+            }
+            return _buildAddressListContent(state.customer);
+          }
+
+          return _buildLoadingState();
+        },
       ),
     );
   }
@@ -343,7 +315,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   }
 
   /// Build error state
-  Widget _buildErrorState() {
+  Widget _buildErrorState(String errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -357,7 +329,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _errorMessage ?? 'An error occurred',
+              errorMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -366,7 +338,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _fetchCustomerAddresses,
+              onPressed: () => context.read<CustomerCubit>().fetchCustomer(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
@@ -384,18 +356,12 @@ class _AddressListScreenState extends State<AddressListScreen> {
   }
 
   /// Build address list content
-  Widget _buildAddressListContent() {
-    if (_customer == null) {
-      return const Center(
-        child: Text('No customer data available'),
-      );
-    }
-
-    final addresses = _customer!.addresses;
+  Widget _buildAddressListContent(Customer customer) {
+    final addresses = customer.addresses;
 
     // Check if addresses list is empty or invalid
-    if (_isAddressListEmpty(addresses)) {
-      return _buildEmptyState();
+    if (_isAddressListEmpty(customer, addresses)) {
+      return _buildEmptyState(customer);
     }
 
     return Column(
@@ -403,13 +369,13 @@ class _AddressListScreenState extends State<AddressListScreen> {
         Expanded(
           child: RefreshIndicator(
             color: const Color(0xFFFF5C9A),
-            onRefresh: _fetchCustomerAddresses,
+            onRefresh: _refreshCustomerData,
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: addresses.length,
               itemBuilder: (context, index) {
                 final address = addresses[index];
-                final isDefault = address.id == _customer!.defaultAddress?.id;
+                final isDefault = address.id == customer.defaultAddress?.id;
                 final isSelected = address.id == _selectedAddressId;
 
                 return Padding(
@@ -418,6 +384,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     address: address,
                     isDefault: isDefault,
                     isSelected: isSelected,
+                    customer: customer,
                     onTap: () {
                       setState(() {
                         _selectedAddressId = address.id;
@@ -455,7 +422,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => AddressScreen(
-                                  customer: _customer,
+                                  customer: customer,
                                   isAddingNew: true,
                                 ),
                               ),
@@ -463,7 +430,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                             // If address was added successfully, refresh the list
                             if (result == true && mounted) {
-                              _fetchCustomerAddresses();
+                              context.read<CustomerCubit>().fetchCustomer();
                             }
                           },
                           child: Container(
@@ -506,7 +473,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                         child: GestureDetector(
                           onTap: () {
                             // Return updated customer object
-                            Navigator.pop(context, _customer);
+                            Navigator.pop(context, customer);
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -536,7 +503,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => AddressScreen(
-                            customer: _customer,
+                            customer: customer,
                             isAddingNew: true,
                           ),
                         ),
@@ -544,7 +511,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                       // If address was added successfully, refresh the list
                       if (result == true && mounted) {
-                        _fetchCustomerAddresses();
+                        context.read<CustomerCubit>().fetchCustomer();
                       }
                     },
                     child: Container(
@@ -584,14 +551,14 @@ class _AddressListScreenState extends State<AddressListScreen> {
   }
 
   /// Check if address list is empty or invalid
-  bool _isAddressListEmpty(List<CustomerAddress> addresses) {
+  bool _isAddressListEmpty(Customer customer, List<CustomerAddress> addresses) {
     // Check if addresses list is null or empty
     if (addresses.isEmpty) {
       return true;
     }
 
     // Check if default address is null or has empty fields
-    final defaultAddress = _customer!.defaultAddress;
+    final defaultAddress = customer.defaultAddress;
     if (defaultAddress == null) {
       return true;
     }
@@ -619,13 +586,13 @@ class _AddressListScreenState extends State<AddressListScreen> {
   }
 
   /// Build empty state
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(Customer customer) {
     return Column(
       children: [
         Expanded(
           child: RefreshIndicator(
             color: const Color(0xFFFF5C9A),
-            onRefresh: _fetchCustomerAddresses,
+            onRefresh: _refreshCustomerData,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: SizedBox(
@@ -688,7 +655,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => AddressScreen(
-                      customer: _customer,
+                      customer: customer,
                       isAddingNew: true,
                     ),
                   ),
@@ -696,7 +663,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                 // If address was added successfully, refresh the list
                 if (result == true && mounted) {
-                  _fetchCustomerAddresses();
+                  context.read<CustomerCubit>().fetchCustomer();
                 }
               },
               child: Container(
@@ -740,6 +707,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
     required CustomerAddress address,
     required bool isDefault,
     required bool isSelected,
+    required Customer customer,
     required VoidCallback onTap,
   }) {
     // Build full address text
@@ -875,7 +843,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => AddressScreen(
-                                    customer: _customer,
+                                    customer: customer,
                                     existingAddress: address,
                                   ),
                                 ),
@@ -883,7 +851,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                               // If address was updated successfully, refresh the list
                               if (result == true && mounted) {
-                                _fetchCustomerAddresses();
+                                context.read<CustomerCubit>().fetchCustomer();
                               }
                             }
                           : null,

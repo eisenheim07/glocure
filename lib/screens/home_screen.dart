@@ -106,12 +106,20 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Refresh wishlist status for all product cards
+  void _refreshWishlistStatus() {
+    setState(() {
+      _wishlistRefreshKey++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         type: AppBarType.full,
+        onWishlistReturn: _refreshWishlistStatus,
       ),
       body: Column(
         children: [

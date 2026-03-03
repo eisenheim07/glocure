@@ -20,21 +20,23 @@ import '../cubits/top_products/top_products_state.dart';
 import 'category_products.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final TopProduct product;
+  final TopProduct? product;
+  final String? productId;
   final String? handle;
 
   const ProductDetailsScreen({
     super.key,
-    required this.product,
+    this.product,
+    this.productId,
     this.handle,
-  });
+  }) : assert(product != null || productId != null, 'Either product or productId must be provided');
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> with TickerProviderStateMixin {
-  late TopProduct _product;
+  TopProduct? _product;
   bool _isLoading = true;
   int _currentImageIndex = 0;
   int _selectedVariantIndex = 0;
@@ -59,7 +61,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     super.initState();
     _product = widget.product;
     _fetchProductDetails();
-    _checkWishlistStatus();
+    if (_product != null) {
+      _checkWishlistStatus();
+    }
 
     // Initialize heart animation
     _heartAnimationController = AnimationController(
@@ -107,10 +111,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Check if product is in wishlist
   Future<void> _checkWishlistStatus() async {
+    if (_product == null) return;
+    
     setState(() => _isCheckingWishlist = true);
     
     try {
-      final isInWishlist = await WishlistStorage.isInWishlist(_product.id);
+      final isInWishlist = await WishlistStorage.isInWishlist(_product!.id);
       setState(() {
         _isInWishlist = isInWishlist;
         _isCheckingWishlist = false;
@@ -123,13 +129,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Toggle wishlist status
   Future<void> _toggleWishlist() async {
+    if (_product == null) return;
+    
     // Trigger animation
     _heartAnimationController.forward(from: 0.0);
     
     try {
       if (_isInWishlist) {
         // Remove from wishlist
-        final success = await WishlistStorage.removeFromWishlist(_product.id);
+        final success = await WishlistStorage.removeFromWishlist(_product!.id);
         if (success) {
           setState(() => _isInWishlist = false);
           if (mounted) {
@@ -145,8 +153,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         }
       } else {
         // Add to wishlist
-        final variant = _product.variants.isNotEmpty 
-            ? _product.variants[_selectedVariantIndex] 
+        final variant = _product!.variants.isNotEmpty 
+            ? _product!.variants[_selectedVariantIndex] 
             : null;
         
         if (variant == null) {
@@ -174,15 +182,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         }
 
         final wishlistItem = WishlistItem(
-          productId: _product.id,
+          productId: _product!.id,
           variantId: variant.id,
-          productHandle: _product.handle,
+          productHandle: _product!.handle,
           mainHandle: widget.handle ?? 'top-products',
-          title: _product.title,
+          title: _product!.title,
           price: variant.priceV2.amount,
           discountedPrice: variant.compareAtPriceV2?.amount,
           discountPercent: discountPercent,
-          imageUrl: _product.images.isNotEmpty ? _product.images[0].originalSrc : null,
+          imageUrl: _product!.images.isNotEmpty ? _product!.images[0].originalSrc : null,
           addedAt: DateTime.now(),
         );
 
@@ -225,16 +233,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   }
 
   /// Fetch complete product details from Admin API
-  /// Falls back to passed _product object only if API returns null
+  /// Case 1: Product object passed → Fetch fresh data → Fallback to object on error
+  /// Case 2: Product ID only → Fetch data → Show error bottom sheet on failure
   Future<void> _fetchProductDetails() async {
     setState(() => _isLoading = true);
     
     try {
-      // Extract numeric ID from Shopify GID
-      final numericId = _product.id.contains('/') ? _product.id.split('/').last : _product.id;
-      debugPrint('🚀 Fetching complete product details for ID: $numericId');
+      // Determine the product ID to use
+      String productIdToFetch;
+      if (widget.productId != null) {
+        // Case 2: Use provided product ID
+        productIdToFetch = widget.productId!;
+      } else if (_product != null) {
+        // Case 1: Extract numeric ID from existing product's Shopify GID
+        productIdToFetch = _product!.id.contains('/') ? _product!.id.split('/').last : _product!.id;
+      } else {
+        throw Exception('No product ID available');
+      }
 
-      final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$numericId';
+      debugPrint('🚀 Fetching complete product details for ID: $productIdToFetch');
+
+      final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$productIdToFetch';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -295,28 +314,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             }).toList(),
           };
 
-          // Use API data as primary source
-          final updatedProduct = TopProduct(
+          // Create product object from API data
+          final fetchedProduct = TopProduct(
             id: 'gid://shopify/Product/${productJson['id']}',
-            title: productJson['title'] ?? _product.title,
-            description: productJson['body_html'] ?? _product.description,
-            handle: productJson['handle'] ?? _product.handle,
-            images: images.isNotEmpty ? images : _product.images,
-            variants: variants.isNotEmpty ? variants : _product.variants,
-            productType: productJson['product_type'] ?? _product.productType,
-            vendor: productJson['vendor'] ?? _product.vendor,
+            title: productJson['title'] ?? '',
+            description: productJson['body_html'] ?? '',
+            handle: productJson['handle'] ?? '',
+            images: images,
+            variants: variants,
+            productType: productJson['product_type'] ?? '',
+            vendor: productJson['vendor'] ?? '',
             tags: (productJson['tags'] as String? ?? '').split(', ').where((t) => t.isNotEmpty).toList(),
-            createdAt: productJson['created_at'] ?? _product.createdAt,
-            updatedAt: productJson['updated_at'] ?? _product.updatedAt,
-            onlineStoreUrl: _product.onlineStoreUrl,
+            createdAt: productJson['created_at'] ?? '',
+            updatedAt: productJson['updated_at'] ?? '',
+            onlineStoreUrl: null,
           );
 
           if (mounted) {
             setState(() {
-              _product = updatedProduct;
+              _product = fetchedProduct;
               _specifications = specifications;
               _isLoading = false;
             });
+            
+            // Check wishlist status after product is loaded
+            _checkWishlistStatus();
           }
 
           debugPrint('✅ Successfully fetched complete product details from API');
@@ -324,22 +346,126 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         }
       }
 
-      // If API fails or returns no data, use the passed product object
-      debugPrint('⚠️ API returned no data, using passed product object');
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      // API call failed or returned no data
+      throw Exception('Product not found or API error');
+      
     } catch (e) {
       debugPrint('❌ Error fetching product details: $e');
-      // Fall back to passed product object
+      
       if (mounted) {
-        setState(() => _isLoading = false);
+        // Case 1: Product object available → Use fallback data
+        if (widget.product != null && _product != null) {
+          debugPrint('⚠️ Using fallback product object due to API error');
+          setState(() => _isLoading = false);
+          // Check wishlist status with fallback data
+          _checkWishlistStatus();
+        } 
+        // Case 2: Only product ID provided → Show error bottom sheet
+        else {
+          debugPrint('❌ No fallback data available, showing error dialog');
+          setState(() => _isLoading = false);
+          _showErrorBottomSheet();
+        }
       }
     }
   }
 
-  ProductVariant get _selectedVariant => _product.variants.isNotEmpty
-      ? _product.variants[_selectedVariantIndex]
+  /// Show non-cancelable error bottom sheet when product data cannot be loaded
+  /// Only used when no fallback product object is available (Case 2)
+  void _showErrorBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => PopScope(
+        canPop: false,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Error icon
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.error_outline,
+                  size: 32,
+                  color: Colors.red.shade400,
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Error title
+              const Text(
+                'Unable to Load Product',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              
+              const SizedBox(height: 8),
+              
+              // Error message
+              Text(
+                'There might some error while fetching the product details, Our team is working on it.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Okay button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close bottom sheet
+                    Navigator.of(context).pop(); // Go back to previous screen
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF5C9A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Okay',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  ProductVariant get _selectedVariant => _product?.variants.isNotEmpty == true
+      ? _product!.variants[_selectedVariantIndex]
       : ProductVariant(
           id: '',
           title: '',
@@ -373,6 +499,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Add product to cart
   Future<void> _addToCart() async {
+    if (_product == null) return;
+    
     // Trigger cart animation
     _cartAnimationController.forward(from: 0.0);
     
@@ -394,7 +522,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       }
 
       // Get the first variant ID (as per requirement)
-      if (_product.variants.isEmpty) {
+      if (_product!.variants.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -447,12 +575,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         final maxTitleLength = 40; // Approximate character limit for 2 lines
         String message;
         
-        if (_product.title.length > maxTitleLength) {
+        if (_product!.title.length > maxTitleLength) {
           // Truncate and add ellipsis before "added to cart"
-          final truncatedTitle = _product.title.substring(0, maxTitleLength).trim();
+          final truncatedTitle = _product!.title.substring(0, maxTitleLength).trim();
           message = '$truncatedTitle...added to cart';
         } else {
-          message = '${_product.title} added to cart';
+          message = '${_product!.title} added to cart';
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -502,10 +630,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   @override
   Widget build(BuildContext context) {
+    // Show loading shimmer if product is not loaded yet
+    if (_isLoading || _product == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(
+          type: AppBarType.simple,
+          title: 'Product detail',
+        ),
+        body: Column(
+          children: [
+            const SizedBox(height: 10),
+            Expanded(child: _buildLoadingShimmer()),
+            _buildBottomBarShimmer(),
+          ],
+        ),
+      );
+    }
+
     final currentPrice = formatIndianCurrency(_selectedVariant.priceV2.amount);
     final originalPrice = _selectedVariant.compareAtPriceV2 != null ? formatIndianCurrency(_selectedVariant.compareAtPriceV2!.amount) : '';
     final discount = _discountPercent();
-    final description = _cleanDescription(_product.description);
+    final description = _cleanDescription(_product!.description);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -535,7 +681,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                         _isLoading
                             ? _buildTitleShimmer()
                             : Text(
-                                _product.title,
+                                _product!.title,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -556,7 +702,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                         // Variant selector with shimmer
                         if (_isLoading)
                           _buildVariantShimmer()
-                        else if (_product.variants.length > 1)
+                        else if (_product!.variants.length > 1)
                           _buildVariantSelector(),
 
                         // Product Specifications with shimmer
@@ -607,7 +753,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Image carousel with dot indicators and share icon
   Widget _buildImageCarousel() {
-    final images = _product.images;
+    final images = _product!.images;
 
     if (images.isEmpty) {
       return Container(
@@ -659,8 +805,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             right: 12,
             child: GestureDetector(
               onTap: () {
-                final url = _product.onlineStoreUrl ?? 'https://glocure.com/products/${_product.handle}';
-                Clipboard.setData(ClipboardData(text: '${_product.title}\n$url'));
+                final url = _product!.onlineStoreUrl ?? 'https://glocure.com/products/${_product!.handle}';
+                Clipboard.setData(ClipboardData(text: '${_product!.title}\n$url'));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Link copied to clipboard'), duration: Duration(seconds: 2)),
                 );
@@ -775,8 +921,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         Wrap(
           spacing: 10,
           runSpacing: 8,
-          children: List.generate(_product.variants.length, (index) {
-            final variant = _product.variants[index];
+          children: List.generate(_product!.variants.length, (index) {
+            final variant = _product!.variants[index];
             final isSelected = index == _selectedVariantIndex;
 
             return GestureDetector(

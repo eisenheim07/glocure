@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/page_model.dart';
-import '../services/api_service.dart';
+import '../cubits/pages/pages_cubit.dart';
+import '../cubits/pages/pages_state.dart';
 
 class DisclaimerScreen extends StatefulWidget {
   const DisclaimerScreen({super.key});
@@ -11,21 +13,14 @@ class DisclaimerScreen extends StatefulWidget {
 }
 
 class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerProviderStateMixin {
-  bool _isLoading = true;
-  String? _errorMessage;
-  List<PageModel> _pages = [];
   late TabController _tabController;
-
-  // Filter pages by handle
-  PageModel? _privacyPolicy;
-  PageModel? _termsConditions;
-  PageModel? _refundReturns;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _fetchPages();
+    // Fetch pages on init
+    context.read<PagesCubit>().fetchPages();
   }
 
   @override
@@ -34,109 +29,64 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
     super.dispose();
   }
 
-  Future<void> _fetchPages() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final response = await ApiService().getPages(first: 50);
-      _pages = response.pages;
-
-      // Filter pages by handle
-      _privacyPolicy = _pages.firstWhere(
-        (page) => page.handle.toLowerCase().contains('privacy'),
-        orElse: () => PageModel(
-          id: '',
-          title: 'Privacy Policy',
-          handle: 'privacy-policy',
-          body: '<p>Privacy Policy content not available.</p>',
-          bodySummary: '',
-        ),
-      );
-
-      _termsConditions = _pages.firstWhere(
-        (page) => page.handle.toLowerCase().contains('terms') || page.handle.toLowerCase().contains('condition'),
-        orElse: () => PageModel(
-          id: '',
-          title: 'Terms & Conditions',
-          handle: 'terms-conditions',
-          body: '<p>Terms & Conditions content not available.</p>',
-          bodySummary: '',
-        ),
-      );
-
-      _refundReturns = _pages.firstWhere(
-        (page) => page.handle.toLowerCase().contains('refund') || page.handle.toLowerCase().contains('return'),
-        orElse: () => PageModel(
-          id: '',
-          title: 'Refund and Returns Policy',
-          handle: 'refund-returns',
-          body: '<p>Refund and Returns Policy content not available.</p>',
-          bodySummary: '',
-        ),
-      );
-
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('❌ Error fetching pages: $e');
-      setState(() {
-        _errorMessage = 'Error: ${e.toString()}';
-        _isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'GloCure Disclaimer',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: false,
-        bottom: _isLoading || _errorMessage != null
-            ? null
-            : TabBar(
-                controller: _tabController,
-                labelColor: const Color(0xFFFF5C9A),
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: const Color(0xFFFF5C9A),
-                labelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                tabs: const [
-                  Tab(text: 'Privacy Policy'),
-                  Tab(text: 'Terms & Conditions'),
-                  Tab(text: 'Refund & Returns'),
-                ],
+    return BlocBuilder<PagesCubit, PagesState>(
+      builder: (context, state) {
+        final showTabs = state is PagesSuccess;
+
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: const Text(
+              'GloCure Disclaimer',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
               ),
-      ),
-      body: _isLoading
-          ? _buildLoadingState()
-          : _errorMessage != null
-              ? _buildErrorState()
-              : _buildContent(),
+            ),
+            centerTitle: false,
+            bottom: showTabs
+                ? TabBar(
+                    controller: _tabController,
+                    labelColor: const Color(0xFFFF5C9A),
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: const Color(0xFFFF5C9A),
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    tabs: const [
+                      Tab(text: 'Privacy Policy'),
+                      Tab(text: 'Terms & Conditions'),
+                      Tab(text: 'Refund & Returns'),
+                    ],
+                  )
+                : null,
+          ),
+          body: () {
+            if (state is PagesLoading || state is PagesInitial) {
+              return _buildLoadingState();
+            } else if (state is PagesError) {
+              return _buildErrorState(state.message);
+            } else if (state is PagesSuccess) {
+              return _buildContent(state);
+            }
+            return const SizedBox.shrink();
+          }(),
+        );
+      },
     );
   }
 
@@ -196,7 +146,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(String errorMessage) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -210,7 +160,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             ),
             const SizedBox(height: 16),
             Text(
-              _errorMessage ?? 'An error occurred',
+              errorMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -219,7 +169,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _fetchPages,
+              onPressed: () => context.read<PagesCubit>().fetchPages(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
@@ -236,13 +186,13 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(PagesSuccess state) {
     return TabBarView(
       controller: _tabController,
       children: [
-        _buildPageContent(_privacyPolicy),
-        _buildPageContent(_termsConditions),
-        _buildPageContent(_refundReturns),
+        _buildPageContent(state.privacyPolicy),
+        _buildPageContent(state.termsConditions),
+        _buildPageContent(state.refundReturns),
       ],
     );
   }
@@ -288,7 +238,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
   String _stripHtmlTags(String htmlString) {
     // Remove HTML tags
     String text = htmlString.replaceAll(RegExp(r'<[^>]*>'), '');
-    
+
     // Decode HTML entities
     text = text
         .replaceAll('&nbsp;', ' ')
@@ -303,11 +253,11 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
         .replaceAll('<br />', '\n')
         .replaceAll('</p>', '\n\n')
         .replaceAll('</div>', '\n\n');
-    
+
     // Clean up extra whitespace
     text = text.replaceAll(RegExp(r'\n\s*\n\s*\n'), '\n\n');
     text = text.trim();
-    
+
     return text;
   }
 }

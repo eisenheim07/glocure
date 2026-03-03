@@ -19,6 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton = false, // Show back arrow in full type
     this.backgroundColor = Colors.white,
     this.toolbarHeight,
+    this.onWishlistReturn, // Callback when returning from wishlist
   });
 
   final AppBarType type;
@@ -27,6 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton; // Show back arrow in full type (except home)
   final Color? backgroundColor;
   final double? toolbarHeight;
+  final VoidCallback? onWishlistReturn; // Callback when returning from wishlist
 
   @override
   Widget build(BuildContext context) {
@@ -99,13 +101,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           source: ImageConstant.icWishlist,
           width: 60,
           height: 34,
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => const WishlistScreen(),
               ),
             );
+            // Notify parent that we returned from wishlist
+            onWishlistReturn?.call();
           },
         ),
         const SizedBox(width: 12),

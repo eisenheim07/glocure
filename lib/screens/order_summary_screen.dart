@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:glocure/screens/product_details_screen.dart';
 import 'package:shimmer/shimmer.dart';
-import 'dart:convert';
 import '../models/customer_model.dart';
 import '../models/cart_model.dart';
+import '../models/top_products_model.dart';
 import '../services/api_service.dart';
 import '../services/order_service.dart';
-import '../utils/auth_storage.dart';
 import '../utils/format_utils.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/payment_selection_bottom_sheet.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
+import '../cubits/customer/customer_cubit.dart';
+import '../cubits/customer/customer_state.dart';
 import '../screens/payu_payment_screen.dart';
 import '../screens/payment_status_screen.dart';
 import '../models/order_model.dart';
@@ -33,7 +35,6 @@ class OrderSummaryScreen extends StatefulWidget {
 class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   bool _isLoading = true;
   bool _isRefreshing = false; // Track refresh state
-  Customer? _customer;
   bool _showAllProducts = false; // Track if user wants to see all products
 
   // Related products state
@@ -55,32 +56,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
       // If customer object is passed, use it
       if (widget.customer != null) {
-        _customer = widget.customer;
-        debugPrint('Customer object from previous screen:');
-        debugPrint(jsonEncode({
-          'id': _customer?.id,
-          'firstName': _customer?.firstName,
-          'lastName': _customer?.lastName,
-          'email': _customer?.email,
-          'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null
-              ? {
-                  'id': _customer?.defaultAddress?.id,
-                  'firstName': _customer?.defaultAddress?.firstName,
-                  'lastName': _customer?.defaultAddress?.lastName,
-                  'address1': _customer?.defaultAddress?.address1,
-                  'address2': _customer?.defaultAddress?.address2,
-                  'city': _customer?.defaultAddress?.city,
-                  'province': _customer?.defaultAddress?.province,
-                  'country': _customer?.defaultAddress?.country,
-                  'zip': _customer?.defaultAddress?.zip,
-                  'phone': _customer?.defaultAddress?.phone,
-                }
-              : null,
-        }));
+        context.read<CustomerCubit>().updateCustomer(widget.customer!);
       } else {
         // Fetch customer data
-        await _fetchCustomerData();
+        await context.read<CustomerCubit>().fetchCustomer();
       }
     } catch (e) {
       debugPrint('Error initializing screen: $e');
@@ -110,55 +89,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     }
   }
 
-  Future<void> _fetchCustomerData() async {
-    try {
-      final token = await AuthStorage.getToken();
-      if (token == null || token.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please login first')),
-          );
-          Navigator.pop(context);
-        }
-        return;
-      }
-
-      _customer = await ApiService().getCustomer(token);
-
-      if (_customer != null) {
-        debugPrint('Customer object from API:');
-        debugPrint(jsonEncode({
-          'id': _customer?.id,
-          'firstName': _customer?.firstName,
-          'lastName': _customer?.lastName,
-          'email': _customer?.email,
-          'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null
-              ? {
-                  'id': _customer?.defaultAddress?.id,
-                  'firstName': _customer?.defaultAddress?.firstName,
-                  'lastName': _customer?.defaultAddress?.lastName,
-                  'address1': _customer?.defaultAddress?.address1,
-                  'address2': _customer?.defaultAddress?.address2,
-                  'city': _customer?.defaultAddress?.city,
-                  'province': _customer?.defaultAddress?.province,
-                  'country': _customer?.defaultAddress?.country,
-                  'zip': _customer?.defaultAddress?.zip,
-                  'phone': _customer?.defaultAddress?.phone,
-                }
-              : null,
-        }));
-      }
-    } catch (e) {
-      debugPrint('Error fetching customer: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading data: $e')),
-        );
-      }
-    }
-  }
-
   Future<void> _handleRefresh() async {
     setState(() => _isRefreshing = true);
 
@@ -167,7 +97,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       await context.read<CartCubit>().refreshCart();
 
       // Refresh customer data
-      await _fetchCustomerData();
+      await context.read<CustomerCubit>().refreshCustomer();
 
       // Refresh related products if cart has items
       final cartState = context.read<CartCubit>().state;
@@ -184,19 +114,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     }
   }
 
-  void _handleProceedToPay(BuildContext context, Cart cart) {
+  void _handleProceedToPay(BuildContext context, Cart cart, Customer customer) {
     // Validate customer and address
-    if (_customer == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please login to continue'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    final defaultAddress = _customer?.defaultAddress;
+    final defaultAddress = customer.defaultAddress;
     if (defaultAddress == null || defaultAddress.zip == null || defaultAddress.zip!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -223,7 +143,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       context,
       pincode: defaultAddress.zip!,
       cart: cart,
-      customer: _customer!,
+      customer: customer,
       onPaymentSelected: (paymentMethod) async {
         debugPrint('Payment method selected: $paymentMethod');
         // Show loading state on order summary screen
@@ -234,7 +154,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           debugPrint('📦 Creating $paymentMethod order...');
           final order = await OrderService().createOrder(
             cart: cart,
-            customer: _customer!,
+            customer: customer,
             paymentMethod: paymentMethod,
           );
 
@@ -254,7 +174,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 MaterialPageRoute(
                   builder: (context) => PayUPaymentScreen(
                     order: order,
-                    customer: _customer!,
+                    customer: customer,
                   ),
                 ),
               );
@@ -346,29 +266,43 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         type: AppBarType.simple,
         title: 'Order Summary',
       ),
-      body: _isLoading || _isRefreshing
-          ? _buildLoadingShimmer()
-          : _customer == null
-              ? _buildErrorState()
-              : BlocBuilder<CartCubit, CartState>(
-                  builder: (context, cartState) {
-                    return Column(
-                      children: [
-                        // Scrollable content
-                        Expanded(
-                          child: _buildContent(),
-                        ),
+      body: BlocBuilder<CustomerCubit, CustomerState>(
+        builder: (context, customerState) {
+          if (_isLoading || _isRefreshing || customerState is CustomerLoading) {
+            return _buildLoadingShimmer();
+          }
 
-                        // Fixed bottom section with total and button
-                        if (cartState is CartSuccess) _buildBottomSection(cartState.cart),
-                      ],
-                    );
-                  },
-                ),
+          if (customerState is CustomerError) {
+            return _buildErrorState();
+          }
+
+          if (customerState is! CustomerSuccess) {
+            return _buildLoadingShimmer();
+          }
+
+          final customer = customerState.customer;
+
+          return BlocBuilder<CartCubit, CartState>(
+            builder: (context, cartState) {
+              return Column(
+                children: [
+                  // Scrollable content
+                  Expanded(
+                    child: _buildContent(customer),
+                  ),
+
+                  // Fixed bottom section with total and button
+                  if (cartState is CartSuccess) _buildBottomSection(cartState.cart, customer),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(Customer customer) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
         // Fetch related products when cart is loaded
@@ -392,12 +326,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Shipping Address Card
-                _buildShippingAddressCard(),
+                _buildShippingAddressCard(customer),
 
                 const SizedBox(height: 16),
 
                 // Contact Information Card
-                _buildContactInformationCard(),
+                _buildContactInformationCard(customer),
 
                 const SizedBox(height: 16),
 
@@ -420,7 +354,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildBottomSection(Cart cart) {
+  Widget _buildBottomSection(Cart cart, Customer customer) {
     final totalAmount = cart.cost?.totalAmount.amount ?? '0';
     final formattedTotal = formatIndianCurrency(totalAmount);
 
@@ -471,7 +405,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () => _handleProceedToPay(context, cart),
+                onPressed: () => _handleProceedToPay(context, cart, customer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,
@@ -502,8 +436,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildShippingAddressCard() {
-    final defaultAddr = _customer?.defaultAddress;
+  Widget _buildShippingAddressCard(Customer customer) {
+    final defaultAddr = customer.defaultAddress;
 
     if (defaultAddr == null) {
       return _buildEmptyCard('Shipping Address', 'No address available');
@@ -574,17 +508,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => AddressListScreen(
-                          customer: _customer,
+                          customer: customer,
                           returnSelectedAddress: true,
                         ),
                       ),
                     );
 
-                    // If customer was updated, refresh the screen
+                    // If customer was updated, refresh the cubit
                     if (updatedCustomer != null && mounted) {
-                      setState(() {
-                        _customer = updatedCustomer;
-                      });
+                      context.read<CustomerCubit>().updateCustomer(updatedCustomer);
                     }
                   },
                   padding: EdgeInsets.zero,
@@ -605,12 +537,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildContactInformationCard() {
-    final firstName = _customer?.firstName ?? '';
-    final lastName = _customer?.lastName ?? '';
+  Widget _buildContactInformationCard(Customer customer) {
+    final firstName = customer.firstName ?? '';
+    final lastName = customer.lastName ?? '';
     final fullName = '$firstName $lastName'.trim();
-    final email = _customer?.email ?? '';
-    final phone = _customer?.defaultAddress?.phone ?? _customer?.phone ?? '';
+    final email = customer.email ?? '';
+    final phone = customer.defaultAddress?.phone ?? customer.phone ?? '';
 
     return Container(
       width: double.infinity,
@@ -1011,9 +943,23 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     }
 
     return GestureDetector(
-      onTap: () {
-        // TODO: Navigate to product details
+      onTap: () async {
+        // Navigate to product details using productId
         debugPrint('Product tapped: $productId');
+        debugPrint('Product tapped: $product');
+
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailsScreen(productId: productId),
+          ),
+        );
+
+        // Refresh cart data when returning from product details
+        // This ensures newly added items are visible in the cart
+        if (mounted) {
+          await _handleRefresh();
+        }
       },
       child: Container(
         width: 160,
