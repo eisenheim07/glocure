@@ -1,22 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
-import '../config/api_config.dart';
 import '../models/top_products_model.dart';
-import '../models/wishlist_item_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
 import '../utils/auth_storage.dart';
-import '../utils/wishlist_storage.dart';
 import '../services/api_service.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/custom_app_bar.dart';
 import '../cubits/top_products/top_products_cubit.dart';
 import '../cubits/top_products/top_products_state.dart';
+import '../cubits/product_details/product_details_cubit.dart';
+import '../cubits/product_details/product_details_state.dart';
 import 'category_products.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -36,22 +32,13 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> with TickerProviderStateMixin {
-  TopProduct? _product;
-  bool _isLoading = true;
-  int _currentImageIndex = 0;
-  int _selectedVariantIndex = 0;
-  Map<String, dynamic>? _specifications;
   late String discoverHandle;
   final PageController _pageController = PageController();
-  
-  // Wishlist state
-  bool _isInWishlist = false;
-  bool _isCheckingWishlist = true;
-  
+
   // Animation controller for heart icon
   late AnimationController _heartAnimationController;
   late Animation<double> _heartScaleAnimation;
-  
+
   // Animation controller for cart icon
   late AnimationController _cartAnimationController;
   late Animation<double> _cartScaleAnimation;
@@ -59,46 +46,44 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   @override
   void initState() {
     super.initState();
-    _product = widget.product;
-    _fetchProductDetails();
-    if (_product != null) {
-      _checkWishlistStatus();
-    }
+
+    // Initialize product details via Cubit
+    context.read<ProductDetailsCubit>().initializeProduct(
+          product: widget.product,
+          productId: widget.productId,
+          handle: widget.handle,
+        );
 
     // Initialize heart animation
     _heartAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _heartScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.4)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(begin: 1.0, end: 1.4).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.4, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(begin: 1.4, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_heartAnimationController);
-    
+
     // Initialize cart animation
     _cartAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _cartScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.3)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(begin: 1.0, end: 1.3).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.3, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(begin: 1.3, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_cartAnimationController);
@@ -109,118 +94,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     context.read<TopProductsCubit>().fetchProductsForHandle(discoverHandle);
   }
 
-  /// Check if product is in wishlist
-  Future<void> _checkWishlistStatus() async {
-    if (_product == null) return;
-    
-    setState(() => _isCheckingWishlist = true);
-    
-    try {
-      final isInWishlist = await WishlistStorage.isInWishlist(_product!.id);
-      setState(() {
-        _isInWishlist = isInWishlist;
-        _isCheckingWishlist = false;
-      });
-    } catch (e) {
-      debugPrint('Error checking wishlist status: $e');
-      setState(() => _isCheckingWishlist = false);
-    }
-  }
-
   /// Toggle wishlist status
   Future<void> _toggleWishlist() async {
-    if (_product == null) return;
-    
     // Trigger animation
     _heartAnimationController.forward(from: 0.0);
-    
-    try {
-      if (_isInWishlist) {
-        // Remove from wishlist
-        final success = await WishlistStorage.removeFromWishlist(_product!.id);
-        if (success) {
-          setState(() => _isInWishlist = false);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Removed from wishlist'),
-                backgroundColor: Colors.orange,
-                behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-        }
-      } else {
-        // Add to wishlist
-        final variant = _product!.variants.isNotEmpty 
-            ? _product!.variants[_selectedVariantIndex] 
-            : null;
-        
-        if (variant == null) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Product variant not available'),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-          return;
-        }
 
-        // Calculate discount
-        int? discountPercent;
-        if (variant.compareAtPriceV2 != null) {
-          final compareAt = double.tryParse(variant.compareAtPriceV2!.amount) ?? 0;
-          final price = double.tryParse(variant.priceV2.amount) ?? 0;
-          if (compareAt > 0 && price < compareAt) {
-            discountPercent = ((compareAt - price) / compareAt * 100).round();
-          }
-        }
+    // Use Cubit to handle wishlist toggle
+    await context.read<ProductDetailsCubit>().toggleWishlist(widget.handle);
 
-        final wishlistItem = WishlistItem(
-          productId: _product!.id,
-          variantId: variant.id,
-          productHandle: _product!.handle,
-          mainHandle: widget.handle ?? 'top-products',
-          title: _product!.title,
-          price: variant.priceV2.amount,
-          discountedPrice: variant.compareAtPriceV2?.amount,
-          discountPercent: discountPercent,
-          imageUrl: _product!.images.isNotEmpty ? _product!.images[0].originalSrc : null,
-          addedAt: DateTime.now(),
-        );
-
-        final success = await WishlistStorage.addToWishlist(wishlistItem);
-        if (success) {
-          setState(() => _isInWishlist = true);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Added to wishlist'),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error toggling wishlist: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+    // Show appropriate snackbar based on current state
+    final currentState = context.read<ProductDetailsCubit>().state;
+    if (currentState is ProductDetailsLoaded && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(currentState.isInWishlist ? 'Added to wishlist' : 'Removed from wishlist'),
+          backgroundColor: currentState.isInWishlist ? Colors.green : Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -230,144 +122,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     _heartAnimationController.dispose();
     _cartAnimationController.dispose();
     super.dispose();
-  }
-
-  /// Fetch complete product details from Admin API
-  /// Case 1: Product object passed → Fetch fresh data → Fallback to object on error
-  /// Case 2: Product ID only → Fetch data → Show error bottom sheet on failure
-  Future<void> _fetchProductDetails() async {
-    setState(() => _isLoading = true);
-    
-    try {
-      // Determine the product ID to use
-      String productIdToFetch;
-      if (widget.productId != null) {
-        // Case 2: Use provided product ID
-        productIdToFetch = widget.productId!;
-      } else if (_product != null) {
-        // Case 1: Extract numeric ID from existing product's Shopify GID
-        productIdToFetch = _product!.id.contains('/') ? _product!.id.split('/').last : _product!.id;
-      } else {
-        throw Exception('No product ID available');
-      }
-
-      debugPrint('🚀 Fetching complete product details for ID: $productIdToFetch');
-
-      final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$productIdToFetch';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'X-Shopify-Access-Token': ApiConfig.shopifyAdminAccessToken,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-        final productsJson = responseData['products'] as List<dynamic>? ?? [];
-
-        if (productsJson.isNotEmpty) {
-          final productJson = productsJson.first as Map<String, dynamic>;
-
-          // Parse all product details from API
-          final images = (productJson['images'] as List<dynamic>? ?? [])
-              .map((img) => ProductImage(
-                    originalSrc: img['src'] ?? '',
-                    altText: img['alt'] as String?,
-                  ))
-              .toList();
-
-          final variants = (productJson['variants'] as List<dynamic>? ?? [])
-              .map((v) => ProductVariant(
-                    id: 'gid://shopify/ProductVariant/${v['id']}',
-                    title: v['title'] ?? '',
-                    sku: v['sku'] as String?,
-                    priceV2: Money(
-                      amount: v['price']?.toString() ?? '0',
-                      currencyCode: 'INR',
-                    ),
-                    compareAtPriceV2: v['compare_at_price'] != null
-                        ? Money(
-                            amount: v['compare_at_price'].toString(),
-                            currencyCode: 'INR',
-                          )
-                        : null,
-                    availableForSale: v['available'] ?? false,
-                  ))
-              .toList();
-
-          // Extract specifications
-          final specifications = <String, dynamic>{
-            'options': productJson['options'] ?? [],
-            'variants': (productJson['variants'] as List<dynamic>? ?? []).map((v) {
-              return {
-                'id': v['id'],
-                'title': v['title'],
-                'weight': v['weight'],
-                'weight_unit': v['weight_unit'],
-                'inventory_quantity': v['inventory_quantity'],
-                'option1': v['option1'],
-                'option2': v['option2'],
-                'option3': v['option3'],
-                'sku': v['sku'],
-                'barcode': v['barcode'],
-              };
-            }).toList(),
-          };
-
-          // Create product object from API data
-          final fetchedProduct = TopProduct(
-            id: 'gid://shopify/Product/${productJson['id']}',
-            title: productJson['title'] ?? '',
-            description: productJson['body_html'] ?? '',
-            handle: productJson['handle'] ?? '',
-            images: images,
-            variants: variants,
-            productType: productJson['product_type'] ?? '',
-            vendor: productJson['vendor'] ?? '',
-            tags: (productJson['tags'] as String? ?? '').split(', ').where((t) => t.isNotEmpty).toList(),
-            createdAt: productJson['created_at'] ?? '',
-            updatedAt: productJson['updated_at'] ?? '',
-            onlineStoreUrl: null,
-          );
-
-          if (mounted) {
-            setState(() {
-              _product = fetchedProduct;
-              _specifications = specifications;
-              _isLoading = false;
-            });
-            
-            // Check wishlist status after product is loaded
-            _checkWishlistStatus();
-          }
-
-          debugPrint('✅ Successfully fetched complete product details from API');
-          return;
-        }
-      }
-
-      // API call failed or returned no data
-      throw Exception('Product not found or API error');
-      
-    } catch (e) {
-      debugPrint('❌ Error fetching product details: $e');
-      
-      if (mounted) {
-        // Case 1: Product object available → Use fallback data
-        if (widget.product != null && _product != null) {
-          debugPrint('⚠️ Using fallback product object due to API error');
-          setState(() => _isLoading = false);
-          // Check wishlist status with fallback data
-          _checkWishlistStatus();
-        } 
-        // Case 2: Only product ID provided → Show error bottom sheet
-        else {
-          debugPrint('❌ No fallback data available, showing error dialog');
-          setState(() => _isLoading = false);
-          _showErrorBottomSheet();
-        }
-      }
-    }
   }
 
   /// Show non-cancelable error bottom sheet when product data cannot be loaded
@@ -402,9 +156,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                   color: Colors.red.shade400,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Error title
               const Text(
                 'Unable to Load Product',
@@ -415,9 +169,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Error message
               Text(
                 'There might some error while fetching the product details, Our team is working on it.',
@@ -428,9 +182,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Okay button
               SizedBox(
                 width: double.infinity,
@@ -464,19 +218,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     );
   }
 
-  ProductVariant get _selectedVariant => _product?.variants.isNotEmpty == true
-      ? _product!.variants[_selectedVariantIndex]
-      : ProductVariant(
-          id: '',
-          title: '',
-          sku: null,
-          priceV2: Money(amount: '0', currencyCode: 'INR'),
-          compareAtPriceV2: null,
-          availableForSale: false,
-        );
+  /// Get selected variant from current state
+  ProductVariant _getSelectedVariant(ProductDetailsLoaded state) {
+    return state.product.variants.isNotEmpty
+        ? state.product.variants[state.selectedVariantIndex]
+        : ProductVariant(
+            id: '',
+            title: '',
+            sku: null,
+            priceV2: Money(amount: '0', currencyCode: 'INR'),
+            compareAtPriceV2: null,
+            availableForSale: false,
+          );
+  }
 
-  int _discountPercent() {
-    final variant = _selectedVariant;
+  /// Calculate discount percentage for a variant
+  int _calculateDiscountPercent(ProductVariant variant) {
     if (variant.compareAtPriceV2 == null) return 0;
     final compareAt = double.tryParse(variant.compareAtPriceV2!.amount) ?? 0;
     final price = double.tryParse(variant.priceV2.amount) ?? 0;
@@ -499,15 +256,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Add product to cart
   Future<void> _addToCart() async {
-    if (_product == null) return;
-    
+    final currentState = context.read<ProductDetailsCubit>().state;
+    if (currentState is! ProductDetailsLoaded) return;
+
     // Trigger cart animation
     _cartAnimationController.forward(from: 0.0);
-    
+
     try {
       // Get cart ID from preferences
       final cartId = await AuthStorage.getCartId();
-      
+
       if (cartId == null || cartId.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -521,8 +279,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         return;
       }
 
-      // Get the first variant ID (as per requirement)
-      if (_product!.variants.isEmpty) {
+      // Get the selected variant
+      if (currentState.product.variants.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -535,7 +293,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         return;
       }
 
-      final variantId = _selectedVariant.id;
+      final selectedVariant = _getSelectedVariant(currentState);
+      final variantId = selectedVariant.id;
 
       // Show loading indicator
       if (mounted) {
@@ -570,19 +329,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       // Hide loading and show success
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
-        
+
         // Format message: truncate title if needed and always end with "...added to cart"
         final maxTitleLength = 40; // Approximate character limit for 2 lines
         String message;
-        
-        if (_product!.title.length > maxTitleLength) {
+
+        if (currentState.product.title.length > maxTitleLength) {
           // Truncate and add ellipsis before "added to cart"
-          final truncatedTitle = _product!.title.substring(0, maxTitleLength).trim();
+          final truncatedTitle = currentState.product.title.substring(0, maxTitleLength).trim();
           message = '$truncatedTitle...added to cart';
         } else {
-          message = '${_product!.title} added to cart';
+          message = '${currentState.product.title} added to cart';
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -630,108 +389,117 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   @override
   Widget build(BuildContext context) {
-    // Show loading shimmer if product is not loaded yet
-    if (_isLoading || _product == null) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: const CustomAppBar(
-          type: AppBarType.simple,
-          title: 'Product detail',
-        ),
-        body: Column(
-          children: [
-            const SizedBox(height: 10),
-            Expanded(child: _buildLoadingShimmer()),
-            _buildBottomBarShimmer(),
-          ],
-        ),
-      );
-    }
-
-    final currentPrice = formatIndianCurrency(_selectedVariant.priceV2.amount);
-    final originalPrice = _selectedVariant.compareAtPriceV2 != null ? formatIndianCurrency(_selectedVariant.compareAtPriceV2!.amount) : '';
-    final discount = _discountPercent();
-    final description = _cleanDescription(_product!.description);
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'Product detail',
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image carousel with shimmer
-                  _isLoading ? _buildImageShimmer() : _buildImageCarousel(),
+      body: BlocConsumer<ProductDetailsCubit, ProductDetailsState>(
+        listener: (context, state) {
+          // Handle error state by showing error bottom sheet
+          if (state is ProductDetailsError && !state.hasProductFallback) {
+            _showErrorBottomSheet();
+          }
+        },
+        builder: (context, state) {
+          if (state is ProductDetailsLoading) {
+            return Column(
+              children: [
+                const SizedBox(height: 10),
+                Expanded(child: _buildLoadingShimmer()),
+                _buildBottomBarShimmer(),
+              ],
+            );
+          }
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
+          if (state is ProductDetailsLoaded) {
+            return _buildProductContent(state);
+          }
 
-                        // Product title with shimmer
-                        _isLoading
-                            ? _buildTitleShimmer()
-                            : Text(
-                                _product!.title,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                  height: 1.3,
-                                ),
-                              ),
+          // Error state with fallback or initial state
+          return Column(
+            children: [
+              const SizedBox(height: 10),
+              Expanded(child: _buildLoadingShimmer()),
+              _buildBottomBarShimmer(),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
-                        const SizedBox(height: 12),
+  /// Build the main product content when data is loaded
+  Widget _buildProductContent(ProductDetailsLoaded state) {
+    final selectedVariant = _getSelectedVariant(state);
+    final currentPrice = formatIndianCurrency(selectedVariant.priceV2.amount);
+    final originalPrice = selectedVariant.compareAtPriceV2 != null ? formatIndianCurrency(selectedVariant.compareAtPriceV2!.amount) : '';
+    final discount = _calculateDiscountPercent(selectedVariant);
+    final description = _cleanDescription(state.product.description);
 
-                        // Pricing row with shimmer
-                        _isLoading
-                            ? _buildPriceShimmer()
-                            : _buildPricingRow(currentPrice, originalPrice, discount),
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image carousel
+                _buildImageCarousel(state),
 
-                        const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
 
-                        // Variant selector with shimmer
-                        if (_isLoading)
-                          _buildVariantShimmer()
-                        else if (_product!.variants.length > 1)
-                          _buildVariantSelector(),
+                      // Product title
+                      Text(
+                        state.product.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                          height: 1.3,
+                        ),
+                      ),
 
-                        // Product Specifications with shimmer
-                        _isLoading ? _buildSpecificationsShimmer() : _buildSpecificationsSection(),
+                      const SizedBox(height: 12),
 
-                        // Description with shimmer
-                        if (_isLoading)
-                          _buildDescriptionShimmer()
-                        else if (description.isNotEmpty)
-                          _buildDescription(description),
+                      // Pricing row
+                      _buildPricingRow(currentPrice, originalPrice, discount),
 
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                      const SizedBox(height: 12),
+
+                      // Variant selector
+                      if (state.product.variants.length > 1) _buildVariantSelector(state),
+
+                      // Product Specifications
+                      _buildSpecificationsSection(state),
+
+                      // Description
+                      if (description.isNotEmpty) _buildDescription(description),
+
+                      const SizedBox(height: 20),
+                    ],
                   ),
+                ),
 
-                  // Discover Products Section
-                  _buildDiscoverSection(),
+                // Discover Products Section
+                _buildDiscoverSection(),
 
-                  const SizedBox(height: 20),
-                ],
-              ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
+        ),
 
-          // Bottom "Add to Cart" button
-          _isLoading ? _buildBottomBarShimmer() : _buildBottomBar(),
-        ],
-      ),
+        // Bottom "Add to Cart" button
+        _buildBottomBar(state, selectedVariant),
+      ],
     );
   }
 
@@ -752,8 +520,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   }
 
   /// Image carousel with dot indicators and share icon
-  Widget _buildImageCarousel() {
-    final images = _product!.images;
+  Widget _buildImageCarousel(ProductDetailsLoaded state) {
+    final images = state.product.images;
 
     if (images.isEmpty) {
       return Container(
@@ -786,7 +554,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               controller: _pageController,
               itemCount: images.length,
               onPageChanged: (index) {
-                setState(() => _currentImageIndex = index);
+                context.read<ProductDetailsCubit>().updateImageIndex(index);
               },
               itemBuilder: (context, index) {
                 return NetworkImageLoader(
@@ -805,8 +573,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             right: 12,
             child: GestureDetector(
               onTap: () {
-                final url = _product!.onlineStoreUrl ?? 'https://glocure.com/products/${_product!.handle}';
-                Clipboard.setData(ClipboardData(text: '${_product!.title}\n$url'));
+                final url = state.product.onlineStoreUrl ?? 'https://glocure.com/products/${state.product.handle}';
+                Clipboard.setData(ClipboardData(text: '${state.product.title}\n$url'));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Link copied to clipboard'), duration: Duration(seconds: 2)),
                 );
@@ -838,7 +606,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(images.length, (index) {
-                  final isActive = index == _currentImageIndex;
+                  final isActive = index == state.currentImageIndex;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -905,7 +673,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   }
 
   /// Variant selector with horizontal chips
-  Widget _buildVariantSelector() {
+  Widget _buildVariantSelector(ProductDetailsLoaded state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -921,13 +689,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         Wrap(
           spacing: 10,
           runSpacing: 8,
-          children: List.generate(_product!.variants.length, (index) {
-            final variant = _product!.variants[index];
-            final isSelected = index == _selectedVariantIndex;
+          children: List.generate(state.product.variants.length, (index) {
+            final variant = state.product.variants[index];
+            final isSelected = index == state.selectedVariantIndex;
 
             return GestureDetector(
               onTap: () {
-                setState(() => _selectedVariantIndex = index);
+                context.read<ProductDetailsCubit>().updateVariantIndex(index);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -957,22 +725,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   }
 
   /// Product Specifications Section
-  Widget _buildSpecificationsSection() {
-    if (_specifications == null) {
+  Widget _buildSpecificationsSection(ProductDetailsLoaded state) {
+    if (state.specifications == null) {
       return const SizedBox.shrink();
     }
 
-    final options = _specifications!['options'] as List<dynamic>? ?? [];
-    final variants = _specifications!['variants'] as List<dynamic>? ?? [];
-    
+    final options = state.specifications!['options'] as List<dynamic>? ?? [];
+    final variants = state.specifications!['variants'] as List<dynamic>? ?? [];
+
     if (options.isEmpty && variants.isEmpty) {
       return const SizedBox.shrink();
     }
 
     // Get current variant specs
-    final currentVariantSpec = variants.isNotEmpty && _selectedVariantIndex < variants.length
-        ? variants[_selectedVariantIndex] as Map<String, dynamic>
-        : null;
+    final currentVariantSpec =
+        variants.isNotEmpty && state.selectedVariantIndex < variants.length ? variants[state.selectedVariantIndex] as Map<String, dynamic> : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1734,13 +1501,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   }
 
   /// Bottom sticky bar with price and action buttons
-  Widget _buildBottomBar() {
-    final variant = _selectedVariant;
-    final currentPrice = formatIndianCurrency(variant.priceV2.amount);
-    final originalPrice = variant.compareAtPriceV2 != null
-        ? formatIndianCurrency(variant.compareAtPriceV2!.amount)
-        : '';
-    final discount = _discountPercent();
+  Widget _buildBottomBar(ProductDetailsLoaded state, ProductVariant selectedVariant) {
+    final currentPrice = formatIndianCurrency(selectedVariant.priceV2.amount);
+    final originalPrice = selectedVariant.compareAtPriceV2 != null ? formatIndianCurrency(selectedVariant.compareAtPriceV2!.amount) : '';
+    final discount = _calculateDiscountPercent(selectedVariant);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -1832,7 +1596,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 icon: ScaleTransition(
                   scale: _heartScaleAnimation,
                   child: Icon(
-                    _isInWishlist ? Icons.favorite : Icons.favorite_border,
+                    state.isInWishlist ? Icons.favorite : Icons.favorite_border,
                     color: const Color(0xFFFF5C9A),
                     size: 22,
                   ),
@@ -2269,27 +2033,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
                   // Price row
                   Row(
-                      children: [
+                    children: [
+                      Text(
+                        currentPrice,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                      if (originalPrice.isNotEmpty) ...[
+                        const SizedBox(width: 6),
                         Text(
-                          currentPrice,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                          originalPrice,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade500,
+                            decoration: TextDecoration.lineThrough,
+                            decorationColor: Colors.grey.shade500,
                           ),
                         ),
-                        if (originalPrice.isNotEmpty) ...[
-                          const SizedBox(width: 6),
-                          Text(
-                            originalPrice,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade500,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: Colors.grey.shade500,
-                            ),
-                          ),
-                        ],
+                      ],
                     ],
                   ),
                 ],
