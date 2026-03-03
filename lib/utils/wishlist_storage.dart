@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import '../models/wishlist_item_model.dart';
+import 'app_logger.dart';
 
 class WishlistStorage {
   static const String _wishlistKey = 'user_wishlist';
@@ -23,11 +24,11 @@ class WishlistStorage {
       if (existingIndex != -1) {
         // Item already in wishlist, update it
         wishlist[existingIndex] = item;
-        debugPrint('✅ Updated item in wishlist: ${item.productId}');
+        AppLogger.success('Updated item in wishlist: ${item.productId}');
       } else {
         // Add new item
         wishlist.add(item);
-        debugPrint('✅ Added item to wishlist: ${item.productId}');
+        AppLogger.success('Added item to wishlist: ${item.productId}');
       }
 
       // Save to storage
@@ -35,10 +36,10 @@ class WishlistStorage {
       final jsonString = jsonEncode(jsonList);
       await prefs.setString(_wishlistKey, jsonString);
 
-      debugPrint('📦 Wishlist saved. Total items: ${wishlist.length}');
+      AppLogger.info('Wishlist saved. Total items: ${wishlist.length}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error adding to wishlist: $e');
+      AppLogger.error('Error adding to wishlist: $e');
       return false;
     }
   }
@@ -57,11 +58,11 @@ class WishlistStorage {
       final jsonString = jsonEncode(jsonList);
       await prefs.setString(_wishlistKey, jsonString);
 
-      debugPrint('✅ Removed item from wishlist: $productId');
-      debugPrint('📦 Wishlist saved. Total items: ${wishlist.length}');
+      AppLogger.success('Removed item from wishlist: $productId');
+      AppLogger.info('Wishlist saved. Total items: ${wishlist.length}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error removing from wishlist: $e');
+      AppLogger.error('Error removing from wishlist: $e');
       return false;
     }
   }
@@ -73,7 +74,7 @@ class WishlistStorage {
       final jsonString = prefs.getString(_wishlistKey);
 
       if (jsonString == null || jsonString.isEmpty) {
-        debugPrint('📦 Wishlist is empty');
+        AppLogger.info('Wishlist is empty');
         return [];
       }
 
@@ -85,10 +86,10 @@ class WishlistStorage {
       // Sort by addedAt (newest first)
       wishlist.sort((a, b) => b.addedAt.compareTo(a.addedAt));
 
-      debugPrint('📦 Loaded wishlist. Total items: ${wishlist.length}');
+      AppLogger.info('Loaded wishlist. Total items: ${wishlist.length}');
       return wishlist;
     } catch (e) {
-      debugPrint('❌ Error loading wishlist: $e');
+      AppLogger.error('Error loading wishlist: $e');
       return [];
     }
   }
@@ -98,10 +99,10 @@ class WishlistStorage {
     try {
       final wishlist = await getWishlist();
       final isInWishlist = wishlist.any((item) => item.productId == productId);
-      debugPrint('🔍 Product $productId in wishlist: $isInWishlist');
+      AppLogger.info('Product $productId in wishlist: $isInWishlist');
       return isInWishlist;
     } catch (e) {
-      debugPrint('❌ Error checking wishlist: $e');
+      AppLogger.error('Error checking wishlist: $e');
       return false;
     }
   }
@@ -115,7 +116,7 @@ class WishlistStorage {
         orElse: () => throw Exception('Item not found'),
       );
     } catch (e) {
-      debugPrint('⚠️ Item not found in wishlist: $productId');
+      AppLogger.warning('Item not found in wishlist: $productId');
       return null;
     }
   }
@@ -125,10 +126,10 @@ class WishlistStorage {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_wishlistKey);
-      debugPrint('✅ Wishlist cleared');
+      AppLogger.success('Wishlist cleared');
       return true;
     } catch (e) {
-      debugPrint('❌ Error clearing wishlist: $e');
+      AppLogger.error('Error clearing wishlist: $e');
       return false;
     }
   }
@@ -139,7 +140,7 @@ class WishlistStorage {
       final wishlist = await getWishlist();
       return wishlist.length;
     } catch (e) {
-      debugPrint('❌ Error getting wishlist count: $e');
+      AppLogger.error('Error getting wishlist count: $e');
       return 0;
     }
   }

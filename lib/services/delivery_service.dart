@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/serviceability_model.dart';
+import '../utils/app_logger.dart';
 
 /// Delivery Service
 /// Handles all delivery-related API calls (Delhivery integration)
@@ -21,15 +22,15 @@ class DeliveryService {
       });
 
       // Log API Request
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('🚚 DELHIVERY API REQUEST');
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📍 Endpoint: ${url.toString()}');
-      debugPrint('🔑 Method: GET');
-      debugPrint('📮 Pincode: $pincode');
-      debugPrint('🔐 Authorization: Token ${ApiConfig.delhiveryApiToken.substring(0, 10)}...');
-      debugPrint('⏰ Timestamp: ${DateTime.now().toIso8601String()}');
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('DELHIVERY API REQUEST');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('Endpoint: ${url.toString()}');
+      AppLogger.info('Method: GET');
+      AppLogger.info('Pincode: $pincode');
+      AppLogger.info('Authorization: Token ${ApiConfig.delhiveryApiToken.substring(0, 10)}...');
+      AppLogger.info('Timestamp: ${DateTime.now().toIso8601String()}');
+      AppLogger.info('═══════════════════════════════════════════════════════');
 
       final startTime = DateTime.now();
 
@@ -42,8 +43,8 @@ class DeliveryService {
       ).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
-          debugPrint('❌ REQUEST TIMEOUT after 30 seconds');
-          debugPrint('═══════════════════════════════════════════════════════');
+          AppLogger.error('REQUEST TIMEOUT after 30 seconds');
+          AppLogger.info('═══════════════════════════════════════════════════════');
           throw Exception('Request timeout. Please check your internet connection.');
         },
       );
@@ -52,35 +53,35 @@ class DeliveryService {
       final duration = endTime.difference(startTime);
 
       // Log API Response
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📥 DELHIVERY API RESPONSE');
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📊 Status Code: ${response.statusCode}');
-      debugPrint('⏱️ Response Time: ${duration.inMilliseconds}ms');
-      debugPrint('📏 Response Length: ${response.body.length} bytes');
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📄 Response Headers:');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('DELHIVERY API RESPONSE');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('Status Code: ${response.statusCode}');
+      AppLogger.info('Response Time: ${duration.inMilliseconds}ms');
+      AppLogger.info('Response Length: ${response.body.length} bytes');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Response Headers:');
       response.headers.forEach((key, value) {
-        debugPrint('   $key: $value');
+        AppLogger.info('   $key: $value');
       });
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📝 Response Body:');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Response Body:');
       
       // Pretty print JSON response
       try {
         final jsonData = json.decode(response.body);
         final prettyJson = const JsonEncoder.withIndent('  ').convert(jsonData);
-        debugPrint(prettyJson);
+        AppLogger.info(prettyJson);
       } catch (e) {
-        debugPrint(response.body);
+        AppLogger.info(response.body);
       }
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('═══════════════════════════════════════════════════════');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         
-        debugPrint('───────────────────────────────────────────────────────');
-        debugPrint('🔍 Parsing Response Structure...');
+        AppLogger.info('───────────────────────────────────────────────────────');
+        AppLogger.info('Parsing Response Structure...');
         
         // The new API returns: {"delivery_codes": [{"postal_code": {...}}]}
         if (data is Map<String, dynamic>) {
@@ -90,35 +91,35 @@ class DeliveryService {
             // Get the first item from delivery_codes array
             final firstDeliveryCode = deliveryCodes[0] as Map<String, dynamic>;
             
-            debugPrint('   Found delivery_codes array with ${deliveryCodes.length} item(s)');
+            AppLogger.info('   Found delivery_codes array with ${deliveryCodes.length} item(s)');
             
             // Pass the entire delivery code object to the model
             final model = ServiceabilityModel.fromJson(firstDeliveryCode);
             
             // Log parsed result
-            debugPrint('═══════════════════════════════════════════════════════');
-            debugPrint('✅ SERVICEABILITY CHECK RESULT');
-            debugPrint('═══════════════════════════════════════════════════════');
-            debugPrint('📮 Pincode: ${model.pincode}');
-            debugPrint('🏙️ City: ${model.city ?? "N/A"}');
-            debugPrint('🗺️ State: ${model.state ?? "N/A"}');
-            debugPrint('🏘️ District: ${model.district ?? "N/A"}');
-            debugPrint('✓ Serviceable: ${model.isServiceable ? "YES ✓" : "NO ✗"}');
-            debugPrint('───────────────────────────────────────────────────────');
-            debugPrint('🎯 Payment Methods Availability:');
-            debugPrint('   💳 Pre-paid: ${model.supportsPrepaid ? "✓ Available" : "✗ Not Available"}');
-            debugPrint('   💵 COD: ${model.supportsCOD ? "✓ Available" : "✗ Not Available"}');
-            debugPrint('   📦 Pickup: ${model.pickupAvailable ? "✓ Available" : "✗ Not Available"}');
-            debugPrint('   💰 Cash: ${model.cashAvailable ? "✓ Available" : "✗ Not Available"}');
-            debugPrint('───────────────────────────────────────────────────────');
-            debugPrint('📊 Additional Info:');
-            debugPrint('   🚚 Is ODA: ${model.isOda ? "YES" : "NO"}');
-            debugPrint('═══════════════════════════════════════════════════════');
+            AppLogger.success('═══════════════════════════════════════════════════════');
+            AppLogger.success('SERVICEABILITY CHECK RESULT');
+            AppLogger.success('═══════════════════════════════════════════════════════');
+            AppLogger.success('Pincode: ${model.pincode}');
+            AppLogger.success('City: ${model.city ?? "N/A"}');
+            AppLogger.success('State: ${model.state ?? "N/A"}');
+            AppLogger.success('District: ${model.district ?? "N/A"}');
+            AppLogger.success('Serviceable: ${model.isServiceable ? "YES ✓" : "NO ✗"}');
+            AppLogger.info('───────────────────────────────────────────────────────');
+            AppLogger.info('Payment Methods Availability:');
+            AppLogger.info('   Pre-paid: ${model.supportsPrepaid ? "✓ Available" : "✗ Not Available"}');
+            AppLogger.info('   COD: ${model.supportsCOD ? "✓ Available" : "✗ Not Available"}');
+            AppLogger.info('   Pickup: ${model.pickupAvailable ? "✓ Available" : "✗ Not Available"}');
+            AppLogger.info('   Cash: ${model.cashAvailable ? "✓ Available" : "✗ Not Available"}');
+            AppLogger.info('───────────────────────────────────────────────────────');
+            AppLogger.info('Additional Info:');
+            AppLogger.info('   Is ODA: ${model.isOda ? "YES" : "NO"}');
+            AppLogger.success('═══════════════════════════════════════════════════════');
             
             return model;
           } else {
-            debugPrint('❌ ERROR: No delivery_codes found in response');
-            debugPrint('═══════════════════════════════════════════════════════');
+            AppLogger.error('ERROR: No delivery_codes found in response');
+            AppLogger.info('═══════════════════════════════════════════════════════');
             
             // Return non-serviceable if no data
             return ServiceabilityModel(
@@ -132,18 +133,18 @@ class DeliveryService {
           }
         }
         
-        debugPrint('❌ ERROR: Invalid response format from delivery service');
-        debugPrint('═══════════════════════════════════════════════════════');
+        AppLogger.error('ERROR: Invalid response format from delivery service');
+        AppLogger.info('═══════════════════════════════════════════════════════');
         throw Exception('Invalid response format from delivery service');
       } else if (response.statusCode == 404) {
         // Pincode not found - treat as non-serviceable
-        debugPrint('═══════════════════════════════════════════════════════');
-        debugPrint('⚠️ PINCODE NOT FOUND (404)');
-        debugPrint('═══════════════════════════════════════════════════════');
-        debugPrint('📮 Pincode: $pincode');
-        debugPrint('✓ Serviceable: NO');
-        debugPrint('💳 Payment Methods: None');
-        debugPrint('═══════════════════════════════════════════════════════');
+        AppLogger.warning('═══════════════════════════════════════════════════════');
+        AppLogger.warning('PINCODE NOT FOUND (404)');
+        AppLogger.warning('═══════════════════════════════════════════════════════');
+        AppLogger.warning('Pincode: $pincode');
+        AppLogger.warning('Serviceable: NO');
+        AppLogger.warning('Payment Methods: None');
+        AppLogger.warning('═══════════════════════════════════════════════════════');
         
         return ServiceabilityModel(
           pincode: pincode,
@@ -154,10 +155,10 @@ class DeliveryService {
           isOda: false,
         );
       } else {
-        debugPrint('❌ ERROR: Failed to check serviceability');
-        debugPrint('Status Code: ${response.statusCode}');
-        debugPrint('Response: ${response.body}');
-        debugPrint('═══════════════════════════════════════════════════════');
+        AppLogger.error('ERROR: Failed to check serviceability');
+        AppLogger.error('Status Code: ${response.statusCode}');
+        AppLogger.error('Response: ${response.body}');
+        AppLogger.info('═══════════════════════════════════════════════════════');
         
         throw Exception(
           'Failed to check serviceability. Status: ${response.statusCode}',
@@ -168,12 +169,12 @@ class DeliveryService {
         rethrow;
       }
       
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('❌ EXCEPTION OCCURRED');
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('Error: ${e.toString()}');
-      debugPrint('Type: ${e.runtimeType}');
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.error('═══════════════════════════════════════════════════════');
+      AppLogger.error('EXCEPTION OCCURRED');
+      AppLogger.error('═══════════════════════════════════════════════════════');
+      AppLogger.error('Error: ${e.toString()}');
+      AppLogger.error('Type: ${e.runtimeType}');
+      AppLogger.error('═══════════════════════════════════════════════════════');
       
       throw Exception('Unable to check delivery availability: ${e.toString()}');
     }

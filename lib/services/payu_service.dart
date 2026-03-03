@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
+import '../utils/app_logger.dart';
 
 /// PayU Payment Service
 /// Handles PayU payment hash generation and parameter preparation
@@ -33,17 +34,17 @@ class PayUService {
   }) {
     final hashString = '${ApiConfig.payuMerchantKey}|$txnId|$amount|$productInfo|$firstName|$email|$udf1|$udf2|$udf3|$udf4|$udf5||||||${ApiConfig.payuMerchantSalt}';
     
-    debugPrint('═══════════════════════════════════════════════════════');
-    debugPrint('🔐 GENERATING PAYU HASH');
-    debugPrint('═══════════════════════════════════════════════════════');
-    debugPrint('Hash String: $hashString');
+    AppLogger.info('═══════════════════════════════════════════════════════');
+    AppLogger.info('GENERATING PAYU HASH');
+    AppLogger.info('═══════════════════════════════════════════════════════');
+    AppLogger.info('Hash String: $hashString');
     
     final bytes = utf8.encode(hashString);
     final hash = sha512.convert(bytes);
     final hashHex = hash.toString();
     
-    debugPrint('Generated Hash: $hashHex');
-    debugPrint('═══════════════════════════════════════════════════════');
+    AppLogger.info('Generated Hash: $hashHex');
+    AppLogger.info('═══════════════════════════════════════════════════════');
     
     return hashHex;
   }
@@ -61,21 +62,21 @@ class PayUService {
     required String successUrl,
     required String failureUrl,
   }) {
-    debugPrint('═══════════════════════════════════════════════════════');
-    debugPrint('💳 PREPARING PAYU PAYMENT PARAMETERS');
-    debugPrint('═══════════════════════════════════════════════════════');
-    debugPrint('Environment: ${ApiConfig.payuIsProduction ? "PRODUCTION" : "TEST MODE"}');
+    AppLogger.info('═══════════════════════════════════════════════════════');
+    AppLogger.info('PREPARING PAYU PAYMENT PARAMETERS');
+    AppLogger.info('═══════════════════════════════════════════════════════');
+    AppLogger.info('Environment: ${ApiConfig.payuIsProduction ? "PRODUCTION" : "TEST MODE"}');
     
     if (!ApiConfig.payuIsProduction) {
-      debugPrint('⚠️ TEST MODE ACTIVE');
-      debugPrint('📝 For testing, use:');
-      debugPrint('   Credit Card: 5123456789012346, CVV: 123, Expiry: 12/25');
-      debugPrint('   ⚠️ UPI validation is unreliable in test mode - use card instead');
+      AppLogger.warning('TEST MODE ACTIVE');
+      AppLogger.info('For testing, use:');
+      AppLogger.info('   Credit Card: 5123456789012346, CVV: 123, Expiry: 12/25');
+      AppLogger.warning('   UPI validation is unreliable in test mode - use card instead');
     }
     
     // Generate unique transaction ID
     final txnId = 'ORDER_${orderNumber}_${DateTime.now().millisecondsSinceEpoch}';
-    debugPrint('Transaction ID: $txnId');
+    AppLogger.info('Transaction ID: $txnId');
     
     // Generate hash
     final hash = generateHash(
@@ -111,20 +112,20 @@ class PayUService {
       'service_provider': 'payu_paisa',
     };
 
-    debugPrint('───────────────────────────────────────────────────────');
-    debugPrint('📝 Payment Parameters:');
-    debugPrint('Merchant Key: ${ApiConfig.payuMerchantKey}');
-    debugPrint('Transaction ID: $txnId');
-    debugPrint('Amount: ₹$amount');
-    debugPrint('Product Info: $productInfo');
-    debugPrint('Customer: $firstName $lastName');
-    debugPrint('Email: $email');
-    debugPrint('Phone: $phone');
-    debugPrint('Success URL: $successUrl');
-    debugPrint('Failure URL: $failureUrl');
-    debugPrint('Enforce Payment Methods: creditcard|debitcard|netbanking|upi');
-    debugPrint('Service Provider: payu_paisa');
-    debugPrint('═══════════════════════════════════════════════════════');
+    AppLogger.info('───────────────────────────────────────────────────────');
+    AppLogger.info('Payment Parameters:');
+    AppLogger.info('Merchant Key: ${ApiConfig.payuMerchantKey}');
+    AppLogger.info('Transaction ID: $txnId');
+    AppLogger.info('Amount: ₹$amount');
+    AppLogger.info('Product Info: $productInfo');
+    AppLogger.info('Customer: $firstName $lastName');
+    AppLogger.info('Email: $email');
+    AppLogger.info('Phone: $phone');
+    AppLogger.info('Success URL: $successUrl');
+    AppLogger.info('Failure URL: $failureUrl');
+    AppLogger.info('Enforce Payment Methods: creditcard|debitcard|netbanking|upi');
+    AppLogger.info('Service Provider: payu_paisa');
+    AppLogger.info('═══════════════════════════════════════════════════════');
 
     return params;
   }
@@ -145,14 +146,14 @@ class PayUService {
     String udf5 = '',
   }) {
     try {
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('🔐 VERIFYING PAYMENT HASH');
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('VERIFYING PAYMENT HASH');
+      AppLogger.info('═══════════════════════════════════════════════════════');
       
       // Reverse hash format: salt|status||||||udf5|udf4|udf3|udf2|udf1|email|firstname|productinfo|amount|txnid|key
       final hashString = '${ApiConfig.payuMerchantSalt}|$status||||||$udf5|$udf4|$udf3|$udf2|$udf1|$email|$firstName|$productInfo|$amount|$txnId|${ApiConfig.payuMerchantKey}';
       
-      debugPrint('Hash String: $hashString');
+      AppLogger.info('Hash String: $hashString');
       
       final bytes = utf8.encode(hashString);
       final hash = sha512.convert(bytes);
@@ -160,14 +161,14 @@ class PayUService {
 
       final isValid = calculatedHash == receivedHash;
       
-      debugPrint('Received Hash: $receivedHash');
-      debugPrint('Calculated Hash: $calculatedHash');
-      debugPrint('Valid: $isValid');
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('Received Hash: $receivedHash');
+      AppLogger.info('Calculated Hash: $calculatedHash');
+      AppLogger.info('Valid: $isValid');
+      AppLogger.info('═══════════════════════════════════════════════════════');
 
       return isValid;
     } catch (e) {
-      debugPrint('❌ Hash verification failed: $e');
+      AppLogger.error('Hash verification failed: $e');
       return false;
     }
   }

@@ -7,6 +7,7 @@ import '../../config/api_config.dart';
 import '../../models/top_products_model.dart';
 import '../../utils/wishlist_storage.dart';
 import '../../models/wishlist_item_model.dart';
+import '../../utils/app_logger.dart';
 import 'product_details_state.dart';
 
 class ProductDetailsCubit extends Cubit<ProductDetailsState> {
@@ -33,7 +34,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         throw Exception('No product ID available');
       }
 
-      debugPrint('🚀 Fetching complete product details for ID: $productIdToFetch');
+      AppLogger.api('Fetching complete product details for ID: $productIdToFetch');
 
       final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$productIdToFetch';
       final response = await http.get(
@@ -125,7 +126,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
           // Check wishlist status after product is loaded
           await checkWishlistStatus();
 
-          debugPrint('✅ Successfully fetched complete product details from API');
+          AppLogger.success('Successfully fetched complete product details from API');
           return;
         }
       }
@@ -134,11 +135,11 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
       throw Exception('Product not found or API error');
       
     } catch (e) {
-      debugPrint('❌ Error fetching product details: $e');
+      AppLogger.error('Error fetching product details: $e');
       
       // Case 1: Product object available → Use fallback data
       if (product != null) {
-        debugPrint('⚠️ Using fallback product object due to API error');
+        AppLogger.warning('Using fallback product object due to API error');
         emit(ProductDetailsLoaded(
           product: product,
           specifications: null,
@@ -152,7 +153,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
       } 
       // Case 2: Only product ID provided → Show error
       else {
-        debugPrint('❌ No fallback data available, showing error');
+        AppLogger.error('No fallback data available, showing error');
         emit(ProductDetailsError(
           message: e.toString(),
           hasProductFallback: false,
@@ -176,7 +177,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         isCheckingWishlist: false,
       ));
     } catch (e) {
-      debugPrint('Error checking wishlist status: $e');
+      AppLogger.error('Error checking wishlist status: $e');
       emit(currentState.copyWith(isCheckingWishlist: false));
     }
   }
@@ -230,7 +231,7 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         }
       }
     } catch (e) {
-      debugPrint('Error toggling wishlist: $e');
+      AppLogger.error('Error toggling wishlist: $e');
     }
   }
 

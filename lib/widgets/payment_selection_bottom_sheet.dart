@@ -8,6 +8,7 @@ import '../models/serviceability_model.dart';
 import '../models/cart_model.dart';
 import '../models/customer_model.dart';
 import '../services/order_service.dart';
+import '../utils/app_logger.dart';
 import '../screens/payu_payment_screen.dart';
 
 /// Payment Selection Bottom Sheet
@@ -361,14 +362,14 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
   }
 
   void _handlePrepaidSelection(BuildContext context) {
-    debugPrint('💳 Pre-paid selected');
+    AppLogger.info('Pre-paid payment method selected');
     // Close bottom sheet and notify parent
     Navigator.pop(context);
     onPaymentSelected?.call('Pre-paid');
   }
 
   void _handleCODSelection(BuildContext context) {
-    debugPrint('💵 COD selected');
+    AppLogger.info('COD payment method selected');
     // Close bottom sheet and notify parent
     Navigator.pop(context);
     onPaymentSelected?.call('COD');

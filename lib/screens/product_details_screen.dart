@@ -6,6 +6,7 @@ import '../models/top_products_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
 import '../utils/auth_storage.dart';
+import '../utils/app_logger.dart';
 import '../services/api_service.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/custom_app_bar.dart';
@@ -104,7 +105,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
     // Fetch discover products using handle (default to "top-products" if null)
     discoverHandle = widget.handle ?? 'top-products';
-    debugPrint('ProductDetailsScreen - Handle received: $discoverHandle');
+    AppLogger.navigation('ProductDetailsScreen', 'Handle received: $discoverHandle');
     context.read<TopProductsCubit>().fetchProductsForHandle(discoverHandle);
   }
 
@@ -397,7 +398,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           ),
         );
       }
-      debugPrint('❌ Add to cart error: $e');
+      AppLogger.error('Add to cart error: $e');
     }
   }
 

@@ -11,6 +11,7 @@ import '../models/filter_model.dart';
 import '../models/customer_model.dart';
 import '../models/page_model.dart';
 import '../utils/auth_storage.dart';
+import '../utils/app_logger.dart';
 import 'connectivity_service.dart';
 
 /// API Service class
@@ -23,33 +24,12 @@ class ApiService {
   // Callback for token expiration (to navigate to login)
   static Function? onTokenExpired;
 
-  /// Simple continuous logging without decorative boxes
-  void _log(String message) {
-    debugPrint('🔵 API_LOG: $message');
-  }
-
-  /// Logs full response continuously with formatted JSON
-  void _logFullResponse(String tag, Map<String, dynamic> responseData) {
-    _log('$tag (length: ${jsonEncode(responseData).length})');
-
-    // Format JSON with proper indentation (2 spaces)
-    const encoder = JsonEncoder.withIndent('  ');
-    final formattedJson = encoder.convert(responseData);
-
-    // Print formatted JSON line by line for better readability
-    _log('📥 Formatted JSON Response:');
-    debugPrint('🔵 API_RESPONSE_JSON:');
-    formattedJson.split('\n').forEach((line) {
-      debugPrint('🔵 $line');
-    });
-  }
-
   /// Check if token is expired and handle accordingly
   Future<bool> _validateToken() async {
     final isExpired = await AuthStorage.isTokenExpired();
 
     if (isExpired) {
-      _log('❌ Token expired! Clearing data and triggering logout...');
+      AppLogger.warning('Token expired! Clearing data and triggering logout...');
       await AuthStorage.clearAllData();
 
       // Trigger callback to navigate to login
@@ -87,17 +67,13 @@ class ApiService {
     }
 
     try {
-      // Log the request continuously
-      _log('═══════════════════════════════════════════════════════════');
-      _log('📤 API REQUEST START');
-      _log('═══════════════════════════════════════════════════════════');
-      _log('URL: ${ApiConfig.baseUrl}');
-      _log('Query:');
-      debugPrint('🔵 API_QUERY: $query');
-      if (variables != null && variables.isNotEmpty) {
-        _log('Variables: $variables');
-      }
-      _log('═══════════════════════════════════════════════════════════');
+      // Log the request
+      AppLogger.apiRequest(
+        method: 'GraphQL',
+        url: ApiConfig.baseUrl,
+        body: {'query': query},
+        variables: variables,
+      );
 
       final body = <String, dynamic>{'query': query};
       if (variables != null && variables.isNotEmpty) {
@@ -114,40 +90,37 @@ class ApiService {
         body: jsonEncode(body),
       );
 
-      // Log the response status
-      _log('═══════════════════════════════════════════════════════════');
-      _log('📥 API RESPONSE RECEIVED');
-      _log('═══════════════════════════════════════════════════════════');
-      _log('Status Code: ${response.statusCode}');
-
       // Check if request was successful
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
-        // Log full response with formatted JSON
-        _logFullResponse('📥 Response Data', responseData);
-
         // Check for GraphQL errors
         if (responseData['errors'] != null) {
-          _log('❌ GraphQL Errors: ${responseData['errors']}');
+          AppLogger.apiResponse(
+            statusCode: response.statusCode,
+            method: 'GraphQL',
+            error: 'GraphQL Error: ${responseData['errors']}',
+          );
           throw Exception('GraphQL Error: ${responseData['errors']}');
         }
 
-        _log('═══════════════════════════════════════════════════════════');
-        _log('✅ API REQUEST COMPLETED SUCCESSFULLY');
-        _log('═══════════════════════════════════════════════════════════');
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'GraphQL',
+          responseData: responseData,
+        );
 
         return responseData;
       } else {
-        _log('❌ HTTP Error: ${response.statusCode}');
-        _log('Response Body: ${response.body}');
-        _log('═══════════════════════════════════════════════════════════');
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'GraphQL',
+          error: 'HTTP Error: ${response.statusCode} - ${response.body}',
+        );
         throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      _log('═══════════════════════════════════════════════════════════');
-      _log('❌ EXCEPTION OCCURRED: $e');
-      _log('═══════════════════════════════════════════════════════════');
+      AppLogger.error('GraphQL request exception: $e');
       rethrow;
     }
   }
@@ -167,9 +140,11 @@ class ApiService {
     }
 
     try {
-      _log('═══════════════════════════════════════════════════════════');
-      _log('📤 ADMIN API REQUEST START');
-      _log('═══════════════════════════════════════════════════════════');
+      AppLogger.apiRequest(
+        method: 'Admin GraphQL',
+        url: ApiConfig.adminBaseUrl,
+        body: {'query': query},
+      );
 
       final response = await http.post(
         Uri.parse(ApiConfig.adminBaseUrl),
@@ -180,21 +155,34 @@ class ApiService {
         body: jsonEncode({'query': query}),
       );
 
-      _log('Status Code: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData['errors'] != null) {
-          _log('❌ GraphQL Errors: ${responseData['errors']}');
+          AppLogger.apiResponse(
+            statusCode: response.statusCode,
+            method: 'Admin GraphQL',
+            error: 'GraphQL Error: ${responseData['errors']}',
+          );
           throw Exception('GraphQL Error: ${responseData['errors']}');
         }
-        _log('✅ ADMIN API REQUEST COMPLETED SUCCESSFULLY');
+
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'Admin GraphQL',
+          responseData: responseData,
+        );
+
         return responseData;
       } else {
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'Admin GraphQL',
+          error: 'HTTP Error: ${response.statusCode}',
+        );
         throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ ADMIN API EXCEPTION: $e');
+      AppLogger.error('Admin GraphQL request exception: $e');
       rethrow;
     }
   }
@@ -202,18 +190,18 @@ class ApiService {
   /// Fetch a Shopify menu by its ID (Admin API)
   Future<CategoryMenuResponse> getMenuById(String menuId) async {
     try {
-      _log('🚀 Starting to fetch menu: $menuId');
+      AppLogger.api('🚀 Starting to fetch menu: $menuId');
 
       final query = 'query { menu(id: "$menuId") { id handle title items { id title type url resourceId } } }';
 
       final responseData = await _makeAdminGraphQLRequest(query);
       final menuResponse = CategoryMenuResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched menu: ${menuResponse.menu?.title} with ${menuResponse.menu?.items.length ?? 0} items');
+      AppLogger.success('Successfully fetched menu: ${menuResponse.menu?.title} with ${menuResponse.menu?.items.length ?? 0} items');
 
       return menuResponse;
     } catch (e) {
-      _log('❌ Failed to fetch menu $menuId: $e');
+      AppLogger.error('Failed to fetch menu $menuId: $e');
       rethrow;
     }
   }
@@ -222,7 +210,7 @@ class ApiService {
   /// Returns a map of handle → imageUrl for matching menu items to images
   Future<Map<String, String>> getAllCollectionImages() async {
     try {
-      _log('🚀 Starting to fetch all collection images...');
+      AppLogger.api('🚀 Starting to fetch all collection images...');
 
       const query = '''
         {
@@ -250,10 +238,10 @@ class ApiService {
         }
       }
 
-      _log('✅ Successfully fetched images for ${imageMap.length} collections');
+      AppLogger.success('Successfully fetched images for ${imageMap.length} collections');
       return imageMap;
     } catch (e) {
-      _log('❌ Failed to fetch collection images: $e');
+      AppLogger.error('Failed to fetch collection images: $e');
       rethrow;
     }
   }
@@ -262,7 +250,7 @@ class ApiService {
   /// This method fetches all home top banners from the API
   Future<HomeTopBannerResponse> getHomeTopBanners() async {
     try {
-      _log('🚀 Starting to fetch home top banners...');
+      AppLogger.api('🚀 Starting to fetch home top banners...');
 
       // GraphQL query
       const query = '''
@@ -297,11 +285,11 @@ class ApiService {
       // Convert response to model
       final bannerResponse = HomeTopBannerResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${bannerResponse.banners.length} banners');
+      AppLogger.success('Successfully fetched ${bannerResponse.banners.length} banners');
 
       return bannerResponse;
     } catch (e) {
-      _log('❌ Failed to fetch home top banners: $e');
+      AppLogger.error('Failed to fetch home top banners: $e');
       rethrow;
     }
   }
@@ -310,7 +298,7 @@ class ApiService {
   /// Same structure as top banner, type: "home_middle_banner"
   Future<HomeTopBannerResponse> getHomeMiddleBanners() async {
     try {
-      _log('🚀 Starting to fetch home middle banners...');
+      AppLogger.api('Starting to fetch home middle banners...');
 
       const query = '''
         {
@@ -341,11 +329,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final bannerResponse = HomeTopBannerResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${bannerResponse.banners.length} middle banners');
+      AppLogger.success('Successfully fetched ${bannerResponse.banners.length} middle banners');
 
       return bannerResponse;
     } catch (e) {
-      _log('❌ Failed to fetch home middle banners: $e');
+      AppLogger.error('Failed to fetch home middle banners: $e');
       rethrow;
     }
   }
@@ -354,7 +342,7 @@ class ApiService {
   /// Same structure as top/middle banner, type: "home_bottom_banner"
   Future<HomeTopBannerResponse> getHomeBottomBanners() async {
     try {
-      _log('🚀 Starting to fetch home bottom banners...');
+      AppLogger.api('Starting to fetch home bottom banners...');
 
       const query = '''
         {
@@ -385,11 +373,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final bannerResponse = HomeTopBannerResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${bannerResponse.banners.length} bottom banners');
+      AppLogger.success('Successfully fetched ${bannerResponse.banners.length} bottom banners');
 
       return bannerResponse;
     } catch (e) {
-      _log('❌ Failed to fetch home bottom banners: $e');
+      AppLogger.error('Failed to fetch home bottom banners: $e');
       rethrow;
     }
   }
@@ -399,7 +387,7 @@ class ApiService {
   /// and reuses the same response model because the structure is identical
   Future<HomeTopBannerResponse> getSkinGeniusAnalyzes() async {
     try {
-      _log('🚀 Starting to fetch Skin Genius analyzes...');
+      AppLogger.api('Starting to fetch Skin Genius analyzes...');
 
       // GraphQL query (direct translation of the provided curl)
       const query = '''
@@ -434,11 +422,11 @@ class ApiService {
       // Reuse the same model since the GraphQL shape is the same
       final analyzesResponse = HomeTopBannerResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${analyzesResponse.banners.length} Skin Genius analyzes');
+      AppLogger.success('Successfully fetched ${analyzesResponse.banners.length} Skin Genius analyzes');
 
       return analyzesResponse;
     } catch (e) {
-      _log('❌ Failed to fetch Skin Genius analyzes: $e');
+      AppLogger.error('Failed to fetch Skin Genius analyzes: $e');
       rethrow;
     }
   }
@@ -448,7 +436,7 @@ class ApiService {
   /// the handle is dynamic so it can be reused for multiple tabs.
   Future<TopProductsCollectionResponse> getCollectionByHandle(String handle) async {
     try {
-      _log('🚀 Starting to fetch products collection for handle: $handle');
+      AppLogger.api('Starting to fetch products collection for handle: $handle');
 
       // Use \$handle so the query contains literal $handle (GraphQL variable), not Dart interpolation
       const query = r'''
@@ -506,13 +494,13 @@ class ApiService {
       );
       final collectionResponse = TopProductsCollectionResponse.fromJson(responseData);
 
-      _log(
-        '✅ Successfully fetched ${collectionResponse.collection?.products.length ?? 0} products for handle: $handle',
+      AppLogger.success(
+        'Successfully fetched ${collectionResponse.collection?.products.length ?? 0} products for handle: $handle',
       );
 
       return collectionResponse;
     } catch (e) {
-      _log('❌ Failed to fetch products collection for handle $handle: $e');
+      AppLogger.error('Failed to fetch products collection for handle $handle: $e');
       rethrow;
     }
   }
@@ -530,8 +518,8 @@ class ApiService {
     List<Map<String, dynamic>>? filters,
   }) async {
     try {
-      _log(
-          '🚀 Starting to fetch collection products for handle: $handle (first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: ${filters?.length ?? 0})');
+      AppLogger.api(
+          'Starting to fetch collection products for handle: $handle (first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: ${filters?.length ?? 0})');
 
       const query = r'''
         query collectionProducts($handle: String!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
@@ -596,13 +584,13 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query, variables: variables);
       final collectionResponse = TopProductsCollectionResponse.fromJson(responseData);
 
-      _log(
-        '✅ Successfully fetched ${collectionResponse.collection?.products.length ?? 0} products for handle: $handle',
+      AppLogger.success(
+        'Successfully fetched ${collectionResponse.collection?.products.length ?? 0} products for handle: $handle',
       );
 
       return collectionResponse;
     } catch (e) {
-      _log('❌ Failed to fetch collection products for handle $handle: $e');
+      AppLogger.error('Failed to fetch collection products for handle $handle: $e');
       rethrow;
     }
   }
@@ -612,7 +600,7 @@ class ApiService {
     required String handle,
   }) async {
     try {
-      _log('🚀 Starting to fetch filters for collection: $handle');
+      AppLogger.api('Starting to fetch filters for collection: $handle');
 
       const query = r'''
         query collectionFilters($handle: String!) {
@@ -640,12 +628,12 @@ class ApiService {
       );
 
       final filtersResponse = ShopifyFiltersResponse.fromJson(responseData);
-      _log(
-        '✅ Successfully fetched ${filtersResponse.filters.length} filter categories for handle: $handle',
+      AppLogger.success(
+        'Successfully fetched ${filtersResponse.filters.length} filter categories for handle: $handle',
       );
       return filtersResponse;
     } catch (e) {
-      _log('❌ Failed to fetch filters for handle $handle: $e');
+      AppLogger.error('Failed to fetch filters for handle $handle: $e');
       rethrow;
     }
   }
@@ -654,7 +642,7 @@ class ApiService {
   /// Same metaobject structure as banners, type: "brand_logo"
   Future<HomeTopBannerResponse> getBrandLogos() async {
     try {
-      _log('🚀 Starting to fetch brand logos...');
+      AppLogger.api('Starting to fetch brand logos...');
 
       const query = '''
         {
@@ -685,11 +673,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final brandResponse = HomeTopBannerResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${brandResponse.banners.length} brand logos');
+      AppLogger.success('Successfully fetched ${brandResponse.banners.length} brand logos');
 
       return brandResponse;
     } catch (e) {
-      _log('❌ Failed to fetch brand logos: $e');
+      AppLogger.error('Failed to fetch brand logos: $e');
       rethrow;
     }
   }
@@ -701,7 +689,7 @@ class ApiService {
     String? after,
   }) async {
     try {
-      _log('🚀 Starting to fetch all products (first: $first, after: $after)');
+      AppLogger.api('Starting to fetch all products (first: $first, after: $after)');
 
       const query = r'''
         query allProducts($first: Int!, $after: String) {
@@ -754,13 +742,13 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query, variables: variables);
       final response = DiscountedProductsResponse.fromJson(responseData);
 
-      _log(
-        '✅ Successfully fetched ${response.products.length} products',
+      AppLogger.success(
+        'Successfully fetched ${response.products.length} products',
       );
 
       return response;
     } catch (e) {
-      _log('❌ Failed to fetch all products: $e');
+      AppLogger.error('Failed to fetch all products: $e');
       rethrow;
     }
   }
@@ -768,7 +756,7 @@ class ApiService {
   /// Get all products and filter to only those with a compareAtPrice (discounted)
   Future<DiscountedProductsResponse> getDiscountedProducts() async {
     try {
-      _log('🚀 Starting to fetch discounted products...');
+      AppLogger.api('Starting to fetch discounted products...');
 
       const query = '''
         {
@@ -818,11 +806,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final response = DiscountedProductsResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${response.products.length} products (before discount filter)');
+      AppLogger.success('Successfully fetched ${response.products.length} products (before discount filter)');
 
       return response;
     } catch (e) {
-      _log('❌ Failed to fetch discounted products: $e');
+      AppLogger.error('Failed to fetch discounted products: $e');
       rethrow;
     }
   }
@@ -833,7 +821,7 @@ class ApiService {
     try {
       // Extract numeric ID from Shopify GID (e.g. "gid://shopify/Product/8595686588594" → "8595686588594")
       final numericId = productId.contains('/') ? productId.split('/').last : productId;
-      _log('🚀 Starting to fetch product by ID: $numericId');
+      AppLogger.api('Starting to fetch product by ID: $numericId');
 
       final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$numericId';
       final response = await http.get(
@@ -843,7 +831,7 @@ class ApiService {
         },
       );
 
-      _log('Status Code: ${response.statusCode}');
+      AppLogger.info('getProductById Status Code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -897,13 +885,13 @@ class ApiService {
           onlineStoreUrl: null,
         );
 
-        _log('✅ Successfully fetched product: ${product.title}');
+        AppLogger.success('Successfully fetched product: ${product.title}');
         return product;
       } else {
         throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ Failed to fetch product by ID: $e');
+      AppLogger.error('Failed to fetch product by ID: $e');
       rethrow;
     }
   }
@@ -914,7 +902,7 @@ class ApiService {
     try {
       // Extract numeric ID from Shopify GID
       final numericId = productId.contains('/') ? productId.split('/').last : productId;
-      _log('🚀 Fetching product specifications for ID: $numericId');
+      AppLogger.api('Fetching product specifications for ID: $numericId');
 
       final url = 'https://glocure.com/admin/api/2025-10/products.json?ids=$numericId';
       final response = await http.get(
@@ -924,7 +912,7 @@ class ApiService {
         },
       );
 
-      _log('Status Code: ${response.statusCode}');
+      AppLogger.info('getProductSpecifications Status Code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
@@ -955,13 +943,13 @@ class ApiService {
           }).toList(),
         };
 
-        _log('✅ Successfully fetched product specifications');
+        AppLogger.success('Successfully fetched product specifications');
         return specifications;
       } else {
         throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ Failed to fetch product specifications: $e');
+      AppLogger.error('Failed to fetch product specifications: $e');
       rethrow;
     }
   }
@@ -970,7 +958,7 @@ class ApiService {
   /// Direct translation of the provided collections GraphQL query
   Future<BrowseCategoriesResponse> getBrowseCategories() async {
     try {
-      _log('🚀 Starting to fetch browse categories...');
+      AppLogger.api('Starting to fetch browse categories...');
 
       const query = '''
         {
@@ -998,11 +986,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final categoriesResponse = BrowseCategoriesResponse.fromJson(responseData);
 
-      _log('✅ Successfully fetched ${categoriesResponse.categories.length} browse categories');
+      AppLogger.success('Successfully fetched ${categoriesResponse.categories.length} browse categories');
 
       return categoriesResponse;
     } catch (e) {
-      _log('❌ Failed to fetch browse categories: $e');
+      AppLogger.error('Failed to fetch browse categories: $e');
       rethrow;
     }
   }
@@ -1011,7 +999,7 @@ class ApiService {
   /// This method searches products using the Shopify search query
   Future<DiscountedProductsResponse> searchProducts(String searchTerm, {int first = 20, String? cursor}) async {
     try {
-      _log('🚀 Starting to search products with term: $searchTerm');
+      AppLogger.api('Starting to search products with term: $searchTerm');
 
       final query = cursor == null
           ? '''
@@ -1106,11 +1094,11 @@ class ApiService {
       final responseData = await _makeGraphQLRequest(query);
       final searchResponse = DiscountedProductsResponse.fromJson(responseData);
 
-      _log('✅ Successfully searched products: ${searchResponse.products.length} results');
+      AppLogger.success('Successfully searched products: ${searchResponse.products.length} results');
 
       return searchResponse;
     } catch (e) {
-      _log('❌ Failed to search products: $e');
+      AppLogger.error('Failed to search products: $e');
       rethrow;
     }
   }
@@ -1119,7 +1107,7 @@ class ApiService {
   /// Used for discover/related products section
   Future<List<TopProduct>> getCollectionProductsById(String collectionId) async {
     try {
-      _log('🚀 Starting to fetch collection products for ID: $collectionId');
+      AppLogger.api('Starting to fetch collection products for ID: $collectionId');
 
       const query = '''
         query getCollectionWithProducts(\$id: ID!) {
@@ -1176,7 +1164,7 @@ class ApiService {
       // Parse the response
       final collection = responseData['data']?['collection'];
       if (collection == null) {
-        _log('⚠️ No collection found for ID: $collectionId');
+        AppLogger.warning('No collection found for ID: $collectionId');
         return [];
       }
 
@@ -1186,11 +1174,11 @@ class ApiService {
         return TopProduct.fromJson(node);
       }).toList();
 
-      _log('✅ Successfully fetched ${products.length} products from collection');
+      AppLogger.success('Successfully fetched ${products.length} products from collection');
 
       return products;
     } catch (e) {
-      _log('❌ Failed to fetch collection products: $e');
+      AppLogger.error('Failed to fetch collection products: $e');
       rethrow;
     }
   }
@@ -1202,7 +1190,7 @@ class ApiService {
     required String password,
   }) async {
     try {
-      _log('🚀 Starting customer login for email: $email');
+      AppLogger.api('Starting customer login for email: $email');
 
       const query = '''
         mutation customerAccessTokenCreate(\$input: CustomerAccessTokenCreateInput!) {
@@ -1238,24 +1226,24 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Login failed: $errorMessage');
+        AppLogger.error('Login failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final customerAccessToken = customerAccessTokenCreate?['customerAccessToken'];
       if (customerAccessToken == null) {
-        _log('❌ No access token received');
+        AppLogger.error('No access token received');
         throw Exception('Login failed: No access token received');
       }
 
-      _log('✅ Successfully logged in');
+      AppLogger.success('Successfully logged in');
 
       return {
         'accessToken': customerAccessToken['accessToken'],
         'expiresAt': customerAccessToken['expiresAt'],
       };
     } catch (e) {
-      _log('❌ Failed to login: $e');
+      AppLogger.error('Failed to login: $e');
       rethrow;
     }
   }
@@ -1264,7 +1252,7 @@ class ApiService {
   /// This mutation creates a new Shopify cart
   Future<String> cartCreate() async {
     try {
-      _log('🚀 Starting to create new cart...');
+      AppLogger.api('Starting to create new cart...');
 
       const query = '''
         mutation {
@@ -1291,22 +1279,22 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Cart creation failed: $errorMessage');
+        AppLogger.error('Cart creation failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final cart = cartCreate?['cart'];
       if (cart == null || cart['id'] == null) {
-        _log('❌ No cart ID received');
+        AppLogger.error('No cart ID received');
         throw Exception('Cart creation failed: No cart ID received');
       }
 
       final cartId = cart['id'] as String;
-      _log('✅ Successfully created cart with ID: $cartId');
+      AppLogger.success('Successfully created cart with ID: $cartId');
 
       return cartId;
     } catch (e) {
-      _log('❌ Failed to create cart: $e');
+      AppLogger.error('Failed to create cart: $e');
       rethrow;
     }
   }
@@ -1316,18 +1304,18 @@ class ApiService {
   /// This should be called after successful login when token is valid
   Future<String> getOrCreateCartId() async {
     try {
-      _log('🛒 Checking for existing cart ID...');
+      AppLogger.info('Checking for existing cart ID...');
 
       // Check if cart ID already exists in preferences
       final existingCartId = await AuthStorage.getCartId();
 
       if (existingCartId != null && existingCartId.isNotEmpty) {
-        _log('✅ Using existing cart ID: $existingCartId');
+        AppLogger.success('Using existing cart ID: $existingCartId');
         return existingCartId;
       }
 
       // No cart ID exists, create a new one
-      _log('📝 No cart ID found, creating new cart...');
+      AppLogger.info('No cart ID found, creating new cart...');
       final newCartId = await cartCreate();
 
       // Save the new cart ID to preferences
@@ -1335,7 +1323,7 @@ class ApiService {
 
       return newCartId;
     } catch (e) {
-      _log('❌ Failed to get or create cart ID: $e');
+      AppLogger.error('Failed to get or create cart ID: $e');
       rethrow;
     }
   }
@@ -1350,10 +1338,10 @@ class ApiService {
     int quantity = 1,
   }) async {
     try {
-      _log('🛒 Adding product to cart...');
-      _log('Cart ID: $cartId');
-      _log('Merchandise ID: $merchandiseId');
-      _log('Quantity: $quantity');
+      AppLogger.info('Adding product to cart...');
+      AppLogger.info('Cart ID: $cartId');
+      AppLogger.info('Merchandise ID: $merchandiseId');
+      AppLogger.info('Quantity: $quantity');
 
       const query = r'''
         mutation cartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
@@ -1405,21 +1393,21 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Add to cart failed: $errorMessage');
+        AppLogger.error('Add to cart failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final cart = cartLinesAdd?['cart'];
       if (cart == null) {
-        _log('❌ No cart data received');
+        AppLogger.error('No cart data received');
         throw Exception('Add to cart failed: No cart data received');
       }
 
-      _log('✅ Successfully added product to cart');
+      AppLogger.success('Successfully added product to cart');
 
       return cart as Map<String, dynamic>;
     } catch (e) {
-      _log('❌ Failed to add product to cart: $e');
+      AppLogger.error('Failed to add product to cart: $e');
       rethrow;
     }
   }
@@ -1428,7 +1416,7 @@ class ApiService {
   /// Fetches complete cart information including products, quantities, and pricing
   Future<Map<String, dynamic>> getCart(String cartId) async {
     try {
-      _log('🛒 Fetching cart details for ID: $cartId');
+      AppLogger.info('Fetching cart details for ID: $cartId');
 
       const query = r'''
         query getCart($cartId: ID!) {
@@ -1512,15 +1500,15 @@ class ApiService {
 
       final cart = responseData['data']?['cart'];
       if (cart == null) {
-        _log('❌ No cart data received');
+        AppLogger.error('No cart data received');
         throw Exception('Cart not found');
       }
 
-      _log('✅ Successfully fetched cart details');
+      AppLogger.success('Successfully fetched cart details');
 
       return cart as Map<String, dynamic>;
     } catch (e) {
-      _log('❌ Failed to fetch cart: $e');
+      AppLogger.error('Failed to fetch cart: $e');
       rethrow;
     }
   }
@@ -1533,9 +1521,9 @@ class ApiService {
     required List<Map<String, dynamic>> lines,
   }) async {
     try {
-      _log('🛒 Updating cart line quantities...');
-      _log('Cart ID: $cartId');
-      _log('Lines: $lines');
+      AppLogger.info('Updating cart line quantities...');
+      AppLogger.info('Cart ID: $cartId');
+      AppLogger.info('Lines: $lines');
 
       const query = r'''
         mutation cartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
@@ -1576,21 +1564,21 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Update cart failed: $errorMessage');
+        AppLogger.error('Update cart failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final cart = cartLinesUpdate?['cart'];
       if (cart == null) {
-        _log('❌ No cart data received');
+        AppLogger.error('No cart data received');
         throw Exception('Update cart failed: No cart data received');
       }
 
-      _log('✅ Successfully updated cart lines');
+      AppLogger.success('Successfully updated cart lines');
 
       return cart as Map<String, dynamic>;
     } catch (e) {
-      _log('❌ Failed to update cart lines: $e');
+      AppLogger.error('Failed to update cart lines: $e');
       rethrow;
     }
   }
@@ -1603,9 +1591,9 @@ class ApiService {
     required List<String> lineIds,
   }) async {
     try {
-      _log('🛒 Removing lines from cart...');
-      _log('Cart ID: $cartId');
-      _log('Line IDs: $lineIds');
+      AppLogger.info('Removing lines from cart...');
+      AppLogger.info('Cart ID: $cartId');
+      AppLogger.info('Line IDs: $lineIds');
 
       const query = r'''
         mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
@@ -1652,21 +1640,21 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Remove from cart failed: $errorMessage');
+        AppLogger.error('Remove from cart failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final cart = cartLinesRemove?['cart'];
       if (cart == null) {
-        _log('❌ No cart data received');
+        AppLogger.error('No cart data received');
         throw Exception('Remove from cart failed: No cart data received');
       }
 
-      _log('✅ Successfully removed lines from cart');
+      AppLogger.success('Successfully removed lines from cart');
 
       return cart as Map<String, dynamic>;
     } catch (e) {
-      _log('❌ Failed to remove lines from cart: $e');
+      AppLogger.error('Failed to remove lines from cart: $e');
       rethrow;
     }
   }
@@ -1675,8 +1663,8 @@ class ApiService {
   /// [customerAccessToken] - The customer access token
   Future<Customer?> getCustomer(String customerAccessToken) async {
     try {
-      _log('👤 Fetching customer details...');
-      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      AppLogger.api('Fetching customer details...');
+      AppLogger.info('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
 
       const query = r'''
         query getCustomer($customerAccessToken: String!) {
@@ -1731,19 +1719,19 @@ class ApiService {
 
       final customer = responseData['data']?['customer'];
       if (customer == null) {
-        _log('⚠️ No customer data received');
+        AppLogger.warning('No customer data received');
         return null;
       }
 
       final customerModel = Customer.fromJson(customer);
-      _log('✅ Successfully fetched customer details');
-      _log('Customer has ${customerModel.addresses.length} addresses');
-      _log('Has default address: ${customerModel.defaultAddress != null}');
-      _log('Has complete address: ${customerModel.hasCompleteAddress()}');
+      AppLogger.success('Successfully fetched customer details');
+      AppLogger.info('Customer has ${customerModel.addresses.length} addresses');
+      AppLogger.info('Has default address: ${customerModel.defaultAddress != null}');
+      AppLogger.info('Has complete address: ${customerModel.hasCompleteAddress()}');
 
       return customerModel;
     } catch (e) {
-      _log('❌ Failed to fetch customer: $e');
+      AppLogger.error('Failed to fetch customer: $e');
       rethrow;
     }
   }
@@ -1756,9 +1744,9 @@ class ApiService {
     required String addressId,
   }) async {
     try {
-      _log('🗑️ Deleting customer address...');
-      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
-      _log('Address ID: $addressId');
+      AppLogger.api('Deleting customer address...');
+      AppLogger.info('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      AppLogger.info('Address ID: $addressId');
 
       const query = r'''
         mutation customerAddressDelete($customerAccessToken: String!, $id: ID!) {
@@ -1789,20 +1777,20 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Delete address failed: $errorMessage');
+        AppLogger.error('Delete address failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final deletedId = customerAddressDelete?['deletedCustomerAddressId'];
       if (deletedId == null) {
-        _log('❌ No deleted address ID received');
+        AppLogger.error('No deleted address ID received');
         return false;
       }
 
-      _log('✅ Successfully deleted address: $deletedId');
+      AppLogger.success('Successfully deleted address: $deletedId');
       return true;
     } catch (e) {
-      _log('❌ Failed to delete address: $e');
+      AppLogger.error('Failed to delete address: $e');
       rethrow;
     }
   }
@@ -1815,9 +1803,9 @@ class ApiService {
     required Map<String, dynamic> address,
   }) async {
     try {
-      _log('📝 Creating customer address...');
-      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
-      _log('Address data: $address');
+      AppLogger.api('Creating customer address...');
+      AppLogger.info('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      AppLogger.info('Address data: $address');
 
       const query = r'''
         mutation customerAddressCreate($customerAccessToken: String!, $address: MailingAddressInput!) {
@@ -1860,23 +1848,23 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Create address failed: $errorMessage');
+        AppLogger.error('Create address failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final customerAddress = customerAddressCreate?['customerAddress'];
       if (customerAddress == null) {
-        _log('❌ No customer address received');
+        AppLogger.error('No customer address received');
         throw Exception('Failed to create address');
       }
 
-      _log('✅ Successfully created address: ${customerAddress['id']}');
+      AppLogger.success('Successfully created address: ${customerAddress['id']}');
 
       // Fetch updated customer data to return
       final updatedCustomer = await getCustomer(customerAccessToken);
       return updatedCustomer;
     } catch (e) {
-      _log('❌ Failed to create address: $e');
+      AppLogger.error('Failed to create address: $e');
       rethrow;
     }
   }
@@ -1891,10 +1879,10 @@ class ApiService {
     required Map<String, dynamic> address,
   }) async {
     try {
-      _log('📝 Updating customer address...');
-      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
-      _log('Address ID: $addressId');
-      _log('Address data: $address');
+      AppLogger.api('Updating customer address...');
+      AppLogger.info('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      AppLogger.info('Address ID: $addressId');
+      AppLogger.info('Address data: $address');
 
       const query = r'''
         mutation customerAddressUpdate($customerAccessToken: String!, $id: ID!, $address: MailingAddressInput!) {
@@ -1938,23 +1926,23 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Update address failed: $errorMessage');
+        AppLogger.error('Update address failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
       final customerAddress = customerAddressUpdate?['customerAddress'];
       if (customerAddress == null) {
-        _log('❌ No customer address received');
+        AppLogger.error('No customer address received');
         throw Exception('Failed to update address');
       }
 
-      _log('✅ Successfully updated address: ${customerAddress['id']}');
+      AppLogger.success('Successfully updated address: ${customerAddress['id']}');
 
       // Fetch updated customer data to return
       final updatedCustomer = await getCustomer(customerAccessToken);
       return updatedCustomer;
     } catch (e) {
-      _log('❌ Failed to update address: $e');
+      AppLogger.error('Failed to update address: $e');
       rethrow;
     }
   }
@@ -1967,9 +1955,9 @@ class ApiService {
     required String addressId,
   }) async {
     try {
-      _log('🔄 Updating customer default address...');
-      _log('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
-      _log('Address ID: $addressId');
+      AppLogger.api('Updating customer default address...');
+      AppLogger.info('Customer Access Token: ${customerAccessToken.substring(0, 10)}...');
+      AppLogger.info('Address ID: $addressId');
 
       const query = r'''
         mutation customerDefaultAddressUpdate($customerAccessToken: String!, $addressId: ID!) {
@@ -2002,17 +1990,17 @@ class ApiService {
 
       if (userErrors.isNotEmpty) {
         final errorMessage = userErrors.map((e) => e['message']).join(', ');
-        _log('❌ Update default address failed: $errorMessage');
+        AppLogger.error('Update default address failed: $errorMessage');
         throw Exception(errorMessage);
       }
 
-      _log('✅ Successfully updated default address');
+      AppLogger.success('Successfully updated default address');
 
       // Fetch updated customer data to return
       final updatedCustomer = await getCustomer(customerAccessToken);
       return updatedCustomer;
     } catch (e) {
-      _log('❌ Failed to update default address: $e');
+      AppLogger.error('Failed to update default address: $e');
       rethrow;
     }
   }
@@ -2021,7 +2009,7 @@ class ApiService {
   /// Returns a list of pages from Shopify
   Future<PagesResponse> getPages({int first = 50}) async {
     try {
-      _log('📄 Fetching pages...');
+      AppLogger.api('Fetching pages...');
 
       const query = r'''
         query getPages($first: Int!) {
@@ -2057,11 +2045,11 @@ class ApiService {
       );
 
       final pagesResponse = PagesResponse.fromJson(responseData['data']);
-      _log('✅ Successfully fetched ${pagesResponse.pages.length} pages');
+      AppLogger.success('Successfully fetched ${pagesResponse.pages.length} pages');
 
       return pagesResponse;
     } catch (e) {
-      _log('❌ Failed to fetch pages: $e');
+      AppLogger.error('Failed to fetch pages: $e');
       rethrow;
     }
   }
@@ -2077,7 +2065,7 @@ class ApiService {
       // Extract numeric ID if GID is provided
       final numericId = productId.contains('/') ? productId.split('/').last : productId;
 
-      _log('🔗 Fetching related products for product ID: $numericId');
+      AppLogger.api('Fetching related products for product ID: $numericId');
 
       final url = 'https://glocure.com/recommendations/products.json?product_id=$numericId&intent=related&limit=$limit';
 
@@ -2089,25 +2077,25 @@ class ApiService {
         },
       );
 
-      _log('Status Code: ${response.statusCode}');
+      AppLogger.info('Related products API Status Code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
         if (responseData['products'] != null) {
           final products = responseData['products'] as List<dynamic>;
-          _log('✅ Successfully fetched ${products.length} related products');
+          AppLogger.success('Successfully fetched ${products.length} related products');
           return products.cast<Map<String, dynamic>>();
         }
 
-        _log('⚠️ No related products found');
+        AppLogger.warning('No related products found');
         return [];
       } else {
-        _log('❌ HTTP Error: ${response.statusCode}');
+        AppLogger.error('HTTP Error: ${response.statusCode}');
         throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ Failed to fetch related products: $e');
+      AppLogger.error('Failed to fetch related products: $e');
       rethrow;
     }
   }

@@ -5,6 +5,7 @@ import '../config/api_config.dart';
 import '../models/order_model.dart';
 import '../models/cart_model.dart';
 import '../models/customer_model.dart';
+import '../utils/app_logger.dart';
 
 /// Order Service
 /// Handles order creation and management via Shopify REST API
@@ -43,7 +44,7 @@ class OrderService {
       }
 
       // Prepare line items
-      debugPrint('🔍 Processing ${cart.lines.length} cart items...');
+      AppLogger.info('Processing ${cart.lines.length} cart items...');
       final lineItems = <Map<String, dynamic>>[];
       
       for (var i = 0; i < cart.lines.length; i++) {
@@ -51,15 +52,15 @@ class OrderService {
         final merchandise = cartLine.merchandise;
         
         if (merchandise == null) {
-          debugPrint('❌ Cart item $i has no merchandise');
+          AppLogger.error('Cart item $i has no merchandise');
           throw Exception('Invalid cart item at index $i');
         }
 
-        debugPrint('📦 Item $i: ${merchandise.product.title}');
-        debugPrint('   Variant ID (GID): ${merchandise.id}');
+        AppLogger.info('Item $i: ${merchandise.product.title}');
+        AppLogger.info('   Variant ID (GID): ${merchandise.id}');
         
         final variantId = _extractNumericId(merchandise.id);
-        debugPrint('   Variant ID (Numeric): $variantId');
+        AppLogger.info('   Variant ID (Numeric): $variantId');
         
         try {
           final numericId = int.parse(variantId);
@@ -67,15 +68,15 @@ class OrderService {
             'variant_id': numericId,
             'quantity': cartLine.quantity,
           });
-          debugPrint('   ✅ Added: variant_id=$numericId, qty=${cartLine.quantity}');
+          AppLogger.success('   Added: variant_id=$numericId, qty=${cartLine.quantity}');
         } catch (e) {
-          debugPrint('   ❌ Failed to parse variant ID: $e');
+          AppLogger.error('   Failed to parse variant ID: $e');
           throw Exception('Invalid variant ID format: $variantId');
         }
       }
 
       // Prepare shipping address
-      debugPrint('📍 Preparing shipping address...');
+      AppLogger.info('Preparing shipping address...');
       final shippingAddress = {
         'first_name': address.firstName ?? customer.firstName ?? 'Customer',
         'last_name': address.lastName ?? customer.lastName ?? 'Name',
@@ -108,22 +109,22 @@ class OrderService {
 
       // Log request
       final fullUrl = '$_baseUrl/orders.json';
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📦 SHOPIFY ORDER CREATION REQUEST');
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('🔗 Full URL: $fullUrl');
-      debugPrint('🔗 Method: POST');
-      debugPrint('📧 Email: ${customer.email}');
-      debugPrint('📦 Items: ${lineItems.length}');
-      debugPrint('💳 Payment Method: $paymentMethod');
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📋 Headers:');
-      debugPrint('   X-Shopify-Access-Token: ${ApiConfig.shopifyAdminAccessToken}');
-      debugPrint('   Content-Type: application/json');
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📝 Raw JSON Body:');
-      debugPrint(json.encode(orderPayload));
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('SHOPIFY ORDER CREATION REQUEST');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('Full URL: $fullUrl');
+      AppLogger.info('Method: POST');
+      AppLogger.info('Email: ${customer.email}');
+      AppLogger.info('Items: ${lineItems.length}');
+      AppLogger.info('Payment Method: $paymentMethod');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Headers:');
+      AppLogger.info('   X-Shopify-Access-Token: ${ApiConfig.shopifyAdminAccessToken}');
+      AppLogger.info('   Content-Type: application/json');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Raw JSON Body:');
+      AppLogger.info(json.encode(orderPayload));
+      AppLogger.info('═══════════════════════════════════════════════════════');
 
       final startTime = DateTime.now();
 
@@ -141,7 +142,7 @@ class OrderService {
         final streamedResponse = await client.send(request).timeout(
           const Duration(seconds: 30),
           onTimeout: () {
-            debugPrint('❌ REQUEST TIMEOUT after 30 seconds');
+            AppLogger.error('REQUEST TIMEOUT after 30 seconds');
             throw Exception('Request timeout');
           },
         );
@@ -155,36 +156,36 @@ class OrderService {
       final duration = endTime.difference(startTime);
 
       // Log response
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📥 SHOPIFY ORDER CREATION RESPONSE');
-      debugPrint('═══════════════════════════════════════════════════════');
-      debugPrint('📊 Status Code: ${response.statusCode}');
-      debugPrint('⏱️ Response Time: ${duration.inMilliseconds}ms');
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📋 Response Headers:');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('SHOPIFY ORDER CREATION RESPONSE');
+      AppLogger.info('═══════════════════════════════════════════════════════');
+      AppLogger.info('Status Code: ${response.statusCode}');
+      AppLogger.info('Response Time: ${duration.inMilliseconds}ms');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Response Headers:');
       response.headers.forEach((key, value) {
-        debugPrint('   $key: $value');
+        AppLogger.info('   $key: $value');
       });
-      debugPrint('───────────────────────────────────────────────────────');
-      debugPrint('📝 Response Body:');
+      AppLogger.info('───────────────────────────────────────────────────────');
+      AppLogger.info('Response Body:');
       if (response.body.isNotEmpty) {
         try {
           final jsonData = json.decode(response.body);
-          debugPrint(const JsonEncoder.withIndent('  ').convert(jsonData));
+          AppLogger.info(const JsonEncoder.withIndent('  ').convert(jsonData));
         } catch (e) {
-          debugPrint(response.body);
+          AppLogger.info(response.body);
         }
       } else {
-        debugPrint('(empty)');
+        AppLogger.info('(empty)');
       }
-      debugPrint('═══════════════════════════════════════════════════════');
+      AppLogger.info('═══════════════════════════════════════════════════════');
 
       // Handle redirect
       if (response.statusCode == 301 || response.statusCode == 302) {
         final location = response.headers['location'];
-        debugPrint('❌ REDIRECT DETECTED');
-        debugPrint('Redirect Location: $location');
-        debugPrint('Original URL: $_baseUrl/orders.json');
+        AppLogger.error('REDIRECT DETECTED');
+        AppLogger.error('Redirect Location: $location');
+        AppLogger.error('Original URL: $_baseUrl/orders.json');
         throw Exception('API redirected to: $location');
       }
 
@@ -194,13 +195,13 @@ class OrderService {
         if (data['order'] != null) {
           final order = OrderModel.fromJson(data['order']);
           
-          debugPrint('═══════════════════════════════════════════════════════');
-          debugPrint('✅ ORDER CREATED SUCCESSFULLY');
-          debugPrint('═══════════════════════════════════════════════════════');
-          debugPrint('🆔 Order ID: ${order.id}');
-          debugPrint('📋 Order Number: ${order.orderNumber}');
-          debugPrint('💰 Total Price: ${order.totalPrice}');
-          debugPrint('═══════════════════════════════════════════════════════');
+          AppLogger.success('═══════════════════════════════════════════════════════');
+          AppLogger.success('ORDER CREATED SUCCESSFULLY');
+          AppLogger.success('═══════════════════════════════════════════════════════');
+          AppLogger.success('Order ID: ${order.id}');
+          AppLogger.success('Order Number: ${order.orderNumber}');
+          AppLogger.success('Total Price: ${order.totalPrice}');
+          AppLogger.success('═══════════════════════════════════════════════════════');
           
           return order;
         } else {
@@ -210,8 +211,8 @@ class OrderService {
         final data = json.decode(response.body);
         final errors = data['errors'] ?? {};
         
-        debugPrint('❌ VALIDATION ERROR (422)');
-        debugPrint('Errors: $errors');
+        AppLogger.error('VALIDATION ERROR (422)');
+        AppLogger.error('Errors: $errors');
         
         String errorMessage = 'Validation failed';
         if (errors is Map) {
@@ -230,17 +231,17 @@ class OrderService {
         
         throw Exception(errorMessage);
       } else if (response.statusCode == 401) {
-        debugPrint('❌ AUTHENTICATION ERROR (401)');
+        AppLogger.error('AUTHENTICATION ERROR (401)');
         throw Exception('Authentication failed');
       } else if (response.statusCode == 403) {
-        debugPrint('❌ PERMISSION ERROR (403)');
+        AppLogger.error('PERMISSION ERROR (403)');
         throw Exception('Permission denied');
       } else {
-        debugPrint('❌ ERROR: Status ${response.statusCode}');
+        AppLogger.error('ERROR: Status ${response.statusCode}');
         throw Exception('Failed to create order: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('❌ EXCEPTION: ${e.toString()}');
+      AppLogger.error('EXCEPTION: ${e.toString()}');
       rethrow;
     }
   }
@@ -307,7 +308,7 @@ class OrderService {
         throw Exception('Failed to update order: ${response.statusCode}');
       }
 
-      debugPrint('✅ Order status updated: $financialStatus');
+      AppLogger.success('Order status updated: $financialStatus');
     } catch (e) {
       throw Exception('Unable to update order: ${e.toString()}');
     }

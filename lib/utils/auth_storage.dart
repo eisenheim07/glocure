@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app_logger.dart';
 
 /// Authentication storage helper
 /// Manages storing and retrieving authentication tokens and user preferences
@@ -30,7 +31,7 @@ class AuthStorage {
   /// Check if user is logged in and token is valid
   static Future<bool> isLoggedIn() async {
     final token = await getToken();
-    print("CUSTOMER_ACCESS_TOKEN ===> $token");
+    AppLogger.info("CUSTOMER_ACCESS_TOKEN ===> $token");
     if (token == null) return false;
 
     final expiresAt = await getExpiresAt();
@@ -51,12 +52,12 @@ class AuthStorage {
       final isExpired = DateTime.now().isAfter(expiryDate);
       
       if (isExpired) {
-        print("⚠️ Token expired at: $expiresAt");
+        AppLogger.warning("Token expired at: $expiresAt");
       }
       
       return isExpired;
     } catch (e) {
-      print("❌ Error parsing expiry date: $e");
+      AppLogger.error("Error parsing expiry date: $e");
       return true;
     }
   }
@@ -77,7 +78,7 @@ class AuthStorage {
   static Future<void> clearAllData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    print("🗑️ All user data cleared (including cart ID)");
+    AppLogger.info("All user data cleared (including cart ID)");
   }
 
   /// Clear only authentication data (keep language selection)
@@ -85,21 +86,21 @@ class AuthStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_accessTokenKey);
     await prefs.remove(_expiresAtKey);
-    print("🗑️ Authentication data cleared");
+    AppLogger.info("Authentication data cleared");
   }
 
   /// Save cart ID
   static Future<void> saveCartId(String cartId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_cartIdKey, cartId);
-    print("🛒 Cart ID saved: $cartId");
+    AppLogger.info("Cart ID saved: $cartId");
   }
 
   /// Get cart ID
   static Future<String?> getCartId() async {
     final prefs = await SharedPreferences.getInstance();
     final cartId = prefs.getString(_cartIdKey);
-    print("🛒 Cart ID retrieved: $cartId");
+    AppLogger.info("Cart ID retrieved: $cartId");
     return cartId;
   }
 
@@ -107,6 +108,6 @@ class AuthStorage {
   static Future<void> clearCartId() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_cartIdKey);
-    print("🗑️ Cart ID cleared");
+    AppLogger.info("Cart ID cleared");
   }
 }

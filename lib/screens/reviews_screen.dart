@@ -49,9 +49,9 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
+        type: AppBarType.simple,
         title: 'Reviews',
-        showBackButton: true,
       ),
       body: BlocBuilder<ReviewsCubit, ReviewsState>(
         builder: (context, state) {
@@ -495,6 +495,28 @@ class _ReviewCard extends StatelessWidget {
                       child: Image.network(
                         picture.url,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+                          return Container(
+                            color: Colors.grey.shade50,
+                            child: Center(
+                              child: SizedBox(
+                                width: 20.h,
+                                height: 20.h,
+                                child: CircularProgressIndicator(
+                                  color: const Color(0xFFFF5C9A),
+                                  strokeWidth: 2,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey.shade100,

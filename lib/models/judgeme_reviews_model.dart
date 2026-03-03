@@ -54,6 +54,7 @@ class JudgemeReview {
       createdAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
       pictures: (json['pictures'] as List<dynamic>? ?? [])
           .map((picture) => JudgemeReviewImage.fromJson(picture))
+          .where((image) => !image.hidden) // Filter out hidden images
           .toList(),
     );
   }
@@ -89,44 +90,101 @@ class JudgemeReview {
 }
 
 class JudgemeReviewImage {
-  final String url;
+  final Map<String, String> urls;
+  final bool hidden;
   final String? altText;
 
   JudgemeReviewImage({
-    required this.url,
+    required this.urls,
+    this.hidden = false,
     this.altText,
   });
 
   factory JudgemeReviewImage.fromJson(Map<String, dynamic> json) {
+    // Handle null or missing urls field
+    final urlsData = json['urls'];
+    Map<String, String> urls = {};
+    
+    if (urlsData != null && urlsData is Map) {
+      urls = Map<String, String>.from(urlsData);
+    }
+    
     return JudgemeReviewImage(
-      url: json['url'] ?? '',
+      urls: urls,
+      hidden: json['hidden'] ?? false,
       altText: json['alt_text'],
     );
+  }
+
+  /// Get the best quality image URL
+  String get url {
+    if (urls.isEmpty) return '';
+    
+    // Priority: original > huge > compact > small
+    if (urls.containsKey('original') && urls['original'] != null && urls['original']!.isNotEmpty) {
+      return urls['original']!;
+    } else if (urls.containsKey('huge') && urls['huge'] != null && urls['huge']!.isNotEmpty) {
+      return urls['huge']!;
+    } else if (urls.containsKey('compact') && urls['compact'] != null && urls['compact']!.isNotEmpty) {
+      return urls['compact']!;
+    } else if (urls.containsKey('small') && urls['small'] != null && urls['small']!.isNotEmpty) {
+      return urls['small']!;
+    }
+    return ''; // Fallback to empty string
+  }
+
+  /// Get thumbnail URL for smaller displays
+  String get thumbnailUrl {
+    if (urls.isEmpty) return '';
+    
+    // Priority: small > compact > original > huge
+    if (urls.containsKey('small') && urls['small'] != null && urls['small']!.isNotEmpty) {
+      return urls['small']!;
+    } else if (urls.containsKey('compact') && urls['compact'] != null && urls['compact']!.isNotEmpty) {
+      return urls['compact']!;
+    } else if (urls.containsKey('original') && urls['original'] != null && urls['original']!.isNotEmpty) {
+      return urls['original']!;
+    } else if (urls.containsKey('huge') && urls['huge'] != null && urls['huge']!.isNotEmpty) {
+      return urls['huge']!;
+    }
+    return ''; // Fallback to empty string
   }
 }
 
 class JudgemeReviewsMeta {
   final int currentPage;
-  final int totalPages;
-  final int totalCount;
   final int perPage;
+  final bool hasMorePages; // Determined by checking if we got fewer reviews than requested
 
   JudgemeReviewsMeta({
     required this.currentPage,
-    required this.totalPages,
-    required this.totalCount,
     required this.perPage,
+    this.hasMorePages = true, // Default to true, will be updated based on reviews count
   });
 
   factory JudgemeReviewsMeta.fromJson(Map<String, dynamic> json) {
     return JudgemeReviewsMeta(
       currentPage: json['current_page'] ?? 1,
-      totalPages: json['total_pages'] ?? 1,
-      totalCount: json['total_count'] ?? 0,
       perPage: json['per_page'] ?? 10,
+      hasMorePages: true, // Will be updated in the service based on reviews length
     );
   }
 
-  /// Check if there are more pages
-  bool get hasNextPage => currentPage < totalPages;
+  /// Create a copy with updated pagination info
+  JudgemeReviewsMeta copyWith({
+    int? currentPage,
+    int? perPage,
+    bool? hasMorePages,
+  }) {
+    return JudgemeReviewsMeta(
+      currentPage: currentPage ?? this.currentPage,
+      perPage: perPage ?? this.perPage,
+      hasMorePages: hasMorePages ?? this.hasMorePages,
+    );
+  }
+
+  /// Check if there are more pages available
+  bool get hasNextPage {
+    return hasMorePages;
+  }
 }

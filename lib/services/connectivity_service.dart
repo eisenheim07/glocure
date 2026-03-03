@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import '../utils/app_logger.dart';
 
 /// Service to handle internet connectivity checking for the entire app
 class ConnectivityService {

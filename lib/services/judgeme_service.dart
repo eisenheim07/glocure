@@ -3,20 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/judgeme_product_model.dart';
 import '../models/judgeme_reviews_model.dart';
+import '../utils/app_logger.dart';
 import 'connectivity_service.dart';
 
 /// Judge.me API Service
 /// This service handles all Judge.me API calls for product reviews
 class JudgemeService {
-  // Judge.me API configuration
   static const String _baseUrl = 'https://judge.me/api/v1';
   static const String _shopDomain = 'bxaqgp-p1.myshopify.com';
   static const String _apiToken = 'Ght5-t24nmY0x8e7EYDoyp26ca8';
-
-  /// Simple continuous logging
-  void _log(String message) {
-    debugPrint('🟡 JUDGEME_API: $message');
-  }
 
   /// Get Judge.me product ID by external product ID (Shopify product ID)
   /// [externalId] - Shopify product ID (e.g., "8595686588594")
@@ -28,37 +23,43 @@ class JudgemeService {
     }
 
     try {
-      _log('🚀 Fetching Judge.me product for external ID: $externalId');
-
       final url = '$_baseUrl/products/-1?shop_domain=$_shopDomain&api_token=$_apiToken&external_id=$externalId';
       
-      _log('📤 Request URL: $url');
+      AppLogger.judgemeRequest(
+        endpoint: 'Get Product by External ID',
+        url: url,
+        params: {'external_id': externalId},
+      );
 
       final response = await http.get(Uri.parse(url));
 
-      _log('📥 Response Status: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-        
-        _log('📥 Response Data: ${jsonEncode(responseData)}');
-
         final productResponse = JudgemeProductResponse.fromJson(responseData);
         
-        _log('✅ Successfully fetched Judge.me product: ${productResponse.product?.name}');
+        AppLogger.judgemeResponse(
+          endpoint: 'Get Product by External ID',
+          statusCode: response.statusCode,
+          responseData: responseData,
+          itemCount: productResponse.product != null ? 1 : 0,
+        );
         
         return productResponse;
       } else {
-        _log('❌ HTTP Error: ${response.statusCode} - ${response.body}');
+        AppLogger.judgemeResponse(
+          endpoint: 'Get Product by External ID',
+          statusCode: response.statusCode,
+          error: 'HTTP Error: ${response.statusCode} - ${response.body}',
+        );
         throw Exception('Failed to fetch product reviews: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ Exception occurred: $e');
+      AppLogger.error('Judge.me getProductByExternalId failed: $e');
       rethrow;
     }
   }
 
-  /// Get product reviews by Judge.me product ID
+  /// Get product reviews by Judge.me product ID with smart pagination
   /// [productId] - Judge.me product ID (from getProductByExternalId response)
   /// [page] - Page number for pagination (default: 1)
   /// [limit] - Number of reviews per page (default: 10)
@@ -74,32 +75,60 @@ class JudgemeService {
     }
 
     try {
-      _log('🚀 Fetching reviews for product ID: $productId (page: $page, limit: $limit)');
-
       final url = '$_baseUrl/reviews?shop_domain=$_shopDomain&api_token=$_apiToken&product_id=$productId&limit=$limit&page=$page';
       
-      _log('📤 Request URL: $url');
+      AppLogger.judgemeRequest(
+        endpoint: 'Get Product Reviews',
+        url: url,
+        params: {
+          'product_id': productId.toString(),
+          'page': page.toString(),
+          'limit': limit.toString(),
+        },
+      );
 
       final response = await http.get(Uri.parse(url));
 
-      _log('📥 Response Status: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-        
-        _log('📥 Response Data Length: ${jsonEncode(responseData).length}');
-
         final reviewsResponse = JudgemeReviewsResponse.fromJson(responseData);
         
-        _log('✅ Successfully fetched ${reviewsResponse.reviews.length} reviews (page $page/${reviewsResponse.meta.totalPages})');
+        // Determine if there are more pages by checking if we got fewer reviews than requested
+        // If we got fewer reviews than the limit, we've reached the end
+        final hasMorePages = reviewsResponse.reviews.length >= limit;
         
-        return reviewsResponse;
+        // Update meta with pagination info
+        final updatedMeta = reviewsResponse.meta.copyWith(
+          currentPage: page,
+          hasMorePages: hasMorePages,
+        );
+        
+        // Create updated response with correct pagination meta
+        final updatedResponse = JudgemeReviewsResponse(
+          reviews: reviewsResponse.reviews,
+          meta: updatedMeta,
+        );
+        
+        AppLogger.judgemeResponse(
+          endpoint: 'Get Product Reviews',
+          statusCode: response.statusCode,
+          responseData: responseData,
+          itemCount: reviewsResponse.reviews.length,
+        );
+        
+        AppLogger.judgeme('Pagination: Page $page requested $limit reviews, got ${reviewsResponse.reviews.length}, hasMorePages: $hasMorePages');
+        
+        return updatedResponse;
       } else {
-        _log('❌ HTTP Error: ${response.statusCode} - ${response.body}');
+        AppLogger.judgemeResponse(
+          endpoint: 'Get Product Reviews',
+          statusCode: response.statusCode,
+          error: 'HTTP Error: ${response.statusCode} - ${response.body}',
+        );
         throw Exception('Failed to fetch reviews: ${response.statusCode}');
       }
     } catch (e) {
-      _log('❌ Exception occurred: $e');
+      AppLogger.error('Judge.me getProductReviews failed: $e');
       rethrow;
     }
   }
@@ -114,21 +143,20 @@ class JudgemeService {
     int limit = 10,
   }) async {
     try {
-      _log('🚀 Getting reviews for external ID: $externalId');
+      AppLogger.judgeme('🚀 Getting reviews for external ID: $externalId');
 
       // First, get the Judge.me product ID
       final productResponse = await getProductByExternalId(externalId);
       
       if (productResponse.product == null) {
-        _log('❌ No Judge.me product found for external ID: $externalId');
+        AppLogger.warning('No Judge.me product found for external ID: $externalId');
         // Return empty response if product not found
         return JudgemeReviewsResponse(
           reviews: [],
           meta: JudgemeReviewsMeta(
             currentPage: 1,
-            totalPages: 1,
-            totalCount: 0,
             perPage: limit,
+            hasMorePages: false,
           ),
         );
       }
@@ -140,11 +168,11 @@ class JudgemeService {
         limit: limit,
       );
 
-      _log('✅ Successfully fetched reviews for external ID: $externalId');
+      AppLogger.success('Successfully fetched reviews for external ID: $externalId');
       
       return reviewsResponse;
     } catch (e) {
-      _log('❌ Failed to get reviews for external ID $externalId: $e');
+      AppLogger.error('Failed to get reviews for external ID $externalId: $e');
       rethrow;
     }
   }
