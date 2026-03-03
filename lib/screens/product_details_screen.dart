@@ -13,6 +13,12 @@ import '../cubits/top_products/top_products_cubit.dart';
 import '../cubits/top_products/top_products_state.dart';
 import '../cubits/product_details/product_details_cubit.dart';
 import '../cubits/product_details/product_details_state.dart';
+import '../cubits/reviews/reviews_cubit.dart';
+import '../models/judgeme_reviews_model.dart';
+import '../models/judgeme_product_model.dart';
+import '../widgets/product_rating_widget.dart';
+import '../widgets/product_reviews_summary.dart';
+import '../screens/reviews_screen.dart';
 import 'category_products.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -53,6 +59,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           productId: widget.productId,
           handle: widget.handle,
         );
+
+    // Initialize reviews if we have a product ID
+    final productId = widget.product?.id ?? widget.productId;
+    if (productId != null) {
+      // Extract numeric ID from Shopify GID
+      final numericId = productId.contains('/') ? productId.split('/').last : productId;
+      context.read<ReviewsCubit>().fetchReviews(numericId);
+    }
 
     // Initialize heart animation
     _heartAnimationController = AnimationController(
@@ -472,6 +486,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       // Pricing row
                       _buildPricingRow(currentPrice, originalPrice, discount),
 
+                      // Product rating (below price)
+                      BlocBuilder<ReviewsCubit, ReviewsState>(
+                        builder: (context, reviewsState) {
+                          if (reviewsState is ReviewsLoaded && reviewsState.product != null) {
+                            final productId = state.product.id;
+                            final numericId = productId.contains('/') ? productId.split('/').last : productId;
+                            return ProductRatingWidget(
+                              product: reviewsState.product,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReviewsScreen(
+                                      productId: numericId,
+                                      productName: state.product.title,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+
                       const SizedBox(height: 12),
 
                       // Variant selector
@@ -484,6 +523,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       if (description.isNotEmpty) _buildDescription(description),
 
                       const SizedBox(height: 20),
+
+                      // Product Reviews Section
+                      _buildReviewsSection(state),
                     ],
                   ),
                 ),
@@ -995,6 +1037,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 _buildSpecificationsShimmer(),
 
                 const SizedBox(height: 16),
+
+                // Reviews shimmer
+                _buildReviewsShimmer(),
 
                 // Description shimmer
                 Shimmer.fromColors(
@@ -2060,6 +2105,457 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Product Reviews Section
+  Widget _buildReviewsSection(ProductDetailsLoaded state) {
+    return BlocBuilder<ReviewsCubit, ReviewsState>(
+      builder: (context, reviewsState) {
+        if (reviewsState is ReviewsLoading) {
+          return _buildReviewsShimmer();
+        }
+
+        if (reviewsState is ReviewsError) {
+          return const SizedBox.shrink(); // Hide on error
+        }
+
+        if (reviewsState is ReviewsLoaded) {
+          // If no reviews available
+          if (reviewsState.reviews.isEmpty) {
+            return _buildNoReviewsSection();
+          }
+
+          // Show reviews in card format
+          return _buildReviewsCard(state, reviewsState);
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  /// Reviews card with proper styling matching specifications
+  Widget _buildReviewsCard(ProductDetailsLoaded state, ReviewsLoaded reviewsState) {
+    final productId = state.product.id;
+    final numericId = productId.contains('/') ? productId.split('/').last : productId;
+    final limitedReviews = reviewsState.reviews.take(2).toList();
+    final hasMoreReviews = reviewsState.reviews.length > 2;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Reviews header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Customer Reviews',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            if (hasMoreReviews)
+              GestureDetector(
+                onTap: () => _navigateToAllReviews(numericId, state.product.title),
+                child: const Text(
+                  'View All',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFFF5C9A),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Reviews card container
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey.shade200,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              // Average rating section
+              // if (reviewsState.product != null)
+              //   _buildAverageRatingRow(reviewsState.product!, numericId, state.product.title),
+              
+              // Review cards
+              ...limitedReviews.asMap().entries.map((entry) {
+                final index = entry.key;
+                final review = entry.value;
+                final isLast = index == limitedReviews.length - 1 && !hasMoreReviews;
+                return _buildReviewRow(review, isLast);
+              }).toList(),
+              
+              // View all button
+              if (hasMoreReviews)
+                _buildViewAllReviewsRow(numericId, state.product.title, reviewsState.reviews.length),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  /// Average rating row
+  Widget _buildAverageRatingRow(JudgemeProduct product, String productId, String productName) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Star rating
+          Row(
+            children: List.generate(5, (index) {
+              final rating = product.averageRating;
+              if (index < rating.floor()) {
+                return const Icon(
+                  Icons.star,
+                  size: 18,
+                  color: Color(0xFFFFA500),
+                );
+              } else if (index < rating) {
+                return const Icon(
+                  Icons.star_half,
+                  size: 18,
+                  color: Color(0xFFFFA500),
+                );
+              } else {
+                return Icon(
+                  Icons.star_border,
+                  size: 18,
+                  color: Colors.grey.shade300,
+                );
+              }
+            }),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Rating text
+          Expanded(
+            child: Text(
+              '${product.averageRating.toStringAsFixed(1)} out of 5 (${product.reviewsCount} review${product.reviewsCount > 1 ? 's' : ''})',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+
+          // Arrow
+          GestureDetector(
+            onTap: () => _navigateToAllReviews(productId, productName),
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Colors.grey.shade400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Individual review row
+  Widget _buildReviewRow(JudgemeReview review, bool isLast) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: isLast ? null : Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Reviewer info and rating
+          Row(
+            children: [
+              // Reviewer avatar
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF5C9A).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    review.reviewerInitials,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFF5C9A),
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 12),
+              
+              // Reviewer name and date
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.reviewerName,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      review.formattedDate,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Star rating
+              Row(
+                children: List.generate(5, (index) {
+                  return Icon(
+                    index < review.rating ? Icons.star : Icons.star_border,
+                    size: 14,
+                    color: const Color(0xFFFFA500),
+                  );
+                }),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Review title
+          if (review.title.isNotEmpty) ...[
+            Text(
+              review.title,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 6),
+          ],
+          
+          // Review body
+          if (review.body.isNotEmpty) ...[
+            Text(
+              review.body,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade700,
+                height: 1.4,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          
+          // Verified buyer badge
+          if (review.verifiedBuyer != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(3),
+                border: Border.all(
+                  color: Colors.green.shade200,
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                'Verified Buyer',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.green.shade700,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// View all reviews row
+  Widget _buildViewAllReviewsRow(String productId, String productName, int totalReviews) {
+    return GestureDetector(
+      onTap: () => _navigateToAllReviews(productId, productName),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'View All $totalReviews Reviews',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFFF5C9A),
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.arrow_forward,
+              size: 14,
+              color: Color(0xFFFF5C9A),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// No reviews section
+  Widget _buildNoReviewsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Customer Reviews',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        
+        const SizedBox(height: 12),
+        
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Colors.grey.shade200,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                Icons.rate_review_outlined,
+                size: 48,
+                color: Colors.grey.shade400,
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'No Reviews Available',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Be the first to review this product',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  /// Reviews shimmer effect
+  Widget _buildReviewsShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title shimmer
+        Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            width: 140,
+            height: 18,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Card shimmer
+        Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  /// Navigate to all reviews screen
+  void _navigateToAllReviews(String productId, String productName) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReviewsScreen(
+          productId: productId,
+          productName: productName,
         ),
       ),
     );
