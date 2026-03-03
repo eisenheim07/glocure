@@ -18,8 +18,10 @@ import 'package:glocure/cubits/cart/cart_cubit.dart';
 import 'package:glocure/cubits/customer/customer_cubit.dart';
 import 'package:glocure/cubits/pages/pages_cubit.dart';
 import 'package:glocure/cubits/product_details/product_details_cubit.dart';
+import 'package:glocure/cubits/connectivity/connectivity_cubit.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/services/api_service.dart';
+import 'package:glocure/services/connectivity_service.dart';
 
 // Global navigator key for navigation from anywhere
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -131,12 +133,16 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => CustomerCubit()),
           BlocProvider(create: (_) => PagesCubit()),
           BlocProvider(create: (_) => ProductDetailsCubit()),
+          BlocProvider(create: (_) => ConnectivityCubit()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
           home: const SplashScreen(),
           builder: (context, child) {
+            // Initialize connectivity service
+            ConnectivityService().initialize(navigatorKey);
+            
             // Disable system text scaling to maintain consistent UI
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(

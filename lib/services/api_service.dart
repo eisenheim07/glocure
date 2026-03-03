@@ -11,6 +11,7 @@ import '../models/filter_model.dart';
 import '../models/customer_model.dart';
 import '../models/page_model.dart';
 import '../utils/auth_storage.dart';
+import 'connectivity_service.dart';
 
 /// API Service class
 /// This class handles all GraphQL API calls
@@ -71,6 +72,12 @@ class ApiService {
     Map<String, dynamic>? variables,
     bool skipTokenValidation = false,
   }) async {
+    // Check internet connectivity first
+    final hasConnection = await ConnectivityService().checkConnectivity();
+    if (!hasConnection) {
+      throw Exception('No internet connection. Please check your network and try again.');
+    }
+
     // Validate token before making request (skip for login/public APIs)
     if (!skipTokenValidation) {
       final isValid = await _validateToken();
@@ -147,6 +154,12 @@ class ApiService {
 
   /// Make a GraphQL request to the Admin API
   Future<Map<String, dynamic>> _makeAdminGraphQLRequest(String query) async {
+    // Check internet connectivity first
+    final hasConnection = await ConnectivityService().checkConnectivity();
+    if (!hasConnection) {
+      throw Exception('No internet connection. Please check your network and try again.');
+    }
+
     // Validate token before making request
     final isValid = await _validateToken();
     if (!isValid) {

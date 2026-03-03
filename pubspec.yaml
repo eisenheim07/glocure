@@ -51,6 +51,9 @@ dependencies:
   # WebView for PayU payment page
   webview_flutter: ^4.4.2
 
+  # Connectivity checking
+  connectivity_plus: ^6.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
