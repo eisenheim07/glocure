@@ -111,7 +111,7 @@ class AuthStorage {
     await prefs.remove(_cartIdKey);
     AppLogger.info("Cart ID cleared");
   }
-}
+
   /// Extract and save customer ID from Shopify GID
   /// Converts "gid://shopify/Customer/9036059508914" to "9036059508914"
   static Future<void> extractAndSaveCustomerId(String shopifyGid) async {
@@ -151,3 +151,4 @@ class AuthStorage {
     await prefs.remove(_customerIdKey);
     AppLogger.info("Customer ID cleared");
   }
+}

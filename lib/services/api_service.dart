@@ -127,7 +127,10 @@ class ApiService {
   }
 
   /// Make a GraphQL request to the Admin API
-  Future<Map<String, dynamic>> _makeAdminGraphQLRequest(String query) async {
+  Future<Map<String, dynamic>> _makeAdminGraphQLRequest(
+    String query, {
+    Map<String, dynamic>? variables,
+  }) async {
     // Check internet connectivity first
     final hasConnection = await ConnectivityService().checkConnectivity();
     if (!hasConnection) {
@@ -145,7 +148,13 @@ class ApiService {
         method: 'Admin GraphQL',
         url: ApiConfig.adminBaseUrl,
         body: {'query': query},
+        variables: variables,
       );
+
+      final body = <String, dynamic>{'query': query};
+      if (variables != null && variables.isNotEmpty) {
+        body['variables'] = variables;
+      }
 
       final response = await http.post(
         Uri.parse(ApiConfig.adminBaseUrl),
@@ -153,7 +162,7 @@ class ApiService {
           'Content-Type': 'application/json',
           'X-Shopify-Access-Token': adminAccessToken,
         },
-        body: jsonEncode({'query': query}),
+        body: jsonEncode(body),
       );
 
       if (response.statusCode == 200) {
@@ -2100,7 +2109,7 @@ class ApiService {
       rethrow;
     }
   }
-}
+
   /// Get customer orders from Shopify Admin API
   Future<List<ShopifyOrder>> getCustomerOrders(String customerId) async {
     AppLogger.info('ApiService: Fetching orders for customer: $customerId');
@@ -2253,82 +2262,6 @@ class ApiService {
 
     } catch (e) {
       AppLogger.error('ApiService: Failed to fetch orders: $e');
-      rethrow;
-    }
-  }
-
-  /// Make Admin GraphQL request
-  Future<Map<String, dynamic>> _makeAdminGraphQLRequest(
-    String query, {
-    Map<String, dynamic>? variables,
-  }) async {
-    // Check internet connectivity first
-    final hasConnection = await ConnectivityService().checkConnectivity();
-    if (!hasConnection) {
-      throw Exception('No internet connection. Please check your network and try again.');
-    }
-
-    try {
-      // Log the request
-      AppLogger.apiRequest(
-        method: 'Admin GraphQL',
-        url: ApiConfig.adminUrl,
-        body: {'query': query},
-        variables: variables,
-      );
-
-      final body = <String, dynamic>{'query': query};
-      if (variables != null && variables.isNotEmpty) {
-        body['variables'] = variables;
-      }
-
-      // Make the HTTP POST request to Admin API
-      final response = await http.post(
-        Uri.parse(ApiConfig.adminUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Access-Token': ApiConfig.shopifyAdminAccessToken,
-        },
-        body: jsonEncode(body),
-      );
-
-      // Check if request was successful
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-
-        // Check for GraphQL errors
-        if (responseData['errors'] != null) {
-          AppLogger.apiResponse(
-            statusCode: response.statusCode,
-            method: 'Admin GraphQL',
-            error: errorMessage,
-          );
-          
-          final errors = responseData['errors'] as List;
-          final errorMessage = errors.map((e) => e['message']).join(', ');
-          throw Exception('GraphQL Error: $errorMessage');
-        }
-
-        // Log successful response
-        AppLogger.apiResponse(
-          statusCode: response.statusCode,
-          method: 'Admin GraphQL',
-          responseData: responseData,
-        );
-
-        return responseData;
-      } else {
-        // Log error response
-        AppLogger.apiResponse(
-          statusCode: response.statusCode,
-          method: 'Admin GraphQL',
-          error: response.body,
-        );
-        
-        throw Exception('HTTP ${response.statusCode}: ${response.body}');
-      }
-    } catch (e) {
-      AppLogger.error('Admin GraphQL request failed: $e');
       rethrow;
     }
   }
