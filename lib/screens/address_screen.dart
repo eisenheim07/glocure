@@ -7,6 +7,7 @@ import 'dart:convert';
 import '../models/customer_model.dart';
 import '../services/api_service.dart';
 import '../utils/auth_storage.dart';
+import '../utils/app_logger.dart';
 import '../widgets/custom_app_bar.dart';
 import 'order_summary_screen.dart';
 
@@ -58,6 +59,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
   // Checkbox state
   bool _isDefaultAddress = false;
+  bool _isDefaultAddressDisabled = false; // Track if checkbox should be disabled
 
   // Form validation state
   bool _isFormValid = false;
@@ -305,8 +307,7 @@ class _AddressScreenState extends State<AddressScreen> {
       // Check if we're updating an existing address or creating a new one
       if (widget.existingAddress != null) {
         // Update existing address
-        debugPrint('✅ Updating address with data:');
-        debugPrint(jsonEncode(addressData));
+        AppLogger.info('Updating address with data: ${jsonEncode(addressData)}');
 
         updatedCustomer = await ApiService().customerAddressUpdate(
           customerAccessToken: token,
@@ -314,26 +315,25 @@ class _AddressScreenState extends State<AddressScreen> {
           address: addressData,
         );
 
-        debugPrint('✅ Address updated successfully');
+        AppLogger.success('Address updated successfully');
       } else {
         // Create new address
-        debugPrint('✅ Creating address with data:');
-        debugPrint(jsonEncode(addressData));
+        AppLogger.info('Creating address with data: ${jsonEncode(addressData)}');
 
         updatedCustomer = await ApiService().customerAddressCreate(
           customerAccessToken: token,
           address: addressData,
         );
 
-        debugPrint('✅ Address created successfully');
+        AppLogger.success('Address created successfully');
       }
 
       if (updatedCustomer == null) {
         throw Exception(widget.existingAddress != null ? 'Failed to update address' : 'Failed to create address');
       }
 
-      // If "Make this my default address" is checked, update default address
-      if (_isDefaultAddress) {
+      // If "Make this my default address" is checked AND not disabled, update default address
+      if (_isDefaultAddress && !_isDefaultAddressDisabled) {
         String? addressIdToSetDefault;
 
         if (widget.existingAddress != null) {
@@ -345,13 +345,15 @@ class _AddressScreenState extends State<AddressScreen> {
         }
 
         if (addressIdToSetDefault != null) {
-          debugPrint('🔄 Setting as default address: $addressIdToSetDefault');
+          AppLogger.info('Setting as default address: $addressIdToSetDefault');
           await ApiService().customerDefaultAddressUpdate(
             customerAccessToken: token,
             addressId: addressIdToSetDefault,
           );
-          debugPrint('✅ Default address updated successfully');
+          AppLogger.success('Default address updated successfully');
         }
+      } else if (_isDefaultAddressDisabled) {
+        AppLogger.info('Skipping default address update - address is already default');
       }
 
       if (mounted) {
@@ -385,7 +387,7 @@ class _AddressScreenState extends State<AddressScreen> {
         }
       }
     } catch (e) {
-      debugPrint('❌ Error ${widget.existingAddress != null ? 'updating' : 'adding'} address: $e');
+      AppLogger.error('Error ${widget.existingAddress != null ? 'updating' : 'adding'} address: $e');
 
       if (mounted) {
         setState(() => _isSavingAddress = false);
@@ -536,8 +538,7 @@ class _AddressScreenState extends State<AddressScreen> {
       // If customer object is passed, use it
       if (widget.customer != null) {
         _customer = widget.customer;
-        debugPrint('Customer object from previous screen:');
-        debugPrint(jsonEncode({
+        AppLogger.info('Customer object from previous screen: ${jsonEncode({
           'id': _customer?.id,
           'firstName': _customer?.firstName,
           'lastName': _customer?.lastName,
@@ -575,7 +576,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     'phone': addr.phone,
                   })
               .toList(),
-        }));
+        })}');
 
         // Populate fields
         _populateFields();
@@ -584,7 +585,7 @@ class _AddressScreenState extends State<AddressScreen> {
         await _fetchCustomerData();
       }
     } catch (e) {
-      debugPrint('Error initializing screen: $e');
+      AppLogger.error('Error initializing screen: $e');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -606,8 +607,7 @@ class _AddressScreenState extends State<AddressScreen> {
       _customer = await ApiService().getCustomer(token);
 
       if (_customer != null) {
-        debugPrint('Customer object from API:');
-        debugPrint(jsonEncode({
+        AppLogger.info('Customer object from API: ${jsonEncode({
           'id': _customer?.id,
           'firstName': _customer?.firstName,
           'lastName': _customer?.lastName,
@@ -645,13 +645,13 @@ class _AddressScreenState extends State<AddressScreen> {
                     'phone': addr.phone,
                   })
               .toList(),
-        }));
+        })}');
 
         // Populate fields
         _populateFields();
       }
     } catch (e) {
-      debugPrint('Error fetching customer: $e');
+      AppLogger.error('Error fetching customer: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading data: $e')),
@@ -675,7 +675,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
     // If editing an existing address, populate with that address data
     if (widget.existingAddress != null) {
-      debugPrint('ℹ️ Editing existing address - populating fields');
+      AppLogger.info('Editing existing address - populating fields');
       final addr = widget.existingAddress!;
 
       _address1Controller.text = addr.address1 ?? '';
@@ -692,8 +692,11 @@ class _AddressScreenState extends State<AddressScreen> {
 
       setState(() {
         _isDefaultAddress = isDefault;
+        _isDefaultAddressDisabled = isDefault; // Disable checkbox if already default
         _isAddressFromGeolocation = false;
       });
+
+      AppLogger.info('Address default status: isDefault=$isDefault, disabled=$isDefault');
 
       // Validate form after populating fields
       _validateForm();
@@ -702,9 +705,10 @@ class _AddressScreenState extends State<AddressScreen> {
 
     // If this is for adding a new address, leave all address fields empty
     if (widget.isAddingNew) {
-      debugPrint('ℹ️ Adding new address - leaving address fields empty');
+      AppLogger.info('Adding new address - leaving address fields empty');
       setState(() {
         _isDefaultAddress = false;
+        _isDefaultAddressDisabled = false; // Enable checkbox for new addresses
         _isAddressFromGeolocation = false;
       });
       return;
@@ -715,11 +719,12 @@ class _AddressScreenState extends State<AddressScreen> {
 
     // If defaultAddress is null, use geolocation
     if (defaultAddr == null) {
-      debugPrint('ℹ️ Default address is null, using geolocation');
+      AppLogger.info('Default address is null, using geolocation');
       _populateFromGeolocation();
 
       setState(() {
         _isDefaultAddress = false;
+        _isDefaultAddressDisabled = false; // Enable checkbox for geolocation addresses
         _isAddressFromGeolocation = true;
       });
       return;
@@ -746,6 +751,7 @@ class _AddressScreenState extends State<AddressScreen> {
       // Set checkbox to true if there's a default address
       setState(() {
         _isDefaultAddress = true;
+        _isDefaultAddressDisabled = false; // Enable checkbox for valid default address (user can uncheck)
         _isAddressFromGeolocation = false; // Address from GraphQL
       });
     } else {
@@ -786,7 +792,7 @@ class _AddressScreenState extends State<AddressScreen> {
   /// Populate address fields from geolocation data
   void _populateFromGeolocation() {
     if (_currentPlacemark == null) {
-      debugPrint('No geolocation data available for address population');
+      AppLogger.warning('No geolocation data available for address population');
       return;
     }
 
@@ -824,7 +830,7 @@ class _AddressScreenState extends State<AddressScreen> {
       _zipController.text = place.postalCode!;
     }
 
-    debugPrint('✅ Address fields populated from geolocation');
+    AppLogger.success('Address fields populated from geolocation');
   }
 
   Future<void> _fetchCurrentLocation() async {
@@ -907,7 +913,7 @@ class _AddressScreenState extends State<AddressScreen> {
         }
       }
     } catch (e) {
-      debugPrint('Error fetching location: $e');
+      AppLogger.error('Error fetching location: $e');
       setState(() {
         _currentLocationName = 'Unable to fetch location';
         _currentLocationAddress = 'Please try again';
@@ -1064,24 +1070,52 @@ class _AddressScreenState extends State<AddressScreen> {
                                 // Make Default Address Checkbox
                                 Row(
                                   children: [
-                                    Checkbox(
-                                      value: _isDefaultAddress,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _isDefaultAddress = value ?? false;
-                                        });
-                                      },
-                                      activeColor: const Color(0xFFFF5C9A),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(4),
+                                    Transform.scale(
+                                      scale: 1.2, // Increase checkbox size
+                                      child: Checkbox(
+                                        value: _isDefaultAddress,
+                                        onChanged: _isDefaultAddressDisabled 
+                                            ? null // Disable checkbox if already default
+                                            : (value) {
+                                                setState(() {
+                                                  _isDefaultAddress = value ?? false;
+                                                });
+                                              },
+                                        activeColor: _isDefaultAddressDisabled
+                                            ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                            : const Color(0xFFFF5C9A), // Full pink for enabled
+                                        checkColor: Colors.white,
+                                        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                                          if (states.contains(WidgetState.selected)) {
+                                            return _isDefaultAddressDisabled
+                                                ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                                : const Color(0xFFFF5C9A); // Full pink for enabled
+                                          }
+                                          return Colors.transparent;
+                                        }),
+                                        side: WidgetStateBorderSide.resolveWith((states) {
+                                          return BorderSide(
+                                            color: _isDefaultAddressDisabled
+                                                ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
+                                                : const Color(0xFFFF5C9A), // Full pink border for enabled
+                                            width: 2,
+                                          );
+                                        }),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
                                       ),
                                     ),
-                                    const Text(
-                                      'Make this my default address',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
+                                    Expanded(
+                                      child: Text(
+                                        'Make this my default address', // Keep same text for both states
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: _isDefaultAddressDisabled 
+                                              ? Colors.black.withOpacity(0.5) // Faded text for disabled
+                                              : Colors.black, // Full black for enabled
+                                        ),
                                       ),
                                     ),
                                   ],
