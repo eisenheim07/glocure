@@ -8,6 +8,7 @@ class AuthStorage {
   static const String _expiresAtKey = 'token_expires_at';
   static const String _languageSelectedKey = 'language_selected';
   static const String _cartIdKey = 'cart_id';
+  static const String _customerIdKey = 'customer_id';
 
   /// Save access token and expiry date
   static Future<void> saveToken(String accessToken, String expiresAt) async {
@@ -111,3 +112,42 @@ class AuthStorage {
     AppLogger.info("Cart ID cleared");
   }
 }
+  /// Extract and save customer ID from Shopify GID
+  /// Converts "gid://shopify/Customer/9036059508914" to "9036059508914"
+  static Future<void> extractAndSaveCustomerId(String shopifyGid) async {
+    try {
+      // Extract numeric ID from Shopify GID format
+      final parts = shopifyGid.split('/');
+      if (parts.length >= 4 && parts[2] == 'Customer') {
+        final customerId = parts[3];
+        await saveCustomerId(customerId);
+        AppLogger.info("Customer ID extracted and saved: $customerId");
+      } else {
+        AppLogger.error("Invalid Shopify GID format: $shopifyGid");
+      }
+    } catch (e) {
+      AppLogger.error("Error extracting customer ID from GID: $e");
+    }
+  }
+
+  /// Save customer ID
+  static Future<void> saveCustomerId(String customerId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_customerIdKey, customerId);
+    AppLogger.info("Customer ID saved: $customerId");
+  }
+
+  /// Get customer ID
+  static Future<String?> getCustomerId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final customerId = prefs.getString(_customerIdKey);
+    AppLogger.info("Customer ID retrieved: $customerId");
+    return customerId;
+  }
+
+  /// Clear customer ID
+  static Future<void> clearCustomerId() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_customerIdKey);
+    AppLogger.info("Customer ID cleared");
+  }

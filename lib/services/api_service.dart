@@ -10,6 +10,7 @@ import '../models/category_menu_model.dart';
 import '../models/filter_model.dart';
 import '../models/customer_model.dart';
 import '../models/page_model.dart';
+import '../models/shopify_order_model.dart';
 import '../utils/auth_storage.dart';
 import '../utils/app_logger.dart';
 import 'connectivity_service.dart';
@@ -2096,6 +2097,238 @@ class ApiService {
       }
     } catch (e) {
       AppLogger.error('Failed to fetch related products: $e');
+      rethrow;
+    }
+  }
+}
+  /// Get customer orders from Shopify Admin API
+  Future<List<ShopifyOrder>> getCustomerOrders(String customerId) async {
+    AppLogger.info('ApiService: Fetching orders for customer: $customerId');
+
+    try {
+      // GraphQL query to fetch orders for a specific customer
+      const query = '''
+        query getCustomerOrders(\$customerId: ID!) {
+          customer(id: \$customerId) {
+            orders(first: 50, sortKey: CREATED_AT, reverse: true) {
+              edges {
+                node {
+                  id
+                  name
+                  email
+                  financialStatus
+                  fulfillmentStatus
+                  totalPriceV2 {
+                    amount
+                    currencyCode
+                  }
+                  subtotalPriceV2 {
+                    amount
+                    currencyCode
+                  }
+                  totalTaxV2 {
+                    amount
+                    currencyCode
+                  }
+                  createdAt
+                  updatedAt
+                  note
+                  tags
+                  lineItems(first: 20) {
+                    edges {
+                      node {
+                        id
+                        title
+                        variantTitle
+                        quantity
+                        originalUnitPriceV2 {
+                          amount
+                          currencyCode
+                        }
+                        totalDiscountV2 {
+                          amount
+                          currencyCode
+                        }
+                        sku
+                        vendor
+                        product {
+                          id
+                        }
+                        variant {
+                          id
+                        }
+                      }
+                    }
+                  }
+                  shippingAddress {
+                    firstName
+                    lastName
+                    address1
+                    address2
+                    city
+                    province
+                    country
+                    zip
+                    phone
+                  }
+                  billingAddress {
+                    firstName
+                    lastName
+                    address1
+                    address2
+                    city
+                    province
+                    country
+                    zip
+                    phone
+                  }
+                }
+              }
+            }
+          }
+        }
+      ''';
+
+      final variables = {
+        'customerId': 'gid://shopify/Customer/$customerId',
+      };
+
+      // Make Admin API request
+      final response = await _makeAdminGraphQLRequest(query, variables: variables);
+
+      final customer = response['data']?['customer'];
+      if (customer == null) {
+        AppLogger.warning('ApiService: No customer found for ID: $customerId');
+        return [];
+      }
+
+      final ordersData = customer['orders']?['edges'] as List?;
+      if (ordersData == null || ordersData.isEmpty) {
+        AppLogger.info('ApiService: No orders found for customer: $customerId');
+        return [];
+      }
+
+      final orders = ordersData.map((edge) {
+        final orderNode = edge['node'];
+        
+        // Convert GraphQL response to our model format
+        final orderData = {
+          'id': orderNode['id'],
+          'name': orderNode['name'],
+          'email': orderNode['email'],
+          'financial_status': orderNode['financialStatus']?.toLowerCase(),
+          'fulfillment_status': orderNode['fulfillmentStatus']?.toLowerCase(),
+          'total_price': orderNode['totalPriceV2']?['amount'],
+          'subtotal_price': orderNode['subtotalPriceV2']?['amount'],
+          'total_tax': orderNode['totalTaxV2']?['amount'],
+          'currency': orderNode['totalPriceV2']?['currencyCode'],
+          'created_at': orderNode['createdAt'],
+          'updated_at': orderNode['updatedAt'],
+          'note': orderNode['note'],
+          'tags': orderNode['tags']?.join(',') ?? '',
+          'line_items': (orderNode['lineItems']?['edges'] as List?)?.map((lineItemEdge) {
+            final lineItem = lineItemEdge['node'];
+            return {
+              'id': lineItem['id'],
+              'title': lineItem['title'],
+              'variant_title': lineItem['variantTitle'] ?? '',
+              'quantity': lineItem['quantity'],
+              'price': lineItem['originalUnitPriceV2']?['amount'],
+              'total_discount': lineItem['totalDiscountV2']?['amount'],
+              'sku': lineItem['sku'] ?? '',
+              'vendor': lineItem['vendor'] ?? '',
+              'product_id': lineItem['product']?['id'],
+              'variant_id': lineItem['variant']?['id'],
+            };
+          }).toList() ?? [],
+          'shipping_address': orderNode['shippingAddress'],
+          'billing_address': orderNode['billingAddress'],
+        };
+
+        return ShopifyOrder.fromJson(orderData);
+      }).toList();
+
+      AppLogger.success('ApiService: Successfully fetched ${orders.length} orders');
+      return orders;
+
+    } catch (e) {
+      AppLogger.error('ApiService: Failed to fetch orders: $e');
+      rethrow;
+    }
+  }
+
+  /// Make Admin GraphQL request
+  Future<Map<String, dynamic>> _makeAdminGraphQLRequest(
+    String query, {
+    Map<String, dynamic>? variables,
+  }) async {
+    // Check internet connectivity first
+    final hasConnection = await ConnectivityService().checkConnectivity();
+    if (!hasConnection) {
+      throw Exception('No internet connection. Please check your network and try again.');
+    }
+
+    try {
+      // Log the request
+      AppLogger.apiRequest(
+        method: 'Admin GraphQL',
+        url: ApiConfig.adminUrl,
+        body: {'query': query},
+        variables: variables,
+      );
+
+      final body = <String, dynamic>{'query': query};
+      if (variables != null && variables.isNotEmpty) {
+        body['variables'] = variables;
+      }
+
+      // Make the HTTP POST request to Admin API
+      final response = await http.post(
+        Uri.parse(ApiConfig.adminUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': ApiConfig.shopifyAdminAccessToken,
+        },
+        body: jsonEncode(body),
+      );
+
+      // Check if request was successful
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        // Check for GraphQL errors
+        if (responseData['errors'] != null) {
+          AppLogger.apiResponse(
+            statusCode: response.statusCode,
+            method: 'Admin GraphQL',
+            error: errorMessage,
+          );
+          
+          final errors = responseData['errors'] as List;
+          final errorMessage = errors.map((e) => e['message']).join(', ');
+          throw Exception('GraphQL Error: $errorMessage');
+        }
+
+        // Log successful response
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'Admin GraphQL',
+          responseData: responseData,
+        );
+
+        return responseData;
+      } else {
+        // Log error response
+        AppLogger.apiResponse(
+          statusCode: response.statusCode,
+          method: 'Admin GraphQL',
+          error: response.body,
+        );
+        
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      AppLogger.error('Admin GraphQL request failed: $e');
       rethrow;
     }
   }
