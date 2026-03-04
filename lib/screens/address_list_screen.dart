@@ -25,6 +25,7 @@ class AddressListScreen extends StatefulWidget {
 
 class _AddressListScreenState extends State<AddressListScreen> {
   String? _selectedAddressId;
+  String? _selectedBaseAddressId; // Store base ID for comparison
   bool _isDeleting = false;
 
   @override
@@ -34,10 +35,45 @@ class _AddressListScreenState extends State<AddressListScreen> {
     if (widget.customer != null) {
       context.read<CustomerCubit>().updateCustomer(widget.customer!);
       _selectedAddressId = widget.customer!.defaultAddress?.id;
+      _selectedBaseAddressId = _extractBaseAddressId(_selectedAddressId);
     } else {
       // Otherwise fetch from API
       context.read<CustomerCubit>().fetchCustomer();
     }
+  }
+
+  /// Extract base address ID from full Shopify address ID
+  /// Example: gid://shopify/MailingAddress/10194549440690?model_name=... -> 10194549440690
+  String? _extractBaseAddressId(String? fullAddressId) {
+    if (fullAddressId == null || fullAddressId.isEmpty) return null;
+    
+    try {
+      // Extract the numeric ID from the Shopify GID
+      final regex = RegExp(r'MailingAddress/(\d+)');
+      final match = regex.firstMatch(fullAddressId);
+      return match?.group(1);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Find address by base ID and update selected address ID to current full ID
+  void _updateSelectedAddressAfterRefresh(List<CustomerAddress> addresses) {
+    if (_selectedBaseAddressId == null) return;
+    
+    // Find address with matching base ID
+    for (final address in addresses) {
+      final baseId = _extractBaseAddressId(address.id);
+      if (baseId == _selectedBaseAddressId) {
+        // Update to current full ID with new access token
+        _selectedAddressId = address.id;
+        return;
+      }
+    }
+    
+    // If no matching address found, clear selection
+    _selectedAddressId = null;
+    _selectedBaseAddressId = null;
   }
 
   /// Refresh customer data from API
@@ -246,6 +282,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
             // Update selected address ID when customer data changes
             if (_selectedAddressId == null) {
               _selectedAddressId = state.customer.defaultAddress?.id;
+              _selectedBaseAddressId = _extractBaseAddressId(_selectedAddressId);
+            } else {
+              // Update selected address ID after refresh to handle new access tokens
+              _updateSelectedAddressAfterRefresh(state.customer.addresses);
             }
             return _buildAddressListContent(state.customer);
           }
@@ -388,6 +428,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     onTap: () {
                       setState(() {
                         _selectedAddressId = address.id;
+                        _selectedBaseAddressId = _extractBaseAddressId(address.id);
                       });
                     },
                   ),
