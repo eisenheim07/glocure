@@ -355,6 +355,10 @@ class _OrderCardState extends State<_OrderCard> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFF3E0),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: const Color(0xFFFFE0B2),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   _getStatusText(widget.order),
@@ -366,7 +370,6 @@ class _OrderCardState extends State<_OrderCard> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
               PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
                 icon: const Icon(
@@ -432,9 +435,7 @@ class _OrderCardState extends State<_OrderCard> {
               ),
             ],
           ),
-          
-          const SizedBox(height: 6),
-          
+
           // Placed on date
           Text(
             'Placed on ${_formatDate(widget.order.createdAt)}',

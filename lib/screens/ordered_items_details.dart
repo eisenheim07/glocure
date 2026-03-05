@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
-import 'package:glocure/utils/size_utils.dart';
+import 'package:glocure/utils/format_utils.dart';
 
 class OrderedItemsDetails extends StatelessWidget {
   final ShopifyOrder order;
@@ -20,108 +20,84 @@ class OrderedItemsDetails extends StatelessWidget {
         showBackButton: true,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.h),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order Summary Card
-            _buildOrderSummaryCard(),
+            // Order Header Card
+            _buildOrderHeaderCard(),
             
-            SizedBox(height: 20.h),
+            const SizedBox(height: 16),
             
-            // Items Section
-            _buildItemsSection(),
+            // Order Details Card
+            _buildOrderDetailsCard(),
+            
+            const SizedBox(height: 16),
+            
+            // Ordered Items Section
+            _buildOrderedItemsSection(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildOrderSummaryCard() {
+  Widget _buildOrderHeaderCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(16.h),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Order Summary',
-                style: TextStyle(
-                  fontSize: 18.fSize,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                order.name,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1A1A),
+                  fontFamily: 'Inter',
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.h,
-                  vertical: 6.h,
-                ),
-                decoration: BoxDecoration(
-                  color: Color(int.parse(order.statusColor.replaceFirst('#', '0xFF'))),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  order.displayStatus,
-                  style: TextStyle(
-                    fontSize: 12.fSize,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                'Placed on ${_formatDate(order.createdAt)}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF777777),
+                  fontFamily: 'Inter',
                 ),
               ),
             ],
           ),
-          
-          SizedBox(height: 16.h),
-          
-          // Order Details
-          _buildDetailRow('Order Number', order.name),
-          _buildDetailRow('Order Date', _formatDate(order.createdAt)),
-          _buildDetailRow('Email', order.email),
-          
-          SizedBox(height: 16.h),
-          
-          // Divider
           Container(
-            height: 1,
-            color: Colors.grey[200],
-          ),
-          
-          SizedBox(height: 16.h),
-          
-          // Price Details
-          _buildPriceRow('Subtotal', '₹${order.subtotalPrice}'),
-          _buildPriceRow('Tax', '₹${order.totalTax}'),
-          
-          SizedBox(height: 12.h),
-          
-          // Total
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 8.h),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFFFF3E0),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: const Color(0xFFFFE0B2),
+                width: 1,
+              ),
             ),
-            child: _buildPriceRow(
-              'Total Amount',
-              '₹${order.totalPrice}',
-              isTotal: true,
+            child: Text(
+              _getStatusText(order),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFFF9800),
+                fontFamily: 'Inter',
+              ),
             ),
           ),
         ],
@@ -129,105 +105,128 @@ class OrderedItemsDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildItemsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Items (${order.lineItems.length})',
-          style: TextStyle(
-            fontSize: 18.fSize,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-        
-        SizedBox(height: 12.h),
-        
-        // Items List
-        ...order.lineItems.map((item) => _buildItemCard(item)).toList(),
-      ],
-    );
-  }
-
-  Widget _buildItemCard(ShopifyLineItem item) {
+  Widget _buildOrderDetailsCard() {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.h),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey[200]!,
+          color: Colors.grey.shade200,
           width: 1,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Item Title
-          Text(
-            item.title,
-            style: TextStyle(
-              fontSize: 16.fSize,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-          
-          if (item.variantTitle.isNotEmpty) ...[
-            SizedBox(height: 4.h),
-            Text(
-              item.variantTitle,
-              style: TextStyle(
-                fontSize: 14.fSize,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
-          
-          SizedBox(height: 12.h),
-          
-          // Item Details
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (item.sku.isNotEmpty) ...[
-                      _buildItemDetailRow('SKU', item.sku),
-                      SizedBox(height: 4.h),
-                    ],
-                    _buildItemDetailRow('Quantity', '${item.quantity}'),
-                    SizedBox(height: 4.h),
-                    _buildItemDetailRow('Price', item.formattedPrice),
-                    if (item.vendor.isNotEmpty) ...[
-                      SizedBox(height: 4.h),
-                      _buildItemDetailRow('Vendor', item.vendor),
-                    ],
-                  ],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Total Amount',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF777777),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    formatIndianCurrency(order.totalPrice),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
               ),
-              
-              // Total Price
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    'Total',
+                  const Text(
+                    'Items',
                     style: TextStyle(
-                      fontSize: 12.fSize,
-                      color: Colors.grey[600],
+                      fontSize: 13,
+                      color: Color(0xFF777777),
+                      fontFamily: 'Inter',
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  const SizedBox(height: 4),
                   Text(
-                    item.totalPrice,
-                    style: TextStyle(
-                      fontSize: 16.fSize,
+                    '${order.lineItems.length} items',
+                    style: const TextStyle(
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFFF5C9A),
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Divider(
+            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            thickness: 1,
+            height: 1,
+          ),
+          
+          const SizedBox(height: 16),
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Financial Status',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF777777),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    order.financialStatus.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    'Fulfillment',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF777777),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    order.fulfillmentStatus.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
                     ),
                   ),
                 ],
@@ -239,90 +238,169 @@ class OrderedItemsDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14.fSize,
-              color: Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14.fSize,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: isTotal ? 8.h : 4.h,
-        horizontal: isTotal ? 12.h : 0,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isTotal ? 16.fSize : 14.fSize,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-              color: isTotal ? Colors.black : Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 16.fSize : 14.fSize,
-              fontWeight: FontWeight.w600,
-              color: isTotal ? const Color(0xFFFF5C9A) : Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildItemDetailRow(String label, String value) {
-    return Row(
+  Widget _buildOrderedItemsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '$label: ',
+        const Text(
+          'Ordered Items',
           style: TextStyle(
-            fontSize: 12.fSize,
-            color: Colors.grey[600],
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A1A1A),
+            fontFamily: 'Inter',
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 12.fSize,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
+        
+        const SizedBox(height: 12),
+        
+        // Items List
+        ...order.lineItems.map((item) => _buildItemCard(item)).toList(),
       ],
     );
   }
 
+  Widget _buildItemCard(ShopifyLineItem item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product Image Placeholder
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.shopping_bag_outlined,
+              color: Color(0xFFCCCCCC),
+              size: 28,
+            ),
+          ),
+          
+          const SizedBox(width: 12),
+          
+          // Product Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1A1A),
+                    fontFamily: 'Inter',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                
+                const SizedBox(height: 8),
+                
+                // Quantity Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF0F5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Qty: ${item.quantity}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFFF5C9A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 8),
+                
+                // Sold by text
+                Row(
+                  children: [
+                    Icon(
+                      Icons.store_outlined,
+                      size: 14,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Sold by Glo Cure',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(width: 12),
+          
+          // Unit Price
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Text(
+                'Unit Price',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Color(0xFF777777),
+                  fontFamily: 'Inter',
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                formatIndianCurrency(item.price),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1A1A),
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   String _formatDate(DateTime date) {
-    final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _getStatusText(ShopifyOrder order) {
+    final financial = order.financialStatus.toLowerCase();
+    final fulfillment = order.fulfillmentStatus.toLowerCase();
+
+    if (financial == 'paid' && fulfillment == 'fulfilled') {
+      return 'Delivered';
+    } else if (financial == 'pending' || fulfillment == 'unfulfilled') {
+      return 'Pending';
+    } else if (financial == 'refunded' || fulfillment == 'cancelled') {
+      return 'Cancelled';
+    } else {
+      return 'Processing';
+    }
   }
 }
