@@ -5,6 +5,7 @@ import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/orders/orders_state.dart';
 import 'package:glocure/models/shopify_order_model.dart';
+import 'package:glocure/utils/format_utils.dart';
 import 'main_navigation_screen.dart';
 import 'ordered_items_details.dart';
 
@@ -93,7 +94,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F8F8),
+        backgroundColor: Colors.white,
         appBar: CustomAppBar(
           type: AppBarType.full,
           showBackButton: true,
@@ -304,306 +305,298 @@ class _OrdersTabContent extends StatelessWidget {
 }
 
 // Order card widget
-class _OrderCard extends StatelessWidget {
+class _OrderCard extends StatefulWidget {
   final ShopifyOrder order;
 
   const _OrderCard({required this.order});
 
   @override
+  State<_OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<_OrderCard> {
+  bool _showAllItems = false;
+
+  @override
   Widget build(BuildContext context) {
+    final itemsToShow = _showAllItems 
+        ? widget.order.lineItems 
+        : widget.order.lineItems.take(2).toList();
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFAFAFA),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              border: Border(
-                bottom: BorderSide(
-                  color: const Color(0xFFE5E5E5).withOpacity(0.5),
-                  width: 1,
+          // Order number and status row
+          Row(
+            children: [
+              Text(
+                widget.order.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A1A1A),
+                  fontFamily: 'Inter',
                 ),
               ),
-            ),
-            child: Row(
-              children: [
-                Text(
-                  order.name,
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _getStatusText(widget.order),
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A1A),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFFF9800),
                     fontFamily: 'Inter',
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(order),
-                    borderRadius: BorderRadius.circular(20),
+              ),
+              const SizedBox(width: 8),
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: Color(0xFF666666),
+                  size: 20,
+                ),
+                offset: const Offset(0, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                onSelected: (value) {
+                  if (value == 'view_details') {
+                    _onViewDetails(context, widget.order);
+                  } else if (value == 'track_order') {
+                    _onTrackOrder(context, widget.order);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'view_details',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.visibility_outlined,
+                          color: Color(0xFFFF5C9A),
+                          size: 20,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'View Details',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(
-                    _getStatusText(order),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                  const PopupMenuItem<String>(
+                    value: 'track_order',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.local_shipping_outlined,
+                          color: Color(0xFFFF5C9A),
+                          size: 20,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Track Order',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 6),
+          
+          // Placed on date
+          Text(
+            'Placed on ${_formatDate(widget.order.createdAt)}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFF777777),
+              fontFamily: 'Inter',
+            ),
+          ),
+          
+          const SizedBox(height: 10),
+          
+          // Divider before amount section
+          Divider(
+            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            thickness: 1,
+            height: 1,
+          ),
+          
+          const SizedBox(height: 10),
+          
+          // Total Amount and Items row
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Total Amount',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    formatIndianCurrency(widget.order.totalPrice),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    'Items',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF777777),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${widget.order.lineItems.length} ${widget.order.lineItems.length == 1 ? 'item' : 'items'}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 10),
+          
+          // Divider before items list
+          Divider(
+            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            thickness: 1,
+            height: 1,
+          ),
+          
+          const SizedBox(height: 10),
+          
+          // Product items list
+          ...itemsToShow.map((item) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 6),
+                  width: 4,
+                  height: 4,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF333333),
+                    shape: BoxShape.circle,
+                  ),
                 ),
                 const SizedBox(width: 8),
-                PopupMenuButton<String>(
-                  icon: const Icon(
-                    Icons.more_vert,
-                    color: Color(0xFF666666),
-                    size: 20,
-                  ),
-                  offset: const Offset(0, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  onSelected: (value) {
-                    if (value == 'view_details') {
-                      _onViewDetails(context, order);
-                    } else if (value == 'track_order') {
-                      _onTrackOrder(context, order);
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem<String>(
-                      value: 'view_details',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.visibility_outlined,
-                            color: Color(0xFFFF5C9A),
-                            size: 20,
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'View Details',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Inter',
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                        ],
-                      ),
+                Expanded(
+                  child: Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF333333),
+                      fontFamily: 'Inter',
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'track_order',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.local_shipping_outlined,
-                            color: Color(0xFFFF5C9A),
-                            size: 20,
-                          ),
-                          SizedBox(width: 12),
-                          Text(
-                            'Track Order',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Inter',
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '... Qty: ${item.quantity}',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF333333),
+                    fontFamily: 'Inter',
+                  ),
                 ),
               ],
             ),
-          ),
-
-          // Content
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Date
-                Row(
-                  children: [
-                    const Text(
-                      'Placed on',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF777777),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _formatDate(order.createdAt),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF333333),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                // Items
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F8F8),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          )),
+          
+          // View More/Less button if more than 2 items
+          if (widget.order.lineItems.length > 2)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _showAllItems = !_showAllItems;
+                    });
+                    // Future functionality: Navigate to order details screen
+                    // _onViewDetails(context, widget.order);
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          const Text(
-                            'Items',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF777777),
-                              fontFamily: 'Inter',
-                            ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFF5C9A).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: const Color(0xFFFF5C9A).withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              '${order.lineItems.length} ${order.lineItems.length == 1 ? 'item' : 'items'}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFFF5C9A),
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Product items
-                      ...order.lineItems.take(2).map((item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 6),
-                                  width: 4,
-                                  height: 4,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFFF5C9A),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF333333),
-                                      fontFamily: 'Inter',
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Qty: ${item.quantity}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF777777),
-                                    fontFamily: 'Inter',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-
-                      if (order.lineItems.length > 2)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            '+${order.lineItems.length - 2} more ${order.lineItems.length - 2 == 1 ? 'item' : 'items'}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF777777),
-                              fontStyle: FontStyle.italic,
-                              fontFamily: 'Inter',
-                            ),
-                          ),
+                      Text(
+                        _showAllItems ? 'View Less' : 'View More',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFFFF5C9A),
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Inter',
                         ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _showAllItems ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        color: const Color(0xFFFF5C9A),
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 12),
-
-                // Total
-                Row(
-                  children: [
-                    const Text(
-                      'Total Amount',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF777777),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '₹${order.totalPrice}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A1A1A),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -623,7 +616,6 @@ class _OrderCard extends StatelessWidget {
   }
 
   void _onTrackOrder(BuildContext context, ShopifyOrder order) {
-    // TODO: Navigate to order tracking screen
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Track order ${order.name}'),
