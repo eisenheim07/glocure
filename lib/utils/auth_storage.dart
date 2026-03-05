@@ -113,17 +113,20 @@ class AuthStorage {
   }
 
   /// Extract and save customer ID from Shopify GID
-  /// Converts "gid://shopify/Customer/9036059508914" to "9036059508914"
+  /// Converts "gid://shopify/Customer/9047451205810" to "9047451205810"
   static Future<void> extractAndSaveCustomerId(String shopifyGid) async {
     try {
       // Extract numeric ID from Shopify GID format
+      // Format: gid://shopify/Customer/9047451205810
+      // After split by '/': ['gid:', '', 'shopify', 'Customer', '9047451205810']
       final parts = shopifyGid.split('/');
-      if (parts.length >= 4 && parts[2] == 'Customer') {
-        final customerId = parts[3];
+      
+      if (parts.length >= 5 && parts[3] == 'Customer') {
+        final customerId = parts[4];
         await saveCustomerId(customerId);
         AppLogger.info("Customer ID extracted and saved: $customerId");
       } else {
-        AppLogger.error("Invalid Shopify GID format: $shopifyGid");
+        AppLogger.error("Invalid Shopify GID format: $shopifyGid (parts: $parts)");
       }
     } catch (e) {
       AppLogger.error("Error extracting customer ID from GID: $e");

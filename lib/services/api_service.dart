@@ -2116,13 +2116,16 @@ class ApiService {
     }
   }
 
-  /// Get customer orders from Shopify Admin API (REST)
-  Future<List<ShopifyOrder>> getCustomerOrders(String customerId) async {
-    AppLogger.info('ApiService: Fetching orders for customer: $customerId');
+  /// Get customer orders by status from Shopify Admin API (REST)
+  /// [status] can be: 'any', 'open', 'closed', 'cancelled'
+  Future<List<ShopifyOrder>> getCustomerOrdersByStatus(String customerId, String status) async {
+    AppLogger.info('ApiService: Fetching orders for customer: $customerId with status: $status');
 
     try {
-      // Use REST API instead of GraphQL for better reliability
-      final url = 'https://glocure.com/admin/api/2025-10/orders.json?customer_id=$customerId&status=any&limit=50';
+      // Use REST API with status parameter
+      final url = 'https://glocure.com/admin/api/2025-10/orders.json?customer_id=$customerId&status=$status&limit=50';
+      
+      AppLogger.info('🔵 API: ORDERS URL: $url');
       
       AppLogger.apiRequest(
         method: 'GET',
@@ -2146,12 +2149,11 @@ class ApiService {
 
         final ordersData = responseData['orders'] as List?;
         if (ordersData == null || ordersData.isEmpty) {
-          AppLogger.info('ApiService: No orders found for customer: $customerId');
-          AppLogger.info('ApiService: Full response: $responseData');
+          AppLogger.info('ApiService: No orders found for customer: $customerId with status: $status');
           return [];
         }
 
-        AppLogger.info('ApiService: Found ${ordersData.length} orders');
+        AppLogger.info('ApiService: Found ${ordersData.length} orders with status: $status');
 
         final orders = ordersData.map((orderData) {
           // Convert REST API response to our model format
@@ -2190,7 +2192,7 @@ class ApiService {
           return ShopifyOrder.fromJson(convertedOrderData);
         }).toList();
 
-        AppLogger.success('ApiService: Successfully fetched ${orders.length} orders');
+        AppLogger.success('ApiService: Successfully fetched ${orders.length} orders with status: $status');
         return orders;
 
       } else {
@@ -2199,7 +2201,7 @@ class ApiService {
       }
 
     } catch (e) {
-      AppLogger.error('ApiService: Failed to fetch orders: $e');
+      AppLogger.error('ApiService: Failed to fetch orders with status $status: $e');
       rethrow;
     }
   }
