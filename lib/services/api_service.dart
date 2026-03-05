@@ -1734,6 +1734,12 @@ class ApiService {
       }
 
       final customerModel = Customer.fromJson(customer);
+      
+      // Extract and save customer ID for orders API
+      if (customerModel.id.isNotEmpty) {
+        await AuthStorage.extractAndSaveCustomerId(customerModel.id);
+      }
+      
       AppLogger.success('Successfully fetched customer details');
       AppLogger.info('Customer has ${customerModel.addresses.length} addresses');
       AppLogger.info('Has default address: ${customerModel.defaultAddress != null}');
@@ -2110,155 +2116,87 @@ class ApiService {
     }
   }
 
-  /// Get customer orders from Shopify Admin API
+  /// Get customer orders from Shopify Admin API (REST)
   Future<List<ShopifyOrder>> getCustomerOrders(String customerId) async {
     AppLogger.info('ApiService: Fetching orders for customer: $customerId');
 
     try {
-      // GraphQL query to fetch orders for a specific customer
-      const query = '''
-        query getCustomerOrders(\$customerId: ID!) {
-          customer(id: \$customerId) {
-            orders(first: 50, sortKey: CREATED_AT, reverse: true) {
-              edges {
-                node {
-                  id
-                  name
-                  email
-                  financialStatus
-                  fulfillmentStatus
-                  totalPriceV2 {
-                    amount
-                    currencyCode
-                  }
-                  subtotalPriceV2 {
-                    amount
-                    currencyCode
-                  }
-                  totalTaxV2 {
-                    amount
-                    currencyCode
-                  }
-                  createdAt
-                  updatedAt
-                  note
-                  tags
-                  lineItems(first: 20) {
-                    edges {
-                      node {
-                        id
-                        title
-                        variantTitle
-                        quantity
-                        originalUnitPriceV2 {
-                          amount
-                          currencyCode
-                        }
-                        totalDiscountV2 {
-                          amount
-                          currencyCode
-                        }
-                        sku
-                        vendor
-                        product {
-                          id
-                        }
-                        variant {
-                          id
-                        }
-                      }
-                    }
-                  }
-                  shippingAddress {
-                    firstName
-                    lastName
-                    address1
-                    address2
-                    city
-                    province
-                    country
-                    zip
-                    phone
-                  }
-                  billingAddress {
-                    firstName
-                    lastName
-                    address1
-                    address2
-                    city
-                    province
-                    country
-                    zip
-                    phone
-                  }
-                }
-              }
-            }
-          }
+      // Use REST API instead of GraphQL for better reliability
+      final url = 'https://glocure.com/admin/api/2025-10/orders.json?customer_id=$customerId&status=any&limit=50';
+      
+      AppLogger.apiRequest(
+        method: 'GET',
+        url: url,
+        body: {},
+      );
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'X-Shopify-Access-Token': ApiConfig.shopifyAdminAccessToken,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      AppLogger.info('ApiService: REST API response received - Status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        AppLogger.info('ApiService: Response data keys: ${responseData.keys}');
+
+        final ordersData = responseData['orders'] as List?;
+        if (ordersData == null || ordersData.isEmpty) {
+          AppLogger.info('ApiService: No orders found for customer: $customerId');
+          AppLogger.info('ApiService: Full response: $responseData');
+          return [];
         }
-      ''';
 
-      final variables = {
-        'customerId': 'gid://shopify/Customer/$customerId',
-      };
+        AppLogger.info('ApiService: Found ${ordersData.length} orders');
 
-      // Make Admin API request
-      final response = await _makeAdminGraphQLRequest(query, variables: variables);
+        final orders = ordersData.map((orderData) {
+          // Convert REST API response to our model format
+          final convertedOrderData = {
+            'id': orderData['id']?.toString(),
+            'name': orderData['name']?.toString() ?? orderData['order_number']?.toString(),
+            'email': orderData['email']?.toString() ?? '',
+            'financial_status': orderData['financial_status']?.toString()?.toLowerCase(),
+            'fulfillment_status': orderData['fulfillment_status']?.toString()?.toLowerCase(),
+            'total_price': orderData['total_price']?.toString(),
+            'subtotal_price': orderData['subtotal_price']?.toString(),
+            'total_tax': orderData['total_tax']?.toString(),
+            'currency': orderData['currency']?.toString() ?? 'INR',
+            'created_at': orderData['created_at'],
+            'updated_at': orderData['updated_at'],
+            'note': orderData['note']?.toString(),
+            'tags': orderData['tags']?.toString() ?? '',
+            'line_items': (orderData['line_items'] as List?)?.map((lineItem) {
+              return {
+                'id': lineItem['id']?.toString(),
+                'title': lineItem['title']?.toString(),
+                'variant_title': lineItem['variant_title']?.toString() ?? '',
+                'quantity': lineItem['quantity'] ?? 1,
+                'price': lineItem['price']?.toString(),
+                'total_discount': lineItem['total_discount']?.toString() ?? '0.00',
+                'sku': lineItem['sku']?.toString() ?? '',
+                'vendor': lineItem['vendor']?.toString() ?? '',
+                'product_id': lineItem['product_id']?.toString(),
+                'variant_id': lineItem['variant_id']?.toString(),
+              };
+            }).toList() ?? [],
+            'shipping_address': orderData['shipping_address'],
+            'billing_address': orderData['billing_address'],
+          };
 
-      final customer = response['data']?['customer'];
-      if (customer == null) {
-        AppLogger.warning('ApiService: No customer found for ID: $customerId');
-        return [];
+          return ShopifyOrder.fromJson(convertedOrderData);
+        }).toList();
+
+        AppLogger.success('ApiService: Successfully fetched ${orders.length} orders');
+        return orders;
+
+      } else {
+        AppLogger.error('ApiService: REST API error - Status: ${response.statusCode}, Body: ${response.body}');
+        throw Exception('Failed to fetch orders: HTTP ${response.statusCode}');
       }
-
-      final ordersData = customer['orders']?['edges'] as List?;
-      if (ordersData == null || ordersData.isEmpty) {
-        AppLogger.info('ApiService: No orders found for customer: $customerId');
-        return [];
-      }
-
-      final orders = ordersData.map((edge) {
-        final orderNode = edge['node'];
-        
-        // Convert GraphQL response to our model format
-        final orderData = {
-          'id': orderNode['id'],
-          'name': orderNode['name'],
-          'email': orderNode['email'],
-          'financial_status': orderNode['financialStatus']?.toLowerCase(),
-          'fulfillment_status': orderNode['fulfillmentStatus']?.toLowerCase(),
-          'total_price': orderNode['totalPriceV2']?['amount'],
-          'subtotal_price': orderNode['subtotalPriceV2']?['amount'],
-          'total_tax': orderNode['totalTaxV2']?['amount'],
-          'currency': orderNode['totalPriceV2']?['currencyCode'],
-          'created_at': orderNode['createdAt'],
-          'updated_at': orderNode['updatedAt'],
-          'note': orderNode['note'],
-          'tags': orderNode['tags']?.join(',') ?? '',
-          'line_items': (orderNode['lineItems']?['edges'] as List?)?.map((lineItemEdge) {
-            final lineItem = lineItemEdge['node'];
-            return {
-              'id': lineItem['id'],
-              'title': lineItem['title'],
-              'variant_title': lineItem['variantTitle'] ?? '',
-              'quantity': lineItem['quantity'],
-              'price': lineItem['originalUnitPriceV2']?['amount'],
-              'total_discount': lineItem['totalDiscountV2']?['amount'],
-              'sku': lineItem['sku'] ?? '',
-              'vendor': lineItem['vendor'] ?? '',
-              'product_id': lineItem['product']?['id'],
-              'variant_id': lineItem['variant']?['id'],
-            };
-          }).toList() ?? [],
-          'shipping_address': orderNode['shippingAddress'],
-          'billing_address': orderNode['billingAddress'],
-        };
-
-        return ShopifyOrder.fromJson(orderData);
-      }).toList();
-
-      AppLogger.success('ApiService: Successfully fetched ${orders.length} orders');
-      return orders;
 
     } catch (e) {
       AppLogger.error('ApiService: Failed to fetch orders: $e');

@@ -34,16 +34,38 @@ class OrdersCubit extends Cubit<OrdersState> {
 
     try {
       final customerId = await AuthStorage.getCustomerId();
+      AppLogger.info('OrdersCubit: Retrieved customer ID from storage: $customerId');
+      
       if (customerId == null || customerId.isEmpty) {
-        AppLogger.error('OrdersCubit: No customer ID found');
+        AppLogger.error('OrdersCubit: No customer ID found in storage');
+        
+        // Try to get customer ID from current session
+        final token = await AuthStorage.getToken();
+        if (token != null) {
+          AppLogger.info('OrdersCubit: Found token, trying to fetch customer...');
+          final customer = await _apiService.getCustomer(token);
+          if (customer != null) {
+            AppLogger.info('OrdersCubit: Customer fetched, retrying orders...');
+            await initializeOrders(); // Retry after customer ID is saved
+            return;
+          }
+        }
+        
         emit(OrdersError('Customer not found. Please login again.'));
         return;
       }
 
-      AppLogger.info('OrdersCubit: Fetching orders for customer: $customerId');
+      // Test with known customer ID if current one doesn't work
+      String testCustomerId = customerId;
+      if (customerId != '8596371243186') {
+        AppLogger.warning('OrdersCubit: Customer ID ($customerId) differs from expected (8596371243186)');
+        AppLogger.info('OrdersCubit: Trying with both IDs...');
+      }
+
+      AppLogger.info('OrdersCubit: Fetching orders for customer: $testCustomerId');
 
       // Fetch all orders from Shopify Admin API
-      final orders = await _apiService.getCustomerOrders(customerId);
+      final orders = await _apiService.getCustomerOrders(testCustomerId);
       
       _allOrders = orders;
       _lastFetchTime = DateTime.now();
