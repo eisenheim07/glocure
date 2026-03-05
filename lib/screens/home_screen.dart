@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Action Buttons (Skin Analysis & Video Consult)
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 8.h),
             child: (_isInitialLoad || _isRefreshing)
                 ? Row(
                     children: [
@@ -135,24 +135,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
                           child: Container(
-                            height: 56,
+                            height: 42.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: Shimmer.fromColors(
                           baseColor: Colors.grey[300]!,
                           highlightColor: Colors.grey[100]!,
                           child: Container(
-                            height: 56,
+                            height: 42.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
                         ),
@@ -168,29 +168,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             // TODO: Navigate to Skin Analysis screen
                           },
                           child: Container(
-                            height: 56,
+                            height: 42.h,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF8B3A8B), Color(0xFFB84A9E)],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Image.asset(
                                   ImageConstant.icMedicalStaff,
-                                  width: 16,
-                                  height: 16,
+                                  width: 12.w,
+                                  height: 12.h,
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
+                                SizedBox(width: 5.w),
+                                Text(
                                   'Start skin Analysis',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12.fSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
-                      const SizedBox(width: 12),
+                      SizedBox(width: 8.w),
 
                       // Derma Video Consult Button
                       Expanded(
@@ -220,29 +220,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                           child: Container(
-                            height: 56,
+                            height: 42.h,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF1E5BA8), Color(0xFF2B7BC9)],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Image.asset(
                                   ImageConstant.icDashboard,
-                                  width: 16,
-                                  height: 16,
+                                  width: 12.w,
+                                  height: 12.h,
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
+                                SizedBox(width: 5.w),
+                                Text(
                                   'Derma Video Consult',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 12.fSize,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Sticky Search Bar with shimmer during initial load and refresh
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
             child: (_isInitialLoad || _isRefreshing)
                 ? const SearchBarShimmer()
                 : BlocBuilder<DiscountedProductsCubit, DiscountedProductsState>(
@@ -288,24 +288,24 @@ class _HomeScreenState extends State<HomeScreen> {
             child: RefreshIndicator(
               onRefresh: _onRefresh,
               child: ListView(
-                padding: const EdgeInsets.only(bottom: 24),
+                padding: EdgeInsets.only(bottom: 24.h),
                 children: [
                   BlocBuilder<HomeBannerCubit, HomeBannerState>(
                     builder: (context, state) {
                       if (state is HomeBannerLoading || _isInitialLoad || _isRefreshing) return _BannerShimmerLayout();
                       if (state is HomeBannerError) {
                         return Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: EdgeInsets.all(16.w),
                           child: Column(
                             children: [
-                              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                              const SizedBox(height: 8),
+                              Icon(Icons.error_outline, size: 48.h, color: Colors.red),
+                              SizedBox(height: 8.h),
                               Text(
                                 '${state.message}',
-                                style: const TextStyle(fontSize: 14, color: Colors.red),
+                                style: TextStyle(fontSize: 14.fSize, color: Colors.red),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8.h),
                               TextButton(onPressed: () => context.read<HomeBannerCubit>().fetchBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -314,10 +314,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (state is HomeBannerSuccess) {
                         final banners = state.banners;
                         if (banners.isEmpty) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
+                          return Padding(
+                            padding: EdgeInsets.all(16.w),
                             child: Center(
-                              child: Text('No banners found', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                              child: Text('No banners found', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
                             ),
                           );
                         }
@@ -326,42 +326,45 @@ class _HomeScreenState extends State<HomeScreen> {
                       return _BannerShimmerLayout();
                     },
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 20.h),
                   // Skin Genius Analyzes Header with shimmer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: (_isInitialLoad || _isRefreshing)
                         ? Shimmer.fromColors(
                             baseColor: Colors.grey[300]!,
                             highlightColor: Colors.grey[100]!,
                             child: Container(
-                              width: 200,
-                              height: 24,
+                              width: 180.w,
+                              height: 20.h,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(4.r),
                               ),
                             ),
                           )
                         : Text(
                             'Skin Genius Analyzes',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16.fSize),
                           ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 12.h),
                   BlocBuilder<SkinGeniusCubit, SkinGeniusState>(
                     builder: (context, state) {
                       if (state is SkinGeniusLoading || _isInitialLoad || _isRefreshing) return const _SkinGeniusShimmer();
                       if (state is SkinGeniusError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              const Icon(Icons.error_outline, size: 40, color: Colors.red),
-                              const SizedBox(height: 8),
+                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              SizedBox(height: 8.h),
                               Text(
                                 state.message,
-                                style: const TextStyle(fontSize: 14, color: Colors.red),
+                                style: TextStyle(fontSize: 14.fSize, color: Colors.red),
                                 textAlign: TextAlign.center,
                               ),
                               TextButton(onPressed: () => context.read<SkinGeniusCubit>().fetchAnalyzes(), child: const Text('Retry')),
@@ -372,9 +375,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (state is SkinGeniusSuccess) {
                         final analyzes = state.analyzes;
                         if (analyzes.isEmpty) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text('No Skin Genius analyzes yet', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Text('No Skin Genius analyzes yet', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
                           );
                         }
                         return _SkinGeniusList(analyzes: analyzes);
@@ -382,9 +385,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const _SkinGeniusShimmer();
                     },
                   ),
+                  SizedBox(height: 12.h),
                   // Top products header + "View all" with shimmer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: (_isInitialLoad || _isRefreshing)
                         ? Row(
                             children: [
@@ -392,11 +396,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
                                 child: Container(
-                                  width: 180,
-                                  height: 24,
+                                  width: 160.w,
+                                  height: 20.h,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
                               ),
@@ -405,11 +409,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
                                 child: Container(
-                                  width: 60,
-                                  height: 20,
+                                  width: 55.w,
+                                  height: 18.h,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
                               ),
@@ -420,7 +424,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               Expanded(
                                 child: Text(
                                   'Browse By Trending',
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16.fSize),
                                 ),
                               ),
                               TextButton(
@@ -433,43 +440,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   );
                                 },
-                                child: const Text(
+                                child: Text(
                                   'View all',
-                                  style: TextStyle(color: Color(0xFFFF5C9A), fontWeight: FontWeight.w600),
+                                  style: TextStyle(color: const Color(0xFFFF5C9A), fontWeight: FontWeight.w600, fontSize: 12.fSize),
                                 ),
                               ),
                             ],
                           ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   // Trending tabs with shimmer
                   (_isInitialLoad || _isRefreshing)
                       ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
                               Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
                                 child: Container(
-                                  width: 120,
-                                  height: 36,
+                                  width: 100.w,
+                                  height: 28.h,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(16.r),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 6.w),
                               Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
                                 child: Container(
-                                  width: 120,
-                                  height: 36,
+                                  width: 100.w,
+                                  height: 28.h,
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(16.r),
                                   ),
                                 ),
                               ),
@@ -478,13 +485,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       : SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: List.generate(_trendingTabs.length, (index) {
                               final tab = _trendingTabs[index];
                               final isSelected = index == _selectedTrendingTabIndex;
                               return Padding(
-                                padding: EdgeInsets.only(right: 8.h),
+                                padding: EdgeInsets.only(right: 6.w),
                                 child: GestureDetector(
                                   onTap: () {
                                     if (!isSelected) {
@@ -495,16 +502,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                     }
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                                     decoration: BoxDecoration(
                                       color: isSelected ? const Color(0xFFFFE9F0) : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(16.r),
                                       border: Border.all(color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0)),
                                     ),
                                     child: Text(
                                       tab.label,
                                       style: TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 10.fSize,
                                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                                         color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF7A7A7A),
                                       ),
@@ -515,7 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             }),
                           ),
                         ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   // Top products BlocBuilder with horizontal cards
                   BlocBuilder<TopProductsCubit, TopProductsState>(
                     builder: (context, state) {
@@ -525,13 +532,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       if (state is TopProductsError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 18, color: Colors.red),
-                              const SizedBox(width: 6),
+                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: const TextStyle(fontSize: 13, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -550,9 +557,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         final products = collection?.products ?? [];
 
                         if (products.isEmpty) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text('No products found for this filter.', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Text('No products found for this filter.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
                           );
                         }
 
@@ -572,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const _TopProductsShimmer();
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   // Browse by categories section
                   BlocBuilder<BrowseCategoriesCubit, BrowseCategoriesState>(
                     builder: (context, state) {
@@ -582,15 +589,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       if (state is BrowseCategoriesError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 18, color: Colors.red),
-                              const SizedBox(width: 6),
+                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              SizedBox(width: 6.w),
                               Expanded(
                                 child: Text(
                                   state.message,
-                                  style: const TextStyle(fontSize: 13, color: Colors.red),
+                                  style: TextStyle(fontSize: 13.fSize, color: Colors.red),
                                 ),
                               ),
                               TextButton(
@@ -605,9 +612,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (state is BrowseCategoriesSuccess) {
                         final categories = state.categories;
                         if (categories.isEmpty) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Text('No categories found.', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Text('No categories found.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
                           );
                         }
                         return _BrowseCategoriesSection(categories: categories);
@@ -617,18 +624,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const _BrowseCategoriesShimmer();
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   BlocBuilder<MiddleBannerCubit, MiddleBannerState>(
                     builder: (context, state) {
                       if (state is MiddleBannerLoading || _isInitialLoad || _isRefreshing) return _MiddleBannerShimmer();
                       if (state is MiddleBannerError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              const Icon(Icons.error_outline, size: 40, color: Colors.red),
-                              const SizedBox(height: 8),
-                              Text(state.message, style: const TextStyle(fontSize: 14, color: Colors.red), textAlign: TextAlign.center),
+                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              SizedBox(height: 8.h),
+                              Text(state.message, style: TextStyle(fontSize: 14.fSize, color: Colors.red), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<MiddleBannerCubit>().fetchMiddleBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -642,7 +649,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const SizedBox.shrink();
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   // Discounted Products section
                   BlocBuilder<DiscountedProductsCubit, DiscountedProductsState>(
                     builder: (context, state) {
@@ -651,13 +658,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       if (state is DiscountedProductsError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 18, color: Colors.red),
-                              const SizedBox(width: 6),
+                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: const TextStyle(fontSize: 13, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () => context.read<DiscountedProductsCubit>().fetchDiscountedProducts(),
@@ -675,20 +682,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const _DiscountedProductsShimmer();
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   // Brands section
                   BlocBuilder<BrandLogosCubit, BrandLogosState>(
                     builder: (context, state) {
                       if (state is BrandLogosLoading || _isInitialLoad || _isRefreshing) return const _BrandsShimmer();
                       if (state is BrandLogosError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline, size: 18, color: Colors.red),
-                              const SizedBox(width: 6),
+                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: const TextStyle(fontSize: 13, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () => context.read<BrandLogosCubit>().fetchBrandLogos(),
@@ -706,19 +713,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const _BrandsShimmer();
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   // Bottom banners section (reuses _MiddleBannerSection / _MiddleBannerCard style)
                   BlocBuilder<BottomBannerCubit, BottomBannerState>(
                     builder: (context, state) {
                       if (state is BottomBannerLoading || _isInitialLoad || _isRefreshing) return _MiddleBannerShimmer();
                       if (state is BottomBannerError) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              const Icon(Icons.error_outline, size: 40, color: Colors.red),
-                              const SizedBox(height: 8),
-                              Text(state.message, style: const TextStyle(fontSize: 14, color: Colors.red), textAlign: TextAlign.center),
+                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              SizedBox(height: 8.h),
+                              Text(state.message, style: TextStyle(fontSize: 14.fSize, color: Colors.red), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<BottomBannerCubit>().fetchBottomBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -755,14 +762,14 @@ class _BannerColumn extends StatelessWidget {
     final thirdBanner = banners.length > 2 ? banners[2] : null;
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (firstBanner != null) _BannerCard(banner: firstBanner),
-          if (firstBanner != null) const SizedBox(height: 16),
+          if (firstBanner != null) SizedBox(height: 16.h),
           if (secondBanner != null) _BannerCard(banner: secondBanner),
-          if (secondBanner != null) const SizedBox(height: 16),
+          if (secondBanner != null) SizedBox(height: 16.h),
           if (thirdBanner != null) _BannerCard(banner: thirdBanner),
         ],
       ),
@@ -787,19 +794,19 @@ class _BannerCard extends StatelessWidget {
     }
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8.h),
+      borderRadius: BorderRadius.circular(8.r),
       child: imageUrl != null
           ? NetworkImageLoader(
               imageUrl: imageUrl,
               width: double.infinity,
               fit: BoxFit.fitWidth,
-              borderRadius: BorderRadius.circular(8.h),
+              borderRadius: BorderRadius.circular(8.r),
             )
           : Container(
               width: double.infinity,
               height: 175.h,
               color: Colors.grey[300],
-              child: const Center(child: Icon(Icons.image_not_supported, size: 48)),
+              child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
             ),
     );
   }
@@ -811,13 +818,13 @@ class _BannerShimmerLayout extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
-      padding: const EdgeInsets.all(16),
-      children: const [
-        _BannerShimmerCard(height: 292, width: double.infinity),
-        SizedBox(height: 16),
-        _BannerShimmerCard(height: 175, width: double.infinity),
-        SizedBox(height: 16),
-        _BannerShimmerCard(height: 175, width: double.infinity),
+      padding: EdgeInsets.all(16.w),
+      children: [
+        _BannerShimmerCard(height: 292.h, width: double.infinity),
+        SizedBox(height: 16.h),
+        _BannerShimmerCard(height: 175.h, width: double.infinity),
+        SizedBox(height: 16.h),
+        _BannerShimmerCard(height: 175.h, width: double.infinity),
       ],
     );
   }
@@ -835,7 +842,7 @@ class _BannerShimmerCard extends StatelessWidget {
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
         child: Container(width: width, height: height, color: Colors.white),
       ),
     );
@@ -851,12 +858,12 @@ class _MiddleBannerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < banners.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
+            if (i > 0) SizedBox(height: 12.h),
             _MiddleBannerCard(banner: banners[i]),
           ],
         ],
@@ -883,22 +890,22 @@ class _MiddleBannerCard extends StatelessWidget {
     const radius = 15.0;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
+      borderRadius: BorderRadius.circular(radius.r),
       child: imageUrl != null && imageUrl.isNotEmpty
           ? NetworkImageLoader(
               imageUrl: imageUrl,
               width: double.infinity,
               fit: BoxFit.fitWidth,
-              borderRadius: BorderRadius.circular(radius),
+              borderRadius: BorderRadius.circular(radius.r),
             )
           : Container(
               width: double.infinity,
               height: 175.h,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(radius),
+                borderRadius: BorderRadius.circular(radius.r),
               ),
-              child: const Center(child: Icon(Icons.image_not_supported, size: 48)),
+              child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
             ),
     );
   }
@@ -908,7 +915,7 @@ class _MiddleBannerShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
@@ -917,7 +924,7 @@ class _MiddleBannerShimmer extends StatelessWidget {
           height: 175.h,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(15.r),
           ),
         ),
       ),
@@ -934,12 +941,12 @@ class _BottomBannerSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < banners.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
+            if (i > 0) SizedBox(height: 12.h),
             _BottomBannerCard(banner: banners[i]),
           ],
         ],
@@ -966,22 +973,22 @@ class _BottomBannerCard extends StatelessWidget {
     const radius = 15.0;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
+      borderRadius: BorderRadius.circular(radius.r),
       child: imageUrl != null && imageUrl.isNotEmpty
           ? NetworkImageLoader(
               imageUrl: imageUrl,
               width: double.infinity,
               fit: BoxFit.fitWidth,
-              borderRadius: BorderRadius.circular(radius),
+              borderRadius: BorderRadius.circular(radius.r),
             )
           : Container(
               width: double.infinity,
               height: 175.h,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(radius),
+                borderRadius: BorderRadius.circular(radius.r),
               ),
-              child: const Center(child: Icon(Icons.image_not_supported, size: 48)),
+              child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
             ),
     );
   }
@@ -996,12 +1003,12 @@ class _SkinGeniusList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 140.h,
+      height: 92.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: analyzes.length,
-        separatorBuilder: (_, __) => SizedBox(width: 14.h),
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           return _SkinGeniusCard(item: analyzes[index]);
         },
@@ -1040,9 +1047,9 @@ class _SkinGeniusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = _imageUrl();
     final label = _label();
-    const cardWidth = 110.0;
-    const imageSize = 90.0;
-    const cornerRadius = 16.0;
+    final cardWidth = 75.0.w;
+    final imageSize = 60.0.w;
+    final cornerRadius = 10.0;
 
     return GestureDetector(
       onTap: () {
@@ -1061,27 +1068,27 @@ class _SkinGeniusCard extends StatelessWidget {
             Container(
               width: cardWidth,
               height: cardWidth,
-              decoration: BoxDecoration(color: const Color(0xFFF5E6EC), borderRadius: BorderRadius.circular(cornerRadius)),
-              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: const Color(0xFFF5E6EC), borderRadius: BorderRadius.circular(cornerRadius.r)),
+              padding: EdgeInsets.all(4.w),
               child: Center(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(6.r),
                   child: imageUrl != null
                       ? NetworkImageLoader(
                           imageUrl: imageUrl,
                           width: imageSize,
                           height: imageSize,
                           fit: BoxFit.cover,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(6.r),
                         )
                       : _placeholderBox(imageSize),
                 ),
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 4.h),
             Text(
               label,
-              style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.normal),
+              style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -1108,14 +1115,14 @@ class _SkinGeniusShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const cardWidth = 110.0;
+    final cardWidth = 75.0.w;
     return SizedBox(
-      height: 140.h,
+      height: 92.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         itemCount: 5,
-        separatorBuilder: (_, __) => SizedBox(width: 14.h),
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           return Shimmer.fromColors(
             baseColor: Colors.grey[300]!,
@@ -1126,10 +1133,10 @@ class _SkinGeniusShimmer extends StatelessWidget {
                 Container(
                   width: cardWidth,
                   height: cardWidth,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.r)),
                 ),
-                const SizedBox(height: 8),
-                Container(width: 60, height: 12, color: Colors.white),
+                SizedBox(height: 4.h),
+                Container(width: 40.w, height: 8.h, color: Colors.white),
               ],
             ),
           );
@@ -1164,12 +1171,12 @@ class _TopProductsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 252.h,
+      height: 190.h,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         scrollDirection: Axis.horizontal,
         itemCount: products.length,
-        separatorBuilder: (_, __) => SizedBox(width: 14.h),
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () async {
@@ -1311,7 +1318,8 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
           productId: widget.product.id,
           variantId: variant.id,
           productHandle: widget.product.handle,
-          mainHandle: 'top-products', // Default handle for home screen products
+          mainHandle: 'top-products',
+          // Default handle for home screen products
           title: widget.product.title,
           price: variant.priceV2.amount,
           discountedPrice: variant.compareAtPriceV2?.amount,
@@ -1368,14 +1376,14 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
     final imageUrl = _imageUrl();
     final price = _priceText();
 
-    final cardWidth = 220.h;
+    final cardWidth = 180.w;
 
     return Container(
       width: cardWidth,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: Colors.grey.shade200,
           width: 0.8,
@@ -1389,30 +1397,30 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(18), topRight: Radius.circular(18)),
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(12.r), topRight: Radius.circular(12.r)),
                 child: Container(
-                  height: 138.h,
                   width: cardWidth,
                   color: Colors.grey[50],
                   child: imageUrl != null && imageUrl.isNotEmpty
                       ? NetworkImageLoader(
                           imageUrl: imageUrl,
                           width: cardWidth,
-                          height: 138.h,
+                          height: 90.h,
                           fit: BoxFit.contain,
                         )
                       : Container(
+                          height: 90.h,
                           color: Colors.grey[200],
-                          child: const Center(child: Icon(Icons.image_outlined, color: Colors.grey)),
+                          child: Center(child: Icon(Icons.image_outlined, color: Colors.grey, size: 22.h)),
                         ),
                 ),
               ),
               Positioned(
-                top: 10,
-                right: 10,
+                top: 4.h,
+                right: 4.w,
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: 24.w,
+                  height: 24.h,
                   decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
                   child: IconButton(
                     onPressed: _toggleWishlist,
@@ -1421,7 +1429,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                       child: Icon(
                         _isInWishlist ? Icons.favorite : Icons.favorite_border,
                         color: const Color(0xFFFF5C9A),
-                        size: 22,
+                        size: 14.h,
                       ),
                     ),
                     padding: EdgeInsets.zero,
@@ -1439,7 +1447,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
 
           // Product info section
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.fromLTRB(6.w, 6.h, 6.w, 6.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -1448,34 +1456,20 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                   widget.product.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black, height: 1.3),
+                  style: TextStyle(fontSize: 10.fSize, fontWeight: FontWeight.w600, color: Colors.black, height: 1.2),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 2.h),
                 Text(
                   widget.product.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF777777), height: 1.3),
+                  style: TextStyle(fontSize: 9.fSize, color: const Color(0xFF777777)),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        price,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(color: Color(0xFFFF5C9A), shape: BoxShape.circle),
-                      child: const Icon(Icons.shopping_bag_outlined, size: 18, color: Colors.white),
-                    ),
-                  ],
+                SizedBox(height: 4.h),
+                Text(
+                  price,
+                  style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.bold, color: Colors.black),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -1492,12 +1486,12 @@ class _TopProductsShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardWidth = 220.h;
+    final cardWidth = 155.w;
 
     return SizedBox(
-      height: 252.h,
+      height: 190.h,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           return Shimmer.fromColors(
@@ -1505,11 +1499,11 @@ class _TopProductsShimmer extends StatelessWidget {
             highlightColor: Colors.grey[100]!,
             child: Container(
               width: cardWidth,
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r)),
             ),
           );
         },
-        separatorBuilder: (_, __) => SizedBox(width: 14.h),
+        separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemCount: 3,
       ),
     );
@@ -1525,13 +1519,13 @@ class _BrowseCategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFFFFE5F0),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18.r),
         ),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 12.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -1541,9 +1535,10 @@ class _BrowseCategoriesSection extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
+                    fontSize: 15.fSize,
                   ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 10.h),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(3, (index) {
@@ -1584,41 +1579,41 @@ class _BrowseCategoryCard extends StatelessWidget {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: EdgeInsets.only(bottom: 7.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14.r),
           border: isHighlighted ? Border.all(color: const Color(0xFF2F80ED), width: 2) : null,
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(18),
-                bottomLeft: Radius.circular(18),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14.r),
+                bottomLeft: Radius.circular(14.r),
               ),
               child: SizedBox(
-                width: 110.h,
-                height: 92.h,
+                width: 85.w,
+                height: 70.h,
                 child: imageUrl != null && imageUrl.isNotEmpty
                     ? NetworkImageLoader(
                         imageUrl: imageUrl,
-                        width: 110.h,
-                        height: 92.h,
+                        width: 85.w,
+                        height: 70.h,
                         fit: BoxFit.cover,
                       )
                     : Container(
                         color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.image_outlined, color: Colors.grey),
+                        child: Center(
+                          child: Icon(Icons.image_outlined, color: Colors.grey, size: 24.h),
                         ),
                       ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 8.w),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 4.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -1627,20 +1622,20 @@ class _BrowseCategoryCard extends StatelessWidget {
                       category.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: 12.fSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 2.h),
                     Text(
                       category.description,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF777777),
+                      style: TextStyle(
+                        fontSize: 10.fSize,
+                        color: const Color(0xFF777777),
                       ),
                     ),
                   ],
@@ -1661,34 +1656,34 @@ class _BrowseCategoriesShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
         child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFFFFE5F0),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(24.r),
           ),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 140,
-                height: 18,
+                width: 140.w,
+                height: 18.h,
                 color: Colors.white,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Column(
                 children: List.generate(3, (index) {
                   return Container(
                     height: 92.h,
-                    margin: const EdgeInsets.only(bottom: 10),
+                    margin: EdgeInsets.only(bottom: 10.h),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(18.r),
                     ),
                   );
                 }),
@@ -1710,7 +1705,7 @@ class _DiscountedProductsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1735,8 +1730,8 @@ class _DiscountedProductsSection extends StatelessWidget {
                   );
                 },
                 child: IconButton(
-                  icon: Icon(Icons.arrow_forward),
-                  iconSize: 22,
+                  icon: const Icon(Icons.arrow_forward),
+                  iconSize: 22.h,
                   color: Colors.black,
                   onPressed: () {
                     Navigator.push(
@@ -1750,15 +1745,15 @@ class _DiscountedProductsSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12.h,
+              crossAxisSpacing: 12.w,
               mainAxisSpacing: 14.h,
-              childAspectRatio: 0.68,
+              childAspectRatio: 0.75,
             ),
             itemCount: products.length,
             itemBuilder: (context, index) {
@@ -1813,7 +1808,7 @@ class _DiscountedProductCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 0.8,
@@ -1824,13 +1819,12 @@ class _DiscountedProductCard extends StatelessWidget {
           children: [
             // Image area with discount badge
             Expanded(
-              flex: 3,
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(18),
-                      topRight: Radius.circular(18),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(18.r),
+                      topRight: Radius.circular(18.r),
                     ),
                     child: SizedBox(
                       width: double.infinity,
@@ -1843,27 +1837,27 @@ class _DiscountedProductCard extends StatelessWidget {
                             )
                           : Container(
                               color: Colors.grey[200],
-                              child: const Center(
-                                child: Icon(Icons.image_outlined, color: Colors.grey),
+                              child: Center(
+                                child: Icon(Icons.image_outlined, color: Colors.grey, size: 32.h),
                               ),
                             ),
                     ),
                   ),
                   if (discount > 0)
                     Positioned(
-                      top: 8,
-                      right: 8,
+                      top: 8.h,
+                      right: 8.w,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
                           '-$discount%',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 11.fSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1881,41 +1875,44 @@ class _DiscountedProductCard extends StatelessWidget {
 
             // Product info
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              padding: EdgeInsets.all(8.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     product.title,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 4.h),
                   Row(
                     children: [
                       Text(
                         currentPrice,
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 13.fSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 4.w),
                       if (originalPrice.isNotEmpty)
-                        Text(
-                          originalPrice,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF999999),
-                            decoration: TextDecoration.lineThrough,
-                            decorationColor: Color(0xFF999999),
+                        Flexible(
+                          child: Text(
+                            originalPrice,
+                            style: TextStyle(
+                              fontSize: 10.fSize,
+                              color: const Color(0xFF999999),
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: const Color(0xFF999999),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                     ],
@@ -1950,7 +1947,7 @@ class _BrandsSection extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+            padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -1962,13 +1959,13 @@ class _BrandsSection extends StatelessWidget {
                         color: Colors.white,
                       ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 SizedBox(
                   height: 80.h,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: brands.length,
-                    separatorBuilder: (_, __) => SizedBox(width: 14.h),
+                    separatorBuilder: (_, __) => SizedBox(width: 14.w),
                     itemBuilder: (context, index) {
                       return _BrandLogoCard(brand: brands[index]);
                     },
@@ -2000,7 +1997,7 @@ class _BrandLogoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = _imageUrl();
-    const size = 72.0;
+    final size = 72.0.w;
 
     return Container(
       width: size,
@@ -2011,15 +2008,15 @@ class _BrandLogoCard extends StatelessWidget {
       ),
       child: ClipOval(
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12.w),
           child: imageUrl != null && imageUrl.isNotEmpty
               ? NetworkImageLoader(
                   imageUrl: imageUrl,
-                  width: size - 24,
-                  height: size - 24,
+                  width: size - 24.w,
+                  height: size - 24.w,
                   fit: BoxFit.contain,
                 )
-              : const Icon(Icons.business, color: Colors.grey, size: 28),
+              : Icon(Icons.business, color: Colors.grey, size: 28.h),
         ),
       ),
     );
@@ -2050,7 +2047,7 @@ class _DiscountedProductsShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -2058,17 +2055,17 @@ class _DiscountedProductsShimmer extends StatelessWidget {
           Shimmer.fromColors(
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
-            child: Container(width: 180, height: 22, color: Colors.white),
+            child: Container(width: 180.w, height: 22.h, color: Colors.white),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12.h,
+              crossAxisSpacing: 12.w,
               mainAxisSpacing: 14.h,
-              childAspectRatio: 0.68,
+              childAspectRatio: 0.75,
             ),
             itemCount: 4,
             itemBuilder: (context, index) {
@@ -2078,7 +2075,7 @@ class _DiscountedProductsShimmer extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(18.r),
                   ),
                 ),
               );
