@@ -2205,4 +2205,42 @@ class ApiService {
       rethrow;
     }
   }
+
+  /// Delete an order from Shopify Admin API (REST)
+  /// [orderId] - The Shopify order ID to delete
+  Future<bool> deleteOrder(String orderId) async {
+    AppLogger.info('ApiService: Deleting order: $orderId');
+
+    try {
+      final url = 'https://bxaqgp-p1.myshopify.com/admin/api/2025-10/orders/$orderId.json';
+      
+      AppLogger.apiRequest(
+        method: 'DELETE',
+        url: url,
+        body: {},
+      );
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'X-Shopify-Access-Token': ApiConfig.shopifyAdminAccessToken,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      AppLogger.info('ApiService: DELETE order response - Status: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        AppLogger.success('ApiService: Successfully deleted order: $orderId');
+        return true;
+      } else {
+        AppLogger.error('ApiService: Failed to delete order - Status: ${response.statusCode}, Body: ${response.body}');
+        throw Exception('Failed to delete order: HTTP ${response.statusCode}');
+      }
+
+    } catch (e) {
+      AppLogger.error('ApiService: Failed to delete order $orderId: $e');
+      rethrow;
+    }
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/order_model.dart';
 import '../utils/format_utils.dart';
 import '../widgets/custom_app_bar.dart';
+import 'main_navigation_screen.dart';
 
 /// Payment Status Screen
 /// Shows payment result (success, failed, cancelled) with order details
@@ -286,9 +287,13 @@ class PaymentStatusScreen extends StatelessWidget {
             context,
             'View My Orders',
             () {
-              // TODO: Navigate to orders screen
-              debugPrint('Navigate to orders screen');
-              _navigateToHome(context);
+              // Navigate to main screen with orders tab selected
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MainNavigationScreen(initialIndex: 3),
+                ),
+                (route) => false,
+              );
             },
           ),
         ],

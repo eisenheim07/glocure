@@ -11,7 +11,9 @@ import '../widgets/custom_bottom_nav_bar.dart';
 /// Main Navigation Screen
 /// Manages bottom navigation and screen switching
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  final int initialIndex;
+  
+  const MainNavigationScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigationScreen> createState() => MainNavigationScreenState();
@@ -21,10 +23,16 @@ class MainNavigationScreen extends StatefulWidget {
     final state = context.findAncestorStateOfType<MainNavigationScreenState>();
     state?.navigateToHome();
   }
+  
+  /// Static method to navigate to orders from anywhere in the widget tree
+  static void navigateToOrders(BuildContext context) {
+    final state = context.findAncestorStateOfType<MainNavigationScreenState>();
+    state?.navigateToOrders();
+  }
 }
 
 class MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
-  int _currentIndex = 0;
+  late int _currentIndex;
   DateTime? _lastBackPressTime;
 
   // List of screens for each navigation item
@@ -43,10 +51,20 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
       });
     }
   }
+  
+  /// Public method to navigate to orders tab
+  void navigateToOrders() {
+    if (_currentIndex != 3) {
+      setState(() {
+        _currentIndex = 3;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     WidgetsBinding.instance.addObserver(this);
     // Show status bar on home screen with multiple attempts
     _showStatusBar();

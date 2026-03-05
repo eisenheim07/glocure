@@ -145,6 +145,31 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
+  /// Delete an order
+  Future<void> deleteOrder(String orderId) async {
+    AppLogger.info('OrdersCubit: Deleting order: $orderId');
+    
+    try {
+      // Call API service to delete order
+      final success = await _apiService.deleteOrder(orderId);
+      
+      if (success) {
+        AppLogger.success('OrdersCubit: Order deleted successfully');
+        
+        // Refresh current tab to update the list
+        await refreshOrders();
+      } else {
+        throw Exception('Failed to delete order');
+      }
+    } catch (e) {
+      AppLogger.error('OrdersCubit: Error deleting order: $e');
+      emit(OrdersError('Failed to delete order: ${e.toString()}'));
+      
+      // Refresh to restore previous state
+      await refreshOrders();
+    }
+  }
+
   /// Reset to initial state
   void reset() {
     AppLogger.info('OrdersCubit: Resetting to initial state');
