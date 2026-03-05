@@ -6,6 +6,7 @@ import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/orders/orders_state.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/utils/format_utils.dart';
+import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'main_navigation_screen.dart';
 import 'ordered_items_details.dart';
 
@@ -319,10 +320,8 @@ class _OrderCardState extends State<_OrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    final itemsToShow = _showAllItems 
-        ? widget.order.lineItems 
-        : widget.order.lineItems.take(2).toList();
-    
+    final itemsToShow = _showAllItems ? widget.order.lineItems : widget.order.lineItems.take(2).toList();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -468,18 +467,18 @@ class _OrderCardState extends State<_OrderCard> {
               fontFamily: 'Inter',
             ),
           ),
-          
+
           const SizedBox(height: 10),
-          
+
           // Divider before amount section
           Divider(
             color: const Color(0xFFE5E5E5).withOpacity(0.5),
             thickness: 1,
             height: 1,
           ),
-          
+
           const SizedBox(height: 10),
-          
+
           // Total Amount and Items row
           Row(
             children: [
@@ -532,59 +531,59 @@ class _OrderCardState extends State<_OrderCard> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 10),
-          
+
           // Divider before items list
           Divider(
             color: const Color(0xFFE5E5E5).withOpacity(0.5),
             thickness: 1,
             height: 1,
           ),
-          
+
           const SizedBox(height: 10),
-          
+
           // Product items list
           ...itemsToShow.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  width: 4,
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF333333),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    item.title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF333333),
-                      fontFamily: 'Inter',
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 6),
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF333333),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF333333),
+                          fontFamily: 'Inter',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '... Qty: ${item.quantity}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF333333),
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  '... Qty: ${item.quantity}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF333333),
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
-          )),
-          
+              )),
+
           // View More/Less button if more than 2 items
           if (widget.order.lineItems.length > 2)
             Padding(
@@ -651,141 +650,52 @@ class _OrderCardState extends State<_OrderCard> {
   }
 
   void _onDeleteOrder(BuildContext context, ShopifyOrder order) {
-    // Show confirmation bottom sheet
-    showModalBottomSheet(
+    // Show confirmation bottom sheet using common widget
+    CommonBottomSheet.show(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext bottomSheetContext) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              const Text(
-                'Delete Order',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
-                  fontFamily: 'Inter',
-                ),
+      title: 'Delete Order',
+      message: 'Are you sure you want to delete order ${order.name}? This action cannot be undone.',
+      icon: const Icon(
+        Icons.delete_outline,
+        size: 48,
+        color: Color(0xFFFF5C9A),
+      ),
+      isIconEnabled: false,
+      primaryButtonText: 'Delete',
+      secondaryButtonText: 'Cancel',
+      onPrimaryPressed: () async {
+        Navigator.pop(context);
+
+        try {
+          // Call cubit to delete order (this will show loading state and refresh)
+          await context.read<OrdersCubit>().deleteOrder(order.id);
+
+          // Show success message
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Order ${order.name} deleted successfully'),
+                backgroundColor: const Color(0xFF4CAF50),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              
-              const SizedBox(height: 16),
-              
-              // Message
-              Text(
-                'Are you sure you want to delete order ${order.name}? This action cannot be undone.',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF666666),
-                  fontFamily: 'Inter',
-                  height: 1.5,
-                ),
+            );
+          }
+        } catch (e) {
+          // Show error message
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to delete order: ${e.toString()}'),
+                backgroundColor: const Color(0xFFF44336),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              
-              const SizedBox(height: 24),
-              
-              // Buttons
-              Row(
-                children: [
-                  // Cancel button
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(bottomSheetContext).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF666666),
-                        side: const BorderSide(
-                          color: Color(0xFFE0E0E0),
-                          width: 1.5,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(width: 12),
-                  
-                  // Delete button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.of(bottomSheetContext).pop();
-                        
-                        try {
-                          // Call cubit to delete order (this will show loading state and refresh)
-                          await context.read<OrdersCubit>().deleteOrder(order.id);
-                          
-                          // Show success message
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Order ${order.name} deleted successfully'),
-                                backgroundColor: const Color(0xFF4CAF50),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          // Show error message
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Failed to delete order: ${e.toString()}'),
-                                backgroundColor: const Color(0xFFF44336),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5C9A),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Delete',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
+            );
+          }
+        }
       },
+      onSecondaryPressed: () => Navigator.pop(context),
     );
   }
 

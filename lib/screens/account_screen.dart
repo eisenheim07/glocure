@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
+import 'package:glocure/widgets/common_bottom_sheet.dart';
 import '../utils/auth_storage.dart';
 import '../utils/wishlist_storage.dart';
 import 'address_list_screen.dart';
@@ -54,120 +55,14 @@ class _AccountScreenState extends State<AccountScreen> {
 
   /// Show logout confirmation bottom sheet
   Future<void> _showLogoutBottomSheet() async {
-    final confirmed = await showModalBottomSheet<bool>(
+    final confirmed = await CommonBottomSheet.show(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Top indicator
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Title
-            const Text(
-              'Logout',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            // Divider
-            Divider(
-              color: Colors.grey.shade200,
-              thickness: 1,
-            ),
-            const SizedBox(height: 24),
-
-            // Message
-            const Text(
-              'Are you sure you want to log out?',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Buttons
-            Row(
-              children: [
-                // Cancel button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, false),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Yes, Logout button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, true),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Yes, Logout',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
+      title: 'Logout',
+      message: 'Are you sure you want to log out?',
+      primaryButtonText: 'Yes, Logout',
+      secondaryButtonText: 'Cancel',
+      onPrimaryPressed: () => Navigator.pop(context, true),
+      onSecondaryPressed: () => Navigator.pop(context, false),
     );
 
     if (confirmed == true) {
