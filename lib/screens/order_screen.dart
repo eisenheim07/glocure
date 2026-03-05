@@ -6,6 +6,7 @@ import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/orders/orders_state.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'main_navigation_screen.dart';
+import 'ordered_items_details.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -24,7 +25,7 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _pageController = PageController();
-    
+
     // Initialize orders when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OrdersCubit>().initializeOrders();
@@ -77,64 +78,84 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     }
   }
 
+  Future<bool> _onWillPop() async {
+    // If not on "All" tab, go to "All" tab first
+    if (_currentIndex != 0) {
+      _onTabTapped(0);
+      return false; // Don't pop the route
+    }
+    // If on "All" tab, allow back navigation
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
-      appBar: CustomAppBar(
-        type: AppBarType.full,
-        showBackButton: true,
-        onBackPressed: () {
-          MainNavigationScreen.navigateToHome(context);
-        },
-      ),
-      body: Column(
-        children: [
-          // Tab Bar
-          Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: const Color(0xFFFF5C9A),
-              unselectedLabelColor: const Color(0xFF777777),
-              indicatorColor: const Color(0xFFFF5C9A),
-              indicatorWeight: 2.5,
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Inter',
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8F8F8),
+        appBar: CustomAppBar(
+          type: AppBarType.full,
+          showBackButton: true,
+          onBackPressed: () {
+            // Handle back button press
+            if (_currentIndex != 0) {
+              // If not on "All" tab, go to "All" tab
+              _onTabTapped(0);
+            } else {
+              // If on "All" tab, go back to home
+              MainNavigationScreen.navigateToHome(context);
+            }
+          },
+        ),
+        body: Column(
+          children: [
+            // Tab Bar
+            Container(
+              color: Colors.white,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: const Color(0xFFFF5C9A),
+                unselectedLabelColor: const Color(0xFF777777),
+                indicatorColor: const Color(0xFFFF5C9A),
+                indicatorWeight: 2.5,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Inter',
+                ),
+                isScrollable: false,
+                onTap: _onTabTapped,
+                tabs: const [
+                  Tab(text: 'All'),
+                  Tab(text: 'Pending'),
+                  Tab(text: 'Closed'),
+                  Tab(text: 'Cancelled'),
+                ],
               ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                fontFamily: 'Inter',
+            ),
+
+            // Orders Content with PageView
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                children: const [
+                  _OrdersTabContent(tabName: 'All'),
+                  _OrdersTabContent(tabName: 'Pending'),
+                  _OrdersTabContent(tabName: 'Closed'),
+                  _OrdersTabContent(tabName: 'Cancelled'),
+                ],
               ),
-              isScrollable: false,
-              onTap: _onTabTapped,
-              tabs: const [
-                Tab(text: 'All'),
-                Tab(text: 'Pending'),
-                Tab(text: 'Closed'),
-                Tab(text: 'Cancelled'),
-              ],
             ),
-          ),
-          
-          // Orders Content with PageView
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: _onPageChanged,
-              children: const [
-                _OrdersTabContent(tabName: 'All'),
-                _OrdersTabContent(tabName: 'Pending'),
-                _OrdersTabContent(tabName: 'Closed'),
-                _OrdersTabContent(tabName: 'Cancelled'),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -349,10 +370,73 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
+                PopupMenuButton<String>(
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Color(0xFF666666),
+                    size: 20,
+                  ),
+                  offset: const Offset(0, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'view_details') {
+                      _onViewDetails(context, order);
+                    } else if (value == 'track_order') {
+                      _onTrackOrder(context, order);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem<String>(
+                      value: 'view_details',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.visibility_outlined,
+                            color: Color(0xFFFF5C9A),
+                            size: 20,
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'View Details',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'track_order',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_shipping_outlined,
+                            color: Color(0xFFFF5C9A),
+                            size: 20,
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Track Order',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(16),
@@ -382,9 +466,9 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Items
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -429,51 +513,51 @@ class _OrderCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 8),
-                      
+
                       // Product items
                       ...order.lineItems.take(2).map((item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 6),
-                              width: 4,
-                              height: 4,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFFF5C9A),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF333333),
-                                  fontFamily: 'Inter',
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(top: 6),
+                                  width: 4,
+                                  height: 4,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFF5C9A),
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF333333),
+                                      fontFamily: 'Inter',
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Qty: ${item.quantity}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF777777),
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Qty: ${item.quantity}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF777777),
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                      
+                          )),
+
                       if (order.lineItems.length > 2)
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
@@ -490,9 +574,9 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Total
                 Row(
                   children: [
@@ -529,10 +613,31 @@ class _OrderCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  void _onViewDetails(BuildContext context, ShopifyOrder order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderedItemsDetails(order: order),
+      ),
+    );
+  }
+
+  void _onTrackOrder(BuildContext context, ShopifyOrder order) {
+    // TODO: Navigate to order tracking screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Track order ${order.name}'),
+        backgroundColor: const Color(0xFFFF5C9A),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   Color _getStatusColor(ShopifyOrder order) {
     final financial = order.financialStatus.toLowerCase();
     final fulfillment = order.fulfillmentStatus.toLowerCase();
-    
+
     if (financial == 'paid' && fulfillment == 'fulfilled') {
       return const Color(0xFF4CAF50);
     } else if (financial == 'pending' || fulfillment == 'unfulfilled') {
@@ -547,7 +652,7 @@ class _OrderCard extends StatelessWidget {
   String _getStatusText(ShopifyOrder order) {
     final financial = order.financialStatus.toLowerCase();
     final fulfillment = order.fulfillmentStatus.toLowerCase();
-    
+
     if (financial == 'paid' && fulfillment == 'fulfilled') {
       return 'Delivered';
     } else if (financial == 'pending' || fulfillment == 'unfulfilled') {
