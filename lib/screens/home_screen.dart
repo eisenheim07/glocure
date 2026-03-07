@@ -1171,6 +1171,7 @@ class _TopProductsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /*NEW-CODE*/
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -1442,7 +1443,6 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                       ? NetworkImageLoader(
                           imageUrl: imageUrl,
                           width: cardWidth,
-                          height: 90.h,
                           fit: BoxFit.contain,
                         )
                       : Container(
@@ -1484,7 +1484,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
 
           // Product info section
           Padding(
-            padding: EdgeInsets.fromLTRB(6.w, 6.h, 6.w, 6.h),
+            padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 8.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -1518,34 +1518,131 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
 }
 
 /// Shimmer for horizontal product cards
+/*NEW-CODE*/
 class _TopProductsShimmer extends StatelessWidget {
   const _TopProductsShimmer();
 
   @override
   Widget build(BuildContext context) {
-    final cardWidth = 155.w;
+    final cardWidth = 180.w;
 
-    return SizedBox(
-      height: 190.h,
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width: cardWidth,
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r)),
-            ),
-          );
-        },
-        separatorBuilder: (_, __) => SizedBox(width: 8.w),
-        itemCount: 3,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: IntrinsicHeight(
+        child: Row(
+          children: List.generate(3, (index) {
+            return Padding(
+              padding: EdgeInsets.only(right: 8.w),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: cardWidth,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      /// Image placeholder
+                      Container(
+                        width: cardWidth,
+                        height: 180.h,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12.r),
+                            topRight: Radius.circular(12.r),
+                          ),
+                        ),
+                      ),
+
+                      /// Divider
+                      Container(
+                        height: 1,
+                        color: Colors.grey.shade200,
+                      ),
+
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(6.w, 6.h, 6.w, 6.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// Title line
+                            Container(
+                              height: 10.h,
+                              width: double.infinity,
+                              color: Colors.white,
+                            ),
+
+                            SizedBox(height: 6.h),
+
+                            /// Description line
+                            Container(
+                              height: 8.h,
+                              width: 100.w,
+                              color: Colors.white,
+                            ),
+
+                            SizedBox(height: 8.h),
+
+                            /// Price line
+                            Container(
+                              height: 10.h,
+                              width: 60.w,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
 }
+
+/// Shimmer for horizontal product cards
+/*OLD-CODE*/
+// class _TopProductsShimmer extends StatelessWidget {
+//   const _TopProductsShimmer();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final cardWidth = 155.w;
+//
+//     return SizedBox(
+//       height: 190.h,
+//       child: ListView.separated(
+//         padding: EdgeInsets.symmetric(horizontal: 16.w),
+//         scrollDirection: Axis.horizontal,
+//         itemBuilder: (context, index) {
+//           return Shimmer.fromColors(
+//             baseColor: Colors.grey[300]!,
+//             highlightColor: Colors.grey[100]!,
+//             child: Container(
+//               width: cardWidth,
+//               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r)),
+//             ),
+//           );
+//         },
+//         separatorBuilder: (_, __) => SizedBox(width: 8.w),
+//         itemCount: 3,
+//       ),
+//     );
+//   }
+// }
 
 /// Browse by categories section container + list
 class _BrowseCategoriesSection extends StatelessWidget {

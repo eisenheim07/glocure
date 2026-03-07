@@ -418,21 +418,40 @@ class _CategoryProductsState extends State<CategoryProducts> {
                       // Product grid
                       SliverPadding(
                         padding: EdgeInsets.symmetric(horizontal: 14.w),
-                        sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200.w,
-                            crossAxisSpacing: 12.w,
-                            mainAxisSpacing: 14.h,
-                            mainAxisExtent: 240.h, // approximate height
-                          ),
+                        sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return _ProductCard(
-                                product: products[index],
-                                handle: widget.handle,
+                                (context, index) {
+                              final leftIndex = index * 2;
+                              final rightIndex = leftIndex + 1;
+
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 14.h),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: _ProductCard(
+                                        product: products[leftIndex],
+                                        handle: widget.handle,
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 12.w),
+
+                                    if (rightIndex < products.length)
+                                      Expanded(
+                                        child: _ProductCard(
+                                          product: products[rightIndex],
+                                          handle: widget.handle,
+                                        ),
+                                      )
+                                    else
+                                      const Spacer(),
+                                  ],
+                                ),
                               );
                             },
-                            childCount: products.length,
+                            childCount: (products.length / 2).ceil(),
                           ),
                         ),
                       ),
@@ -909,7 +928,7 @@ class _ProductCard extends StatelessWidget {
 
             // Product info
             Padding(
-              padding: EdgeInsets.all(6.w),
+              padding: EdgeInsets.all(8.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
