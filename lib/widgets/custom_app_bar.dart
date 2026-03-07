@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:glocure/utils/size_utils.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
+import '../widgets/wishlist_icon_with_badge.dart';
 import '../screens/cart_screen.dart';
-import '../screens/wishlist_screen.dart';
 
 /// Custom App Bar with two predefined types:
 /// Type 1 (Full): Logo + Elite Glow GIF + Notifications + Wishlist + Cart
@@ -97,20 +97,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
         const SizedBox(width: 12),
-        SmartImage(
-          source: ImageConstant.icWishlist,
+        WishlistIconWithBadge(
           width: 60,
           height: 34,
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const WishlistScreen(),
-              ),
-            );
-            // Notify parent that we returned from wishlist
-            onWishlistReturn?.call();
-          },
+          onWishlistReturn: onWishlistReturn,
         ),
         const SizedBox(width: 12),
         SmartImage(

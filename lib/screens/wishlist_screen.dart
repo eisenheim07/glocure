@@ -9,6 +9,7 @@ import '../utils/auth_storage.dart';
 import '../services/api_service.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
+import '../widgets/wishlist_icon_with_badge.dart';
 import 'product_details_screen.dart';
 
 class WishlistScreen extends StatefulWidget {
@@ -66,6 +67,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
         setState(() {
           _wishlistItems.removeWhere((i) => i.productId == item.productId);
         });
+        
+        // Notify wishlist badge to update
+        WishlistNotifier.notifyWishlistChanged();
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -175,6 +179,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
           _wishlistItems.removeWhere((i) => i.productId == item.productId);
           _movingToCartItemId = null; // Clear shimmer state
         });
+        
+        // Notify wishlist badge to update
+        WishlistNotifier.notifyWishlistChanged();
       }
 
       // Hide loading and show success

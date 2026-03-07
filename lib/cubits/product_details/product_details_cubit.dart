@@ -8,6 +8,7 @@ import '../../models/top_products_model.dart';
 import '../../utils/wishlist_storage.dart';
 import '../../models/wishlist_item_model.dart';
 import '../../utils/app_logger.dart';
+import '../../widgets/wishlist_icon_with_badge.dart';
 import 'product_details_state.dart';
 
 class ProductDetailsCubit extends Cubit<ProductDetailsState> {
@@ -193,6 +194,8 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         final success = await WishlistStorage.removeFromWishlist(currentState.product.id);
         if (success) {
           emit(currentState.copyWith(isInWishlist: false));
+          // Notify wishlist badge to update
+          WishlistNotifier.notifyWishlistChanged();
         }
       } else {
         // Add to wishlist
@@ -228,6 +231,8 @@ class ProductDetailsCubit extends Cubit<ProductDetailsState> {
         final success = await WishlistStorage.addToWishlist(wishlistItem);
         if (success) {
           emit(currentState.copyWith(isInWishlist: true));
+          // Notify wishlist badge to update
+          WishlistNotifier.notifyWishlistChanged();
         }
       }
     } catch (e) {

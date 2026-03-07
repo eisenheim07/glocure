@@ -33,6 +33,7 @@ import '../widgets/app_image.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/search_bar_widget.dart';
+import '../widgets/wishlist_icon_with_badge.dart';
 import 'cart_screen.dart';
 import 'wishlist_screen.dart';
 
@@ -1309,6 +1310,8 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
         final success = await WishlistStorage.removeFromWishlist(widget.product.id);
         if (success && mounted) {
           setState(() => _isInWishlist = false);
+          // Notify wishlist badge to update
+          WishlistNotifier.notifyWishlistChanged();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Removed from wishlist'),
@@ -1363,6 +1366,8 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
         final success = await WishlistStorage.addToWishlist(wishlistItem);
         if (success && mounted) {
           setState(() => _isInWishlist = true);
+          // Notify wishlist badge to update
+          WishlistNotifier.notifyWishlistChanged();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Added to wishlist'),
