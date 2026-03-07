@@ -103,51 +103,53 @@ class _AddressListScreenState extends State<AddressListScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        padding: EdgeInsets.all(20.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 34.w,
-              height: 3.h,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2.r),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 34.w,
+                height: 3.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Title
-            Text(
-              'Delete Address',
-              style: TextStyle(
-                fontSize: 17.fSize,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+              // Title
+              Text(
+                'Delete Address',
+                style: TextStyle(
+                  fontSize: 17.fSize,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-            // Message
-            Text(
-              'Are you sure you want to delete this address?',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12.fSize,
-                color: Colors.grey.shade600,
-                height: 1.4,
+              // Message
+              Text(
+                'Are you sure you want to delete this address?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.fSize,
+                  color: Colors.grey.shade600,
+                  height: 1.4,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // Buttons
-            Row(
+              // Buttons
+              Row(
               children: [
                 // Cancel button
                 Expanded(
@@ -205,6 +207,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
             ),
             SizedBox(height: MediaQuery.of(context).padding.bottom),
           ],
+        ),
         ),
       ),
     );

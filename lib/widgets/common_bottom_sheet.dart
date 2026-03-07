@@ -69,6 +69,9 @@ class CommonBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the bottom padding for system navigation bar
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -77,7 +80,7 @@ class CommonBottomSheet extends StatelessWidget {
           topRight: Radius.circular(24),
         ),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

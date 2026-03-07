@@ -213,13 +213,16 @@ class _CategoryProductsState extends State<CategoryProducts> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetContext) {
-        return _SortBottomSheet(
-          options: _activeSortOptions,
-          selectedIndex: _selectedSortIndex,
-          onSelected: (index) {
-            Navigator.pop(sheetContext);
-            _onSortSelected(index);
-          },
+        return Container(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(sheetContext).padding.bottom),
+          child: _SortBottomSheet(
+            options: _activeSortOptions,
+            selectedIndex: _selectedSortIndex,
+            onSelected: (index) {
+              Navigator.pop(sheetContext);
+              _onSortSelected(index);
+            },
+          ),
         );
       },
     );

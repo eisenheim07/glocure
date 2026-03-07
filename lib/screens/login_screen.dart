@@ -262,93 +262,97 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 10.h, bottom: 14.h),
-                width: 34.w,
-                height: 3.h,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 7.h),
-                child: Text(
-                  'Select Country',
-                  style: TextStyle(
-                    fontSize: 15.fSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+        return Container(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 10.h, bottom: 14.h),
+                  width: 34.w,
+                  height: 3.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
-              ),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: countryCodes.length,
-                  itemBuilder: (context, index) {
-                    final country = countryCodes[index];
-                    final isSelected = country.code == _selectedCountry.code;
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 7.h),
+                  child: Text(
+                    'Select Country',
+                    style: TextStyle(
+                      fontSize: 15.fSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: countryCodes.length,
+                    itemBuilder: (context, index) {
+                      final country = countryCodes[index];
+                      final isSelected = country.code == _selectedCountry.code;
 
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedCountry = country;
-                          _phoneController.clear();
-                        });
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Color(0xFFFFE9F0) : Colors.white,
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              country.flag,
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Text(
-                                country.name,
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedCountry = country;
+                            _phoneController.clear();
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Color(0xFFFFE9F0) : Colors.white,
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                country.flag,
+                                style: TextStyle(fontSize: 24),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  country.name,
+                                  style: TextStyle(
+                                    fontSize: 14.fSize,
+                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                country.dialCode,
                                 style: TextStyle(
                                   fontSize: 14.fSize,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: Colors.black,
+                                  color: const Color(0xFF666666),
                                 ),
                               ),
-                            ),
-                            Text(
-                              country.dialCode,
-                              style: TextStyle(
-                                fontSize: 14.fSize,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                color: const Color(0xFF666666),
-                              ),
-                            ),
-                            if (isSelected) ...[
-                              SizedBox(width: 12),
-                              Icon(
-                                Icons.check_circle,
-                                color: Color(0xFFFF5C9A),
-                                size: 17.h,
-                              ),
+                              if (isSelected) ...[
+                                SizedBox(width: 12),
+                                Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFFFF5C9A),
+                                  size: 17.h,
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-              SizedBox(height: 16),
-            ],
+                SizedBox(height: 16),
+              ],
+            ),
           ),
         );
       },

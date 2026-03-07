@@ -180,9 +180,9 @@ class _AddressScreenState extends State<AddressScreen> {
 
   void _handleAddAddress() {
     if (_isFormValid) {
-      // If address is from geolocation, show confirmation dialog
+      // If address is from geolocation, show confirmation bottom sheet
       if (_isAddressFromGeolocation) {
-        _showGeolocationConfirmationDialog();
+        _showGeolocationConfirmationBottomSheet();
       } else {
         // Address is from GraphQL, proceed directly
         _proceedWithAddAddress();
@@ -193,74 +193,148 @@ class _AddressScreenState extends State<AddressScreen> {
     }
   }
 
-  void _showGeolocationConfirmationDialog() {
-    showDialog(
+  void _showGeolocationConfirmationBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-          title: Text(
-            'Confirm Address',
-            style: TextStyle(
-              fontSize: 15.fSize,
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      builder: (context) => Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
           ),
-          content: Text(
-            'The address was fetched from your current location and might not be accurate. Do you want to proceed?',
-            style: TextStyle(
-              fontSize: 12.fSize,
-              color: Colors.black87,
-              height: 1.5,
-            ),
-          ),
-          actions: [
-            // No button
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.grey.shade700,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top indicator
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              child: Text(
-                'No',
+              const SizedBox(height: 20),
+
+              // Icon
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF5C9A).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.location_on,
+                  size: 32,
+                  color: Color(0xFFFF5C9A),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Title
+              const Text(
+                'Confirm Address',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12.fSize,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                  fontFamily: 'Inter',
                 ),
               ),
-            ),
-            // Yes button
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _proceedWithAddAddress();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(7.r),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                'Yes, No Issue',
+              const SizedBox(height: 8),
+
+              // Message
+              Text(
+                'The address was fetched from your current location and might not be accurate. Please review and confirm if you want to proceed.',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12.fSize,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade600,
+                  fontFamily: 'Inter',
+                  height: 1.5,
                 ),
               ),
-            ),
-          ],
-        );
-      },
+              const SizedBox(height: 24),
+
+              // Buttons
+              Row(
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Confirm button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        _proceedWithAddAddress();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF5C9A),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Yes, Proceed',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
