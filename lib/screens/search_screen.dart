@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:glocure/utils/size_utils.dart';
 import '../cubits/product_search/product_search_cubit.dart';
 import '../cubits/product_search/product_search_state.dart';
@@ -212,7 +213,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
           builder: (context, searchState) {
             // Show search results if searching
             if (searchState is ProductSearchLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return _buildSearchShimmer();
             }
 
             if (searchState is ProductSearchError) {
@@ -361,6 +362,87 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
       ),
     );
   }
+
+  /// Build search shimmer loading
+  Widget _buildSearchShimmer() {
+    return Padding(
+      padding: EdgeInsets.all(14.w),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12.w,
+          mainAxisSpacing: 14.h,
+          childAspectRatio: 0.70,
+        ),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image shimmer
+                  Container(
+                    height: 140.h,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15.r),
+                        topRight: Radius.circular(15.r),
+                      ),
+                    ),
+                  ),
+                  
+                  // Content shimmer
+                  Padding(
+                    padding: EdgeInsets.all(8.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 12.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        Container(
+                          width: 80.w,
+                          height: 10.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Container(
+                          width: 60.w,
+                          height: 14.h,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 /// Search Chip Widget
@@ -434,9 +516,18 @@ class _SearchResultsGrid extends StatelessWidget {
           }).toList(),
         ),
         if (hasNextPage)
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
+          Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Center(
+              child: SizedBox(
+                width: 20.w,
+                height: 20.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFFFF5C9A),
+                ),
+              ),
+            ),
           ),
       ],
     );

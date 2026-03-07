@@ -176,9 +176,12 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
           index: adjustedIndex,
           children: screens,
         ),
-        bottomNavigationBar: CustomBottomNavBar(
-          currentIndex: _currentIndex,
-          onTap: _onNavItemTapped,
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: _onNavItemTapped,
+          ),
         ),
       ),
     );

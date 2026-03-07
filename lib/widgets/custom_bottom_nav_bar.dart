@@ -15,8 +15,11 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the bottom padding for system navigation
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    
     return Container(
-      height: 70,
+      height: 70 + bottomPadding,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -31,35 +34,43 @@ class CustomBottomNavBar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           // Bottom Nav Items
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home,
-                label: 'Home',
-                isSelected: currentIndex == 0,
-                onTap: () => onTap(0),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 70,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavItem(
+                    icon: Icons.home,
+                    label: 'Home',
+                    isSelected: currentIndex == 0,
+                    onTap: () => onTap(0),
+                  ),
+                  _NavItem(
+                    icon: Icons.grid_view_rounded,
+                    label: 'Categories',
+                    isSelected: currentIndex == 1,
+                    onTap: () => onTap(1),
+                  ),
+                  const SizedBox(width: 60), // Space for center button
+                  _NavItem(
+                    icon: Icons.shopping_bag_outlined,
+                    label: 'Orders',
+                    isSelected: currentIndex == 3,
+                    onTap: () => onTap(3),
+                  ),
+                  _NavItem(
+                    icon: Icons.person_outline,
+                    label: 'Account',
+                    isSelected: currentIndex == 4,
+                    onTap: () => onTap(4),
+                  ),
+                ],
               ),
-              _NavItem(
-                icon: Icons.grid_view_rounded,
-                label: 'Categories',
-                isSelected: currentIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              const SizedBox(width: 60), // Space for center button
-              _NavItem(
-                icon: Icons.shopping_bag_outlined,
-                label: 'Orders',
-                isSelected: currentIndex == 3,
-                onTap: () => onTap(3),
-              ),
-              _NavItem(
-                icon: Icons.person_outline,
-                label: 'Account',
-                isSelected: currentIndex == 4,
-                onTap: () => onTap(4),
-              ),
-            ],
+            ),
           ),
 
           // Centered Elevated Scan Button
@@ -97,7 +108,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
           // Scan Label below the button
           Positioned(
-            bottom: 8,
+            bottom: 8 + bottomPadding,
             left: MediaQuery.of(context).size.width / 2 - 20,
             child: GestureDetector(
               onTap: () => onTap(2),
