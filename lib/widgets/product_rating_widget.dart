@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/judgeme_product_model.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 
 /// Product Rating Widget
 /// Shows star rating and review count below product price
@@ -35,21 +36,21 @@ class ProductRatingWidget extends StatelessWidget {
                   return Icon(
                     Icons.star,
                     size: 16.h,
-                    color: const Color(0xFFFFA500),
+                    color: AppColors.warning,
                   );
                 } else if (index < rating) {
                   // Half star
                   return Icon(
                     Icons.star_half,
                     size: 16.h,
-                    color: const Color(0xFFFFA500),
+                    color: AppColors.warning,
                   );
                 } else {
                   // Empty star
                   return Icon(
                     Icons.star_border,
                     size: 16.h,
-                    color: Colors.grey.shade300,
+                    color: AppColors.gray300,
                   );
                 }
               }),
@@ -62,7 +63,7 @@ class ProductRatingWidget extends StatelessWidget {
               '${product!.averageRating.toStringAsFixed(1)} (${product!.reviewsCount} review${product!.reviewsCount > 1 ? 's' : ''})',
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: Colors.grey.shade600,
+                color: AppColors.gray600,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -73,7 +74,7 @@ class ProductRatingWidget extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 12.h,
-              color: Colors.grey.shade400,
+              color: AppColors.gray400,
             ),
           ],
         ),

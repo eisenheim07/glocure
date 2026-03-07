@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 
 /// Common Bottom Sheet Widget
 /// Reusable bottom sheet with consistent styling across the app
@@ -89,7 +90,7 @@ class CommonBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: AppColors.borderPrimary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -108,7 +109,7 @@ class CommonBottomSheet extends StatelessWidget {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.textPrimary,
               fontFamily: 'Inter',
             ),
           ),
@@ -116,7 +117,7 @@ class CommonBottomSheet extends StatelessWidget {
 
           // Divider
           Divider(
-            color: Colors.grey.shade200,
+            color: AppColors.borderSecondary,
             thickness: 1,
           ),
           const SizedBox(height: 16),
@@ -128,7 +129,7 @@ class CommonBottomSheet extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Colors.grey,
+              color: AppColors.textMuted,
               fontFamily: 'Inter',
             ),
           ),
@@ -145,7 +146,7 @@ class CommonBottomSheet extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: secondaryButtonColor ?? Colors.grey.shade100,
+                        color: secondaryButtonColor ?? AppColors.backgroundTertiary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(
@@ -154,7 +155,7 @@ class CommonBottomSheet extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColors.textSecondary,
                             fontFamily: 'Inter',
                           ),
                         ),
@@ -172,7 +173,7 @@ class CommonBottomSheet extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
-                      color: primaryButtonColor ?? const Color(0xFFFF5C9A),
+                      color: primaryButtonColor ?? AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -181,7 +182,7 @@ class CommonBottomSheet extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontFamily: 'Inter',
                         ),
                       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:shimmer/shimmer.dart';
+import '../utils/app_colors.dart';
 
 /// Custom Search Bar Widget
 /// A simple search bar with search icon and placeholder text
@@ -25,7 +27,7 @@ class SearchBarWidget extends StatelessWidget {
       child: Container(
         height: 62,
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          color: AppColors.backgroundTertiary,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -35,7 +37,7 @@ class SearchBarWidget extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Icon(
                   Icons.search,
-                  color: Color(0xFF9E9E9E),
+                  color: AppColors.gray400,
                   size: 20,
                 ),
               ),
@@ -44,7 +46,7 @@ class SearchBarWidget extends StatelessWidget {
                   hintText,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF9E9E9E),
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -65,12 +67,12 @@ class SearchBarShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Container(
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
         ),
       ),

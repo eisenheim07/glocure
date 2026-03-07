@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import '../models/top_products_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../utils/auth_storage.dart';
 import '../utils/app_logger.dart';
 import '../services/api_service.dart';
@@ -146,7 +147,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       context: context,
       isDismissible: false,
       enableDrag: false,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -166,13 +167,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
+                      color: AppColors.error.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.error_outline,
                       size: 32,
-                      color: Colors.red.shade400,
+                      color: AppColors.error.withValues(alpha: 0.7),
                     ),
                   ),
 
@@ -184,7 +185,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -192,11 +193,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                   const SizedBox(height: 8),
 
                   // Error message
-                  Text(
+                  const Text(
                     'There might some error while fetching the product details, Our team is working on it.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textTertiary,
                       height: 1.4,
                     ),
                     textAlign: TextAlign.center,
@@ -214,8 +215,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                         Navigator.of(context).pop(); // Go back to previous screen
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5C9A),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -292,7 +293,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Cart not initialized. Please try again.'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               duration: Duration(seconds: 2),
             ),
           );
@@ -306,7 +307,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Product variant not available'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               duration: Duration(seconds: 2),
             ),
           );
@@ -370,7 +371,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  child: Icon(Icons.check_circle, color: AppColors.white, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -386,7 +387,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 ),
               ],
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
           ),
@@ -399,7 +400,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to add to cart: ${e.toString().replaceAll('Exception: ', '')}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -483,7 +484,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                           height: 1.3,
                         ),
                       ),
@@ -590,9 +591,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200, width: 0.8),
+        border: Border.all(color: AppColors.borderSecondary, width: 0.8),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: AppColors.white,
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -632,16 +633,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: AppColors.white.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: AppColors.shadowLight,
                       blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Icon(Icons.share_outlined, size: 18, color: Colors.black54),
+                child: Icon(Icons.share_outlined, size: 18, color: AppColors.textTertiary),
               ),
             ),
           ),
@@ -663,7 +664,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                     height: isActive ? 10 : 7,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isActive ? const Color(0xFFFF5C9A) : Colors.grey.shade400,
+                      color: isActive ? AppColors.primary : AppColors.textMuted,
                     ),
                   );
                 }),
@@ -684,18 +685,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         if (originalPrice.isNotEmpty) ...[
           const SizedBox(width: 8),
           Text(
             originalPrice,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15,
-              color: Colors.grey.shade500,
+              color: AppColors.textMuted,
               decoration: TextDecoration.lineThrough,
-              decorationColor: Colors.grey.shade500,
+              decorationColor: AppColors.textMuted,
             ),
           ),
         ],
@@ -704,15 +705,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: const Color(0xFF00C853),
+              color: AppColors.success,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               '$discount% off',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: AppColors.white,
               ),
             ),
           ),
@@ -731,7 +732,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 10),
@@ -749,10 +750,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFFFE9F0) : Colors.white,
+                  color: isSelected ? AppColors.secondary : AppColors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade300,
+                    color: isSelected ? AppColors.primary : AppColors.borderPrimary,
                     width: 1.2,
                   ),
                 ),
@@ -761,7 +762,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade700,
+                    color: isSelected ? AppColors.primary : AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -798,7 +799,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
@@ -858,7 +859,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             ? null
             : Border(
                 bottom: BorderSide(
-                  color: Colors.grey.shade200,
+                  color: AppColors.borderSecondary,
                   width: 1,
                 ),
               ),
@@ -868,17 +869,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade600,
+              color: AppColors.textTertiary,
               fontWeight: FontWeight.w500,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Colors.black,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1334,7 +1335,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
@@ -1356,16 +1357,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'View all details',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                 ),
               ),
-              SizedBox(width: 4),
-              Icon(Icons.arrow_forward, size: 14, color: Color(0xFFFF5C9A)),
+              const SizedBox(width: 4),
+              Icon(Icons.arrow_forward, size: 14, color: AppColors.primary),
             ],
           ),
         ),
@@ -1378,7 +1379,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -1404,7 +1405,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: AppColors.borderPrimary,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -2192,9 +2193,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               ),
           ],
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Reviews card container
         Container(
           decoration: BoxDecoration(
@@ -2210,7 +2211,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               // Average rating section
               // if (reviewsState.product != null)
               //   _buildAverageRatingRow(reviewsState.product!, numericId, state.product.title),
-              
+
               // Review cards
               ...limitedReviews.asMap().entries.map((entry) {
                 final index = entry.key;
@@ -2218,14 +2219,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 final isLast = index == limitedReviews.length - 1 && !hasMoreReviews;
                 return _buildReviewRow(review, isLast);
               }).toList(),
-              
+
               // View all button
-              if (hasMoreReviews)
-                _buildViewAllReviewsRow(numericId, state.product.title, reviewsState.reviews.length),
+              if (hasMoreReviews) _buildViewAllReviewsRow(numericId, state.product.title, reviewsState.reviews.length),
             ],
           ),
         ),
-        
+
         const SizedBox(height: 20),
       ],
     );
@@ -2304,12 +2304,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: isLast ? null : Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
-        ),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: Colors.grey.shade200,
+                  width: 1,
+                ),
+              ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2336,9 +2338,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                   ),
                 ),
               ),
-              
+
               const SizedBox(width: 12),
-              
+
               // Reviewer name and date
               Expanded(
                 child: Column(
@@ -2362,7 +2364,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                   ],
                 ),
               ),
-              
+
               // Star rating
               Row(
                 children: List.generate(5, (index) {
@@ -2375,9 +2377,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Review title
           if (review.title.isNotEmpty) ...[
             Text(
@@ -2392,7 +2394,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             ),
             const SizedBox(height: 6),
           ],
-          
+
           // Review body
           if (review.body.isNotEmpty) ...[
             Text(
@@ -2406,7 +2408,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               overflow: TextOverflow.ellipsis,
             ),
           ],
-          
+
           // Verified buyer badge
           if (review.verifiedBuyer != null) ...[
             const SizedBox(height: 8),
@@ -2480,9 +2482,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             color: Colors.black,
           ),
         ),
-        
         const SizedBox(height: 12),
-        
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
@@ -2522,7 +2522,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             ],
           ),
         ),
-        
         const SizedBox(height: 20),
       ],
     );
@@ -2546,9 +2545,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             ),
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Card shimmer
         Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
@@ -2561,7 +2560,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             ),
           ),
         ),
-        
+
         const SizedBox(height: 20),
       ],
     );

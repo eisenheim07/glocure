@@ -8,6 +8,7 @@ import '../models/top_products_model.dart';
 import '../screens/product_details_screen.dart';
 import '../screens/category_products.dart';
 import '../utils/format_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/network_image_loader.dart';
 
 /// Search Screen
@@ -150,12 +151,12 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
         _searchFocusNode.unfocus();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
             onPressed: () {
               _searchFocusNode.unfocus();
               Navigator.pop(context);
@@ -165,7 +166,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             height: 42.h,
             margin: EdgeInsets.only(right: 8.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: AppColors.backgroundTertiary,
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Center(
@@ -184,17 +185,17 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                   hintText: 'Search products',
                   hintStyle: TextStyle(
                     fontSize: 13.fSize,
-                    color: const Color(0xFF9E9E9E),
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w400,
                   ),
                   prefixIcon: const Icon(
                     Icons.search,
-                    color: Color(0xFF9E9E9E),
+                    color: AppColors.textMuted,
                     size: 18,
                   ),
                   suffixIcon: _isSearchBarReadOnly
                       ? IconButton(
-                          icon: const Icon(Icons.close, size: 16, color: Color(0xFF9E9E9E)),
+                          icon: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
                           onPressed: _clearSearch,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -221,7 +222,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                     const SizedBox(height: 16),
                     Text(searchState.message),
                     const SizedBox(height: 16),
@@ -260,11 +261,11 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Color(0xFFFF5C9A)),
+                        icon: const Icon(Icons.delete_outline, color: AppColors.primary),
                         onPressed: _clearSearchHistory,
                       ),
                     ],
@@ -336,14 +337,14 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                           Text(
                             'View all',
                             style: TextStyle(
-                              color: Color(0xFFFF5C9A),
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           SizedBox(width: 4),
                           Icon(
                             Icons.arrow_forward,
-                            color: Color(0xFFFF5C9A),
+                            color: AppColors.primary,
                             size: 18,
                           ),
                         ],
@@ -377,8 +378,8 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
         itemCount: 6,
         itemBuilder: (context, index) {
           return Shimmer.fromColors(
-            baseColor: Colors.grey.shade300,
-            highlightColor: Colors.grey.shade100,
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -392,7 +393,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                     height: 140.h,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AppColors.shimmerBase,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15.r),
                         topRight: Radius.circular(15.r),
@@ -410,7 +411,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                           width: double.infinity,
                           height: 12.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
+                            color: AppColors.shimmerBase,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -419,7 +420,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                           width: 80.w,
                           height: 10.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
+                            color: AppColors.shimmerBase,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -428,7 +429,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                           width: 60.w,
                           height: 14.h,
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
+                            color: AppColors.shimmerBase,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -496,7 +497,7 @@ class _SearchResultsGrid extends StatelessWidget {
       return const Center(
         child: Text(
           'No products found',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+          style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontFamily: 'Inter'),
         ),
       );
     }
@@ -548,7 +549,7 @@ class _ProductsHorizontalGrid extends StatelessWidget {
           padding: EdgeInsets.all(32),
           child: Text(
             'No products found',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
+            style: TextStyle(fontSize: 16, color: AppColors.textMuted, fontFamily: 'Inter'),
           ),
         ),
       );
@@ -653,7 +654,7 @@ class _ProductCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: AppColors.borderSecondary,
             width: 0.8,
           ),
           boxShadow: [
@@ -685,9 +686,9 @@ class _ProductCard extends StatelessWidget {
                           fit: BoxFit.cover,
                         )
                       : Container(
-                          color: Colors.grey[200],
+                          color: AppColors.gray200,
                           child: const Center(
-                            child: Icon(Icons.image_outlined, color: Colors.grey),
+                            child: Icon(Icons.image_outlined, color: AppColors.textMuted),
                           ),
                         ),
                 ),
@@ -741,7 +742,7 @@ class _ProductCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey[600],
+                    color: AppColors.gray600,
                     height: 1.3,
                   ),
                 ),
@@ -766,9 +767,9 @@ class _ProductCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: AppColors.gray500,
                             decoration: TextDecoration.lineThrough,
-                            decorationColor: Colors.grey[500],
+                            decorationColor: AppColors.gray500,
                           ),
                         ),
                       ),

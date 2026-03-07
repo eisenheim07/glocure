@@ -6,6 +6,7 @@ import '../cubits/categories/categories_cubit.dart';
 import '../cubits/categories/categories_state.dart';
 import '../models/category_menu_model.dart';
 import '../models/home_top_banner_model.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import 'category_products.dart';
@@ -28,7 +29,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         type: AppBarType.full,
         showBackButton: true,
@@ -46,9 +47,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                     const SizedBox(height: 8),
-                    Text(state.message, style: const TextStyle(color: Colors.red)),
+                    Text(state.message, style: const TextStyle(color: AppColors.error, fontFamily: 'Inter')),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: () => context.read<CategoriesCubit>().fetchAll(),
@@ -67,7 +68,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       context.read<CategoriesCubit>().selectTab(index);
                     },
                   ),
-                  Container(width: 1, color: const Color(0xFFEEEEEE)),
+                  Container(width: 1, color: AppColors.borderSecondary),
                   Expanded(child: _TabContent(state: state)),
                 ],
               );
@@ -109,7 +110,7 @@ class _VerticalTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 70.w,
-      color: const Color(0xFFFCF5F7),
+      color: AppColors.backgroundSecondary,
       child: Column(
         children: List.generate(_tabs.length, (index) {
           final tab = _tabs[index];
@@ -121,10 +122,10 @@ class _VerticalTabBar extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFFFE0EB) : Colors.transparent,
+                color: isSelected ? AppColors.secondary : Colors.transparent,
                 border: Border(
                   right: BorderSide(
-                    color: isSelected ? const Color(0xFFFF5C9A) : Colors.transparent,
+                    color: isSelected ? AppColors.primary : Colors.transparent,
                     width: 3,
                   ),
                 ),
@@ -136,13 +137,13 @@ class _VerticalTabBar extends StatelessWidget {
                     width: 34.w,
                     height: 34.h,
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFFF5C9A).withOpacity(0.1) : const Color(0xFFF0F0F0),
+                      color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.backgroundTertiary,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       tab.icon,
                       size: 18,
-                      color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF888888),
+                      color: isSelected ? AppColors.primary : AppColors.textMuted,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -152,7 +153,7 @@ class _VerticalTabBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10.fSize,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                      color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF555555),
+                      color: isSelected ? AppColors.primary : AppColors.textSecondary,
                       height: 1.3,
                     ),
                   ),
@@ -229,7 +230,7 @@ class _SkinTypeGrid extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16.fSize,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF555555),
+                color: AppColors.textSecondary,
                 letterSpacing: 2,
               ),
             ),
@@ -308,7 +309,7 @@ class _CircularCategoryItem extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.w500, color: Colors.black),
+            style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.w500, color: AppColors.textPrimary, fontFamily: 'Inter'),
           ),
         ],
       ),
@@ -533,7 +534,7 @@ class _BrandLogoItem extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.backgroundTertiary,
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: imageUrl != null && imageUrl.isNotEmpty

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/image_constant.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/app_image.dart';
 import '../utils/auth_storage.dart';
 import 'main_navigation_screen.dart';
@@ -97,7 +98,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           ),
                           child: IconButton(
                             onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_back, color: Colors.black),
+                            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
                             padding: EdgeInsets.zero,
                           ),
                         ),
@@ -184,7 +185,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                             child: ElevatedButton(
                               onPressed: _continue,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFFF5C9A),
+                                backgroundColor: AppColors.primary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25.r),
                                 ),
@@ -195,7 +196,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                 style: TextStyle(
                                   fontSize: 15.fSize,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   letterSpacing: 1,
                                 ),
                               ),
@@ -229,7 +230,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0),
+            color: isSelected ? AppColors.primary : AppColors.borderSecondary,
             width: 2,
           ),
         ),
@@ -242,10 +243,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFCCCCCC),
+                  color: isSelected ? AppColors.primary : AppColors.borderPrimary,
                   width: 2,
                 ),
-                color: isSelected ? const Color(0xFFFF5C9A) : Colors.transparent,
+                color: isSelected ? AppColors.primary : Colors.transparent,
               ),
               child: isSelected
                   ? const Center(
@@ -264,7 +265,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF333333),
+                  color: isSelected ? AppColors.primary : AppColors.textSecondary,
                 ),
               ),
             ),

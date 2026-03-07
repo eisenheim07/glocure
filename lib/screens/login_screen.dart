@@ -1,5 +1,6 @@
 import 'dart:async';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/image_constant.dart';
@@ -257,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showCountryPicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -274,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 34.w,
                   height: 3.h,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppColors.gray300,
                     borderRadius: BorderRadius.circular(2.r),
                   ),
                 ),
@@ -308,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
                           decoration: BoxDecoration(
-                            color: isSelected ? Color(0xFFFFE9F0) : Colors.white,
+                            color: isSelected ? AppColors.secondary : AppColors.white,
                           ),
                           child: Row(
                             children: [
@@ -323,7 +324,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(
                                     fontSize: 14.fSize,
                                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                    color: Colors.black,
+                                    color: AppColors.black,
                                   ),
                                 ),
                               ),
@@ -332,14 +333,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: TextStyle(
                                   fontSize: 14.fSize,
                                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: const Color(0xFF666666),
+                                  color: AppColors.gray600,
                                 ),
                               ),
                               if (isSelected) ...[
                                 SizedBox(width: 12),
                                 Icon(
                                   Icons.check_circle,
-                                  color: Color(0xFFFF5C9A),
+                                  color: AppColors.primary,
                                   size: 17.h,
                                 ),
                               ],
@@ -469,7 +470,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         width: isActive ? 24 : 8,
                                         height: 3.h,
                                         decoration: BoxDecoration(
-                                          color: isActive ? Color(0xFFFFB3D9) : Colors.white.withOpacity(0.4),
+                                          color: isActive ? AppColors.primaryLight : AppColors.white.withValues(alpha: 0.4),
                                           borderRadius: BorderRadius.circular(2.r),
                                         ),
                                       );
@@ -506,7 +507,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 margin: EdgeInsets.symmetric(horizontal: 20.w),
                                 padding: EdgeInsets.all(3.w),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F5F5),
+                                  color: AppColors.gray100,
                                   borderRadius: BorderRadius.circular(10.r),
                                 ),
                                 child: Row(
@@ -540,7 +541,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             style: TextStyle(
                                               fontSize: 12.fSize,
                                               fontWeight: FontWeight.w600,
-                                              color: _loginMode == LoginMode.email ? const Color(0xFFFF5C9A) : const Color(0xFF999999),
+                                              color: _loginMode == LoginMode.email ? AppColors.primary : AppColors.gray400,
                                             ),
                                           ),
                                         ),
@@ -575,7 +576,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             style: TextStyle(
                                               fontSize: 12.fSize,
                                               fontWeight: FontWeight.w600,
-                                              color: _loginMode == LoginMode.otp ? const Color(0xFFFF5C9A) : const Color(0xFF999999),
+                                              color: _loginMode == LoginMode.otp ? AppColors.primary : AppColors.gray400,
                                             ),
                                           ),
                                         ),
@@ -681,7 +682,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ElevatedButton(
             onPressed: _sendOtp,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5C9A),
+              backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.r),
               ),
@@ -707,18 +708,18 @@ class _LoginScreenState extends State<LoginScreen> {
           text: TextSpan(
             style: TextStyle(
               fontSize: 10.fSize,
-              color: Color(0xFF999999),
+              color: AppColors.gray400,
             ),
             children: [
               TextSpan(text: 'By continuing you agree to our\n'),
               TextSpan(
                 text: 'terms and conditions',
-                style: TextStyle(color: Color(0xFFFF5C9A)),
+                style: TextStyle(color: AppColors.primary),
               ),
               TextSpan(text: ' and our '),
               TextSpan(
                 text: 'Privacy policy',
-                style: TextStyle(color: Color(0xFFFF5C9A)),
+                style: TextStyle(color: AppColors.primary),
               ),
             ],
           ),
@@ -734,7 +735,7 @@ class _LoginScreenState extends State<LoginScreen> {
             style: TextStyle(
               fontSize: 12.fSize,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF666666),
+              color: AppColors.gray600,
             ),
           ),
         ),
@@ -752,7 +753,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(
             fontSize: 15.fSize,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF333333),
+            color: AppColors.gray800,
           ),
         ),
         SizedBox(height: 32),
@@ -767,7 +768,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(
             fontSize: 14.fSize,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF333333),
+            color: AppColors.gray800,
           ),
         ),
 
@@ -781,7 +782,7 @@ class _LoginScreenState extends State<LoginScreen> {
               "Didn't receive the code? ",
               style: TextStyle(
                 fontSize: 12.fSize,
-                color: Color(0xFF999999),
+                color: AppColors.gray400,
               ),
             ),
             TextButton(
@@ -796,7 +797,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(
                   fontSize: 12.fSize,
                   fontWeight: FontWeight.w600,
-                  color: _canResend ? const Color(0xFFFF5C9A) : const Color(0xFFCCCCCC),
+                  color: _canResend ? AppColors.primary : AppColors.gray300,
                 ),
               ),
             ),
@@ -812,7 +813,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ElevatedButton(
             onPressed: _verifyOtp,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5C9A),
+              backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.r),
               ),
@@ -837,7 +838,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildPhoneInput() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.gray100,
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: Row(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 import '../utils/wishlist_storage.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
@@ -93,7 +94,7 @@ class _WishlistIconWithBadgeState extends State<WishlistIconWithBadge> {
               width: 8,
               height: 8,
               decoration: const BoxDecoration(
-                color: Color(0xFFFF5C9A),
+                color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
             ),

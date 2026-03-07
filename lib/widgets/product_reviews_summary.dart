@@ -4,6 +4,7 @@ import '../cubits/reviews/reviews_cubit.dart';
 import '../models/judgeme_reviews_model.dart';
 import '../screens/reviews_screen.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 
 /// Product Reviews Summary Widget
 /// Shows first 2 reviews and "View All" button on product details screen
@@ -26,7 +27,7 @@ class ProductReviewsSummary extends StatelessWidget {
             padding: EdgeInsets.all(16.h),
             child: const Center(
               child: CircularProgressIndicator(
-                color: Color(0xFFFF5C9A),
+                color: AppColors.primary,
               ),
             ),
           );
@@ -61,7 +62,7 @@ class ProductReviewsSummary extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13.fSize,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFFFF5C9A),
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -84,7 +85,7 @@ class ProductReviewsSummary extends StatelessWidget {
                       onPressed: () => _navigateToAllReviews(context),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(
-                          color: Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           width: 1,
                         ),
                         padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -97,7 +98,7 @@ class ProductReviewsSummary extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14.fSize,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -138,10 +139,10 @@ class _ReviewSummaryCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(12.h),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray200,
           width: 1,
         ),
       ),
@@ -156,7 +157,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                 width: 32.h,
                 height: 32.h,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C9A).withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -165,7 +166,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFFF5C9A),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -190,7 +191,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                       review.formattedDate,
                       style: TextStyle(
                         fontSize: 10.fSize,
-                        color: Colors.grey.shade600,
+                        color: AppColors.gray600,
                       ),
                     ),
                   ],
@@ -203,7 +204,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                   return Icon(
                     index < review.rating ? Icons.star : Icons.star_border,
                     size: 12.h,
-                    color: const Color(0xFFFFA500),
+                    color: AppColors.warning,
                   );
                 }),
               ),
@@ -233,7 +234,7 @@ class _ReviewSummaryCard extends StatelessWidget {
               review.body,
               style: TextStyle(
                 fontSize: 11.fSize,
-                color: Colors.grey.shade700,
+                color: AppColors.gray700,
                 height: 1.3,
               ),
               maxLines: 2,

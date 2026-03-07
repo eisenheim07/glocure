@@ -9,6 +9,7 @@ import '../models/cart_model.dart';
 import '../models/customer_model.dart';
 import '../services/order_service.dart';
 import '../utils/app_logger.dart';
+import '../utils/app_colors.dart';
 import '../screens/payu_payment_screen.dart';
 
 /// Payment Selection Bottom Sheet
@@ -58,7 +59,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -74,7 +75,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.gray300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -90,11 +91,11 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.black),
+                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
                     onPressed: () => Navigator.pop(context),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -130,14 +131,14 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
       child: Column(
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
           SizedBox(height: 16),
           Text(
             'Checking delivery availability...',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey,
+              color: AppColors.textMuted,
             ),
           ),
         ],
@@ -186,10 +187,10 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: AppColors.errorLight.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Colors.red.shade200,
+                  color: AppColors.errorLight,
                   width: 1,
                 ),
               ),
@@ -197,7 +198,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.error_outline,
-                    color: Colors.red.shade700,
+                    color: AppColors.error,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -206,7 +207,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                       'Delivery is unavailable at this pincode',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.red.shade700,
+                        color: AppColors.error,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -236,10 +237,10 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: enabled ? Colors.white : Colors.grey.shade100,
+          color: enabled ? AppColors.white : AppColors.gray100,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: enabled ? Colors.grey.shade300 : Colors.grey.shade200,
+            color: enabled ? AppColors.borderPrimary : AppColors.borderSecondary,
             width: 1.5,
           ),
         ),
@@ -251,13 +252,13 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: enabled
-                    ? const Color(0xFFFF5C9A).withValues(alpha: 0.1)
-                    : Colors.grey.shade200,
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.gray200,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: enabled ? const Color(0xFFFF5C9A) : Colors.grey.shade400,
+                color: enabled ? AppColors.primary : AppColors.gray400,
                 size: 24,
               ),
             ),
@@ -274,7 +275,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: enabled ? Colors.black : Colors.grey.shade400,
+                      color: enabled ? AppColors.textPrimary : AppColors.gray400,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -282,7 +283,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 13,
-                      color: enabled ? Colors.grey.shade600 : Colors.grey.shade400,
+                      color: enabled ? AppColors.gray600 : AppColors.gray400,
                     ),
                   ),
                 ],
@@ -292,7 +293,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
             // Arrow or disabled indicator
             Icon(
               enabled ? Icons.arrow_forward_ios : Icons.block,
-              color: enabled ? Colors.grey.shade400 : Colors.grey.shade300,
+              color: enabled ? AppColors.gray400 : AppColors.gray300,
               size: 18,
             ),
           ],
@@ -310,7 +311,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
           Icon(
             Icons.error_outline,
             size: 64,
-            color: Colors.red.shade300,
+            color: AppColors.errorLight,
           ),
           const SizedBox(height: 16),
           Text(
@@ -318,7 +319,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
+              color: AppColors.gray700,
             ),
             textAlign: TextAlign.center,
           ),
@@ -327,7 +328,7 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
             message,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: AppColors.gray600,
             ),
             textAlign: TextAlign.center,
           ),
@@ -339,8 +340,8 @@ class PaymentSelectionBottomSheet extends StatelessWidget {
                 context.read<PaymentSelectionCubit>().checkServiceability(pincode);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

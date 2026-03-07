@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 
 /// Shows a loading indicator until the network image is fully loaded.
 class NetworkImageLoader extends StatelessWidget {
@@ -35,7 +36,7 @@ class NetworkImageLoader extends StatelessWidget {
               Container(
                 width: width,
                 height: height,
-                color: Colors.grey[200],
+                color: AppColors.gray200,
               ),
               SizedBox(
                 width: 28,
@@ -56,8 +57,8 @@ class NetworkImageLoader extends StatelessWidget {
         return Container(
           width: width,
           height: height,
-          color: Colors.grey[300],
-          child: const Center(child: Icon(Icons.broken_image_outlined, color: Colors.grey)),
+          color: AppColors.gray300,
+          child: const Center(child: Icon(Icons.broken_image_outlined, color: AppColors.gray500)),
         );
       },
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 
 /// Custom Bottom Navigation Bar
 /// Features a centered elevated scan button with 4 other navigation items
@@ -24,7 +25,7 @@ class CustomBottomNavBar extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: AppColors.shadowLight,
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -85,13 +86,13 @@ class CustomBottomNavBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFF5C9A), Color(0xFFFF8FB3)],
+                    colors: [AppColors.primary, AppColors.primaryLight],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF5C9A).withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -99,7 +100,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 ),
                 child: const Icon(
                   Icons.qr_code_scanner_rounded,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 28,
                 ),
               ),
@@ -118,8 +119,8 @@ class CustomBottomNavBar extends StatelessWidget {
                   fontSize: 11.fSize,
                   fontWeight: FontWeight.w500,
                   color: currentIndex == 2
-                      ? const Color(0xFFFF5C9A)
-                      : const Color(0xFF9E9E9E),
+                      ? AppColors.primary
+                      : AppColors.textMuted,
                 ),
               ),
             ),
@@ -159,8 +160,8 @@ class _NavItem extends StatelessWidget {
               icon,
               size: 24,
               color: isSelected
-                  ? const Color(0xFFFF5C9A)
-                  : const Color(0xFF9E9E9E),
+                  ? AppColors.primary
+                  : AppColors.textMuted,
             ),
             const SizedBox(height: 4),
             Text(
@@ -169,8 +170,8 @@ class _NavItem extends StatelessWidget {
                 fontSize: 11.fSize,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFFFF5C9A)
-                    : const Color(0xFF9E9E9E),
+                    ? AppColors.primary
+                    : AppColors.textMuted,
               ),
             ),
           ],

@@ -5,6 +5,7 @@ import '../models/customer_model.dart';
 import '../cubits/customer/customer_cubit.dart';
 import '../cubits/customer/customer_state.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'My Profile',
@@ -52,8 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         // Personal Information Section Shimmer
         Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -164,15 +165,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.fSize,
-                color: Colors.red,
+                color: AppColors.error,
               ),
             ),
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.read<CustomerCubit>().fetchCustomer(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
@@ -307,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(
             fontSize: 12.fSize,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
         SizedBox(height: 8),
@@ -315,10 +316,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AppColors.backgroundSecondary,
             borderRadius: BorderRadius.circular(7.r),
             border: Border.all(
-              color: Colors.grey.shade300,
+              color: AppColors.borderPrimary,
               width: 1.w,
             ),
           ),
@@ -327,7 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               fontSize: 12.fSize,
               fontWeight: FontWeight.w400,
-              color: isEmpty ? Colors.grey.shade400 : Colors.black87,
+              color: isEmpty ? AppColors.textDisabled : AppColors.textSecondary,
             ),
           ),
         ),

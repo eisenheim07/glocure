@@ -22,7 +22,8 @@ import 'package:glocure/cubits/connectivity/connectivity_cubit.dart';
 import 'package:glocure/cubits/reviews/reviews_cubit.dart';
 import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/utils/size_utils.dart';
-import 'package:glocure/services/api_service.dart';
+import 'package:glocure/utils/app_theme.dart';
+import 'package:glocure/utils/app_colors.dart';
 import 'package:glocure/services/connectivity_service.dart';
 
 // Global navigator key for navigation from anywhere
@@ -142,6 +143,13 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
+          title: 'Glocure',
+          
+          // Theme Configuration
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.light, // Default to light theme
+          
           home: const SplashScreen(),
           builder: (context, child) {
             // Initialize connectivity service

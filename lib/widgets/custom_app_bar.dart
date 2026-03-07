@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/utils/size_utils.dart';
+import 'package:glocure/utils/app_colors.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
 import '../widgets/wishlist_icon_with_badge.dart';
@@ -39,7 +40,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: backgroundColor,
           border: Border(
             bottom: BorderSide(
-              color: Colors.grey.shade200,
+              color: AppColors.borderSecondary,
               width: 1,
             ),
           ),

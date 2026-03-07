@@ -10,6 +10,7 @@ import '../cubits/top_products/top_products_cubit.dart';
 import '../models/top_products_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import 'filter_screen.dart';
@@ -208,7 +209,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
   void _showSortBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -231,7 +232,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.full,
         showBackButton: true,
@@ -249,11 +250,11 @@ class _CategoryProductsState extends State<CategoryProducts> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.error_outline, size: 41.h, color: Colors.red),
+                    Icon(Icons.error_outline, size: 41.h, color: AppColors.error),
                     SizedBox(height: 12),
                     Text(
                       state.message,
-                      style: TextStyle(fontSize: 12.fSize, color: Colors.red),
+                      style: TextStyle(fontSize: 12.fSize, color: AppColors.error, fontFamily: 'Inter'),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 12),
@@ -303,7 +304,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                   Center(
                     child: Column(
                       children: [
-                        Icon(Icons.inventory_2_outlined, size: 54.h, color: Colors.grey[300]),
+                        Icon(Icons.inventory_2_outlined, size: 54.h, color: AppColors.borderPrimary),
                         SizedBox(height: 16),
                         Text(
                           'No products found',
@@ -389,23 +390,23 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                   child: Container(
                                     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? Color(0xFFFFE9F0) : Colors.white,
+                                      color: isSelected ? AppColors.secondary : AppColors.white,
                                       borderRadius: BorderRadius.circular(17.r),
                                       border: Border.all(
-                                        color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0),
+                                        color: isSelected ? AppColors.primary : AppColors.borderSecondary,
                                       ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(tab.icon, style: const TextStyle(fontSize: 13)),
+                                        Text(tab.icon, style: const TextStyle(fontSize: 13, fontFamily: 'Inter')),
                                         SizedBox(width: 4),
                                         Text(
                                           tab.label,
                                           style: TextStyle(
                                             fontSize: 11.fSize,
                                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                            color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF7A7A7A),
+                                            color: isSelected ? AppColors.primary : AppColors.textMuted,
                                           ),
                                         ),
                                       ],
@@ -554,7 +555,7 @@ class _SortBottomSheet extends StatelessWidget {
               width: 34.w,
               height: 3.h,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.borderPrimary,
                 borderRadius: BorderRadius.circular(2.r),
               ),
             ),
@@ -705,7 +706,7 @@ class _BottomSortBar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.swap_vert, size: 17.h, color: Colors.black),
+                      Icon(Icons.swap_vert, size: 17.h, color: AppColors.textPrimary),
                       SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -726,7 +727,7 @@ class _BottomSortBar extends StatelessWidget {
                                 width: 5.w,
                                 height: 5.h,
                                 decoration: BoxDecoration(
-                                  color: isSortApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
+                                  color: isSortApplied ? AppColors.primary : AppColors.textDisabled,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -748,7 +749,7 @@ class _BottomSortBar extends StatelessWidget {
             ),
 
             // Divider
-            Container(width: 1.w, height: 34.h, color: Color(0xFFE0E0E0)),
+            Container(width: 1.w, height: 34.h, color: AppColors.borderSecondary),
 
             // Filter button (right)
             Expanded(

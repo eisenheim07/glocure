@@ -4,6 +4,7 @@ import 'package:glocure/screens/category_products.dart';
 import 'package:glocure/screens/search_screen.dart';
 import 'package:glocure/screens/custom_webview_screen.dart';
 import 'package:glocure/utils/size_utils.dart';
+import 'package:glocure/utils/app_colors.dart';
 import 'package:shimmer/shimmer.dart';
 import '../config/api_config.dart';
 import '../cubits/home_banner/home_banner_cubit.dart';
@@ -172,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 42.h,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF8B3A8B), Color(0xFFB84A9E)],
+                                colors: [AppColors.primary, AppColors.primaryDark],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
@@ -224,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 42.h,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF1E5BA8), Color(0xFF2B7BC9)],
+                                colors: [AppColors.info, AppColors.infoDark],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),
@@ -303,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(height: 8.h),
                               Text(
                                 '${state.message}',
-                                style: TextStyle(fontSize: 14.fSize, color: Colors.red),
+                                style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'),
                                 textAlign: TextAlign.center,
                               ),
                               SizedBox(height: 8.h),
@@ -318,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: EdgeInsets.all(16.w),
                             child: Center(
-                              child: Text('No banners found', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
+                              child: Text('No banners found', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
                             ),
                           );
                         }
@@ -365,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(height: 8.h),
                               Text(
                                 state.message,
-                                style: TextStyle(fontSize: 14.fSize, color: Colors.red),
+                                style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'),
                                 textAlign: TextAlign.center,
                               ),
                               TextButton(onPressed: () => context.read<SkinGeniusCubit>().fetchAnalyzes(), child: const Text('Retry')),
@@ -378,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (analyzes.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text('No Skin Genius analyzes yet', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
+                            child: Text('No Skin Genius analyzes yet', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
                           );
                         }
                         return _SkinGeniusList(analyzes: analyzes);
@@ -443,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                                 child: Text(
                                   'View all',
-                                  style: TextStyle(color: const Color(0xFFFF5C9A), fontWeight: FontWeight.w600, fontSize: 12.fSize),
+                                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 12.fSize, fontFamily: 'Inter'),
                                 ),
                               ),
                             ],
@@ -505,16 +506,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Container(
                                     padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFFFFE9F0) : Colors.white,
+                                      color: isSelected ? AppColors.secondary : AppColors.white,
                                       borderRadius: BorderRadius.circular(16.r),
-                                      border: Border.all(color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0)),
+                                      border: Border.all(color: isSelected ? AppColors.primary : AppColors.gray200),
                                     ),
                                     child: Text(
                                       tab.label,
                                       style: TextStyle(
                                         fontSize: 10.fSize,
                                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                        color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF7A7A7A),
+                                        color: isSelected ? AppColors.primary : AppColors.gray500,
                                       ),
                                     ),
                                   ),
@@ -539,7 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.error_outline, size: 18.h, color: Colors.red),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -560,7 +561,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (products.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text('No products found for this filter.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
+                            child: Text('No products found for this filter.',
+                                style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
                           );
                         }
 
@@ -598,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Expanded(
                                 child: Text(
                                   state.message,
-                                  style: TextStyle(fontSize: 13.fSize, color: Colors.red),
+                                  style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter'),
                                 ),
                               ),
                               TextButton(
@@ -615,7 +617,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (categories.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text('No categories found.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey)),
+                            child: Text('No categories found.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
                           );
                         }
                         return _BrowseCategoriesSection(categories: categories);
@@ -636,7 +638,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Icon(Icons.error_outline, size: 40.h, color: Colors.red),
                               SizedBox(height: 8.h),
-                              Text(state.message, style: TextStyle(fontSize: 14.fSize, color: Colors.red), textAlign: TextAlign.center),
+                              Text(state.message,
+                                  style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<MiddleBannerCubit>().fetchMiddleBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -665,7 +668,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.error_outline, size: 18.h, color: Colors.red),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () => context.read<DiscountedProductsCubit>().fetchDiscountedProducts(),
@@ -696,7 +699,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(Icons.error_outline, size: 18.h, color: Colors.red),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red)),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () => context.read<BrandLogosCubit>().fetchBrandLogos(),
@@ -726,7 +729,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Icon(Icons.error_outline, size: 40.h, color: Colors.red),
                               SizedBox(height: 8.h),
-                              Text(state.message, style: TextStyle(fontSize: 14.fSize, color: Colors.red), textAlign: TextAlign.center),
+                              Text(state.message,
+                                  style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<BottomBannerCubit>().fetchBottomBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -1069,7 +1073,7 @@ class _SkinGeniusCard extends StatelessWidget {
             Container(
               width: cardWidth,
               height: cardWidth,
-              decoration: BoxDecoration(color: const Color(0xFFF5E6EC), borderRadius: BorderRadius.circular(cornerRadius.r)),
+              decoration: BoxDecoration(color: AppColors.secondary, borderRadius: BorderRadius.circular(cornerRadius.r)),
               padding: EdgeInsets.all(4.w),
               child: Center(
                 child: ClipRRect(
@@ -1089,7 +1093,7 @@ class _SkinGeniusCard extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               label,
-              style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal),
+              style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -1465,7 +1469,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                       scale: _heartScaleAnimation,
                       child: Icon(
                         _isInWishlist ? Icons.favorite : Icons.favorite_border,
-                        color: const Color(0xFFFF5C9A),
+                        color: AppColors.primary,
                         size: 14.h,
                       ),
                     ),
@@ -1493,19 +1497,19 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                   widget.product.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10.fSize, fontWeight: FontWeight.w600, color: Colors.black, height: 1.2),
+                  style: TextStyle(fontSize: 10.fSize, fontWeight: FontWeight.w600, color: Colors.black, height: 1.2, fontFamily: 'Inter'),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   widget.product.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 9.fSize, color: const Color(0xFF777777)),
+                  style: TextStyle(fontSize: 9.fSize, color: AppColors.gray500, fontFamily: 'Inter'),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   price,
-                  style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Inter'),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -1656,7 +1660,7 @@ class _BrowseCategoriesSection extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFFE5F0),
+          color: AppColors.secondary,
           borderRadius: BorderRadius.circular(18.r),
         ),
         padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 12.h),

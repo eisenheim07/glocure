@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import '../cubits/reviews/reviews_cubit.dart';
 import '../models/judgeme_reviews_model.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 
 class ReviewsScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   Icon(
                     Icons.error_outline,
                     size: 54.h,
-                    color: Colors.grey.shade400,
+                    color: AppColors.gray400,
                   ),
                   SizedBox(height: 16.h),
                   Text(
@@ -83,7 +84,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     state.message,
                     style: TextStyle(
                       fontSize: 14.fSize,
-                      color: Colors.grey.shade600,
+                      color: AppColors.gray600,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -215,8 +216,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             children: [
               // Avatar shimmer
               Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
                 child: Container(
                   width: 40.h,
                   height: 40.h,
@@ -267,8 +268,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               Row(
                 children: List.generate(5, (index) {
                   return Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
+                    baseColor: AppColors.shimmerBase,
+                    highlightColor: AppColors.shimmerHighlight,
                     child: Container(
                       width: 16.h,
                       height: 16.h,
@@ -288,8 +289,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           
           // Review title shimmer
           Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
             child: Container(
               width: double.infinity,
               height: 16.h,

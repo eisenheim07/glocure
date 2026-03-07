@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import '../utils/app_logger.dart';
+import '../utils/app_colors.dart';
 
 /// Service to handle internet connectivity checking for the entire app
 class ConnectivityService {
@@ -202,7 +202,7 @@ class ConnectivityService {
                   'Please check your internet connection and try again.',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey.shade600,
+                    color: AppColors.gray600,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,

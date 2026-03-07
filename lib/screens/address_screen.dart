@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';

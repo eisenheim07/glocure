@@ -8,6 +8,7 @@ import '../models/customer_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/auth_storage.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 import '../services/api_service.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/custom_app_bar.dart';
@@ -126,7 +127,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'My Cart',
@@ -173,7 +174,7 @@ class _CartScreenState extends State<CartScreen> {
               await context.read<CartCubit>().refreshCart();
               await _checkCustomerAddress();
             },
-            color: const Color(0xFFFF5C9A),
+            color: AppColors.primary,
             child: ListView.separated(
               padding: EdgeInsets.all(14.w),
               itemCount: cart.lines.length,
@@ -318,8 +319,8 @@ class _CartScreenState extends State<CartScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5C9A),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.r),
                         ),
@@ -373,7 +374,7 @@ class _CartScreenState extends State<CartScreen> {
                     style: TextStyle(
                       fontSize: 16.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
+                      color: AppColors.textSecondary,
                     ),
                   ),
                   SizedBox(height: 7.h),
@@ -381,15 +382,15 @@ class _CartScreenState extends State<CartScreen> {
                     'Add products to get started',
                     style: TextStyle(
                       fontSize: 13.fSize,
-                      color: Colors.grey.shade500,
+                      color: AppColors.textMuted,
                     ),
                   ),
                   SizedBox(height: 20.h),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5C9A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: 28.w,
                         vertical: 10.h,

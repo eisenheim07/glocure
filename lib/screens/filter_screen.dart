@@ -4,6 +4,7 @@ import '../cubits/filter/filter_cubit.dart';
 import '../cubits/filter/filter_state.dart';
 import '../models/filter_model.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 
 class FilterScreen extends StatelessWidget {
   final String collectionHandle;
@@ -13,19 +14,19 @@ class FilterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Filters',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w600,
             fontSize: 15.fSize,
           ),
@@ -33,10 +34,10 @@ class FilterScreen extends StatelessWidget {
         actions: [
           TextButton.icon(
             onPressed: () => context.read<FilterCubit>().resetFilters(),
-            icon: Icon(Icons.refresh, color: Colors.grey, size: 15.h),
+            icon: Icon(Icons.refresh, color: AppColors.textMuted, size: 15.h),
             label: Text(
               'Reset Filters',
-              style: TextStyle(color: Colors.grey, fontSize: 11.fSize),
+              style: TextStyle(color: AppColors.textMuted, fontSize: 11.fSize, fontFamily: 'Inter'),
             ),
           ),
         ],
@@ -83,7 +84,7 @@ class FilterScreen extends StatelessWidget {
                       ),
                       // Vertical divider
                       Container(
-                          width: 1.w, color: Color(0xFFEEEEEE)),
+                          width: 1.w, color: AppColors.borderSecondary),
                       // Right panel
                       Expanded(
                         child: _FilterValuePanel(state: state),
@@ -116,7 +117,7 @@ class _FilterCategorySidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF7F7F7),
+      color: AppColors.backgroundSecondary,
       child: ListView.builder(
         padding: EdgeInsets.zero,
         itemCount: state.availableFilters.length,
@@ -129,11 +130,11 @@ class _FilterCategorySidebar extends StatelessWidget {
             onTap: () => context.read<FilterCubit>().selectCategory(index),
             child: Container(
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white : Colors.transparent,
+                color: isSelected ? AppColors.white : Colors.transparent,
                 border: Border(
                   left: BorderSide(
                     color: isSelected
-                        ? const Color(0xFFFF5C9A)
+                        ? AppColors.primary
                         : Colors.transparent,
                     width: 3.w,
                   ),
@@ -150,8 +151,8 @@ class _FilterCategorySidebar extends StatelessWidget {
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                         color: isSelected
-                            ? const Color(0xFFFF5C9A)
-                            : Colors.black87,
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -160,7 +161,7 @@ class _FilterCategorySidebar extends StatelessWidget {
                       padding: EdgeInsets.symmetric(
                           horizontal: 5.w, vertical: 2.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5C9A),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
@@ -168,7 +169,7 @@ class _FilterCategorySidebar extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 9.fSize,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -208,10 +209,10 @@ class _FilterValuePanel extends StatelessWidget {
               hintText: 'Search in ${currentFilter.label}',
               hintStyle: TextStyle(
                 fontSize: 11.fSize,
-                color: const Color(0xFFAAAAAA),
+                color: AppColors.textDisabled,
               ),
               prefixIcon: Icon(Icons.search,
-                  size: 17.h, color: Color(0xFFAAAAAA)),
+                  size: 17.h, color: AppColors.textDisabled),
               contentPadding: EdgeInsets.symmetric(vertical: 8.h),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7.r),
@@ -228,7 +229,7 @@ class _FilterValuePanel extends StatelessWidget {
               filled: true,
               fillColor: Colors.white,
             ),
-            style: TextStyle(fontSize: 11.fSize),
+            style: TextStyle(fontSize: 11.fSize, fontFamily: 'Inter'),
           ),
         ),
 
@@ -238,7 +239,7 @@ class _FilterValuePanel extends StatelessWidget {
               ? Center(
                   child: Text(
                     'No results found',
-                    style: TextStyle(fontSize: 11.fSize, color: Color(0xFF999999)),
+                    style: TextStyle(fontSize: 11.fSize, color: Color(0xFF999999), fontFamily: 'Inter'),
                   ),
                 )
               : ListView.builder(
