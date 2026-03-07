@@ -23,3 +23,6 @@ class OrdersError extends OrdersState {
 
   OrdersError(this.message);
 }
+
+/// No customer ID state - show "Start Shopping" button
+class OrdersNoCustomer extends OrdersState {}

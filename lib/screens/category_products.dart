@@ -24,10 +24,10 @@ class _SortOption {
   final String? sortKey;
   final bool? reverse;
 
-  const _SortOption({required this.label, this.sortKey, this.reverse});
+  _SortOption({required this.label, this.sortKey, this.reverse});
 }
 
-const List<_SortOption> _sortOptions = [
+final List<_SortOption> _sortOptions = [
   _SortOption(label: 'Featured', sortKey: 'MANUAL', reverse: false),
   _SortOption(label: 'Best Selling', sortKey: 'BEST_SELLING', reverse: false),
   _SortOption(label: 'Price: Low to High', sortKey: 'PRICE', reverse: false),
@@ -39,9 +39,7 @@ const List<_SortOption> _sortOptions = [
 ];
 
 /// Sort options for discounted products (Featured & Best Selling excluded)
-const List<_SortOption> _discountedSortOptions = [
-  // _SortOption(label: 'Featured', sortKey: 'MANUAL', reverse: false),
-  // _SortOption(label: 'Best Selling', sortKey: 'BEST_SELLING', reverse: false),
+final List<_SortOption> _discountedSortOptions = [
   _SortOption(label: 'Price: Low to High', sortKey: 'PRICE', reverse: false),
   _SortOption(label: 'Price: High to Low', sortKey: 'PRICE', reverse: true),
   _SortOption(label: 'Name: A-Z', sortKey: 'TITLE', reverse: false),
@@ -244,18 +242,18 @@ class _CategoryProductsState extends State<CategoryProducts> {
           if (state is CategoryProductsError) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(20.w),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                    const SizedBox(height: 12),
+                    Icon(Icons.error_outline, size: 41.h, color: Colors.red),
+                    SizedBox(height: 12),
                     Text(
                       state.message,
-                      style: const TextStyle(fontSize: 14, color: Colors.red),
+                      style: TextStyle(fontSize: 12.fSize, color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     TextButton(
                       onPressed: () => context.read<CategoryProductsCubit>().fetchProducts(widget.handle.toString()),
                       child: const Text('Retry'),
@@ -291,8 +289,8 @@ class _CategoryProductsState extends State<CategoryProducts> {
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                       child: Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 22,
+                        style: TextStyle(
+                          fontSize: 19.fSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
@@ -302,21 +300,21 @@ class _CategoryProductsState extends State<CategoryProducts> {
                   Center(
                     child: Column(
                       children: [
-                        Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[300]),
-                        const SizedBox(height: 16),
-                        const Text(
+                        Icon(Icons.inventory_2_outlined, size: 54.h, color: Colors.grey[300]),
+                        SizedBox(height: 16),
+                        Text(
                           'No products found',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14.fSize,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF777777),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Pull down to refresh',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 11.fSize,
                             color: Color(0xFF999999),
                           ),
                         ),
@@ -346,17 +344,17 @@ class _CategoryProductsState extends State<CategoryProducts> {
                             children: [
                               Text(
                                 title,
-                                style: const TextStyle(
-                                  fontSize: 22,
+                                style: TextStyle(
+                                  fontSize: 19.fSize,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text(
                                 '${products.length} Products',
-                                style: const TextStyle(
-                                  fontSize: 14,
+                                style: TextStyle(
+                                  fontSize: 12.fSize,
                                   color: Color(0xFF777777),
                                 ),
                               ),
@@ -368,12 +366,12 @@ class _CategoryProductsState extends State<CategoryProducts> {
                       // Filter chips
                       SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 16),
+                          padding: EdgeInsets.only(top: 10.h, bottom: 14.h),
                           child: SizedBox(
-                            height: 38,
+                            height: 32.h,
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: EdgeInsets.symmetric(horizontal: 14.w),
                               itemCount: _filterTabs.length,
                               separatorBuilder: (_, __) => const SizedBox(width: 8),
                               itemBuilder: (context, index) {
@@ -386,10 +384,10 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFFFFE9F0) : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
+                                      color: isSelected ? Color(0xFFFFE9F0) : Colors.white,
+                                      borderRadius: BorderRadius.circular(17.r),
                                       border: Border.all(
                                         color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0),
                                       ),
@@ -398,11 +396,11 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(tab.icon, style: const TextStyle(fontSize: 13)),
-                                        const SizedBox(width: 4),
+                                        SizedBox(width: 4),
                                         Text(
                                           tab.label,
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 11.fSize,
                                             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                                             color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF7A7A7A),
                                           ),
@@ -419,7 +417,28 @@ class _CategoryProductsState extends State<CategoryProducts> {
 
                       // Product grid
                       SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w),
+                        sliver: SliverGrid(
+                          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200.w,
+                            crossAxisSpacing: 12.w,
+                            mainAxisSpacing: 14.h,
+                            mainAxisExtent: 240.h, // approximate height
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return _ProductCard(
+                                product: products[index],
+                                handle: widget.handle,
+                              );
+                            },
+                            childCount: products.length,
+                          ),
+                        ),
+                      ),
+                      /*OLD-CODE*/
+                      /*SliverPadding(
+                        padding: EdgeInsets.symmetric(horizontal: 14.w),
                         sliver: SliverGrid(
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
@@ -437,17 +456,17 @@ class _CategoryProductsState extends State<CategoryProducts> {
                             childCount: products.length,
                           ),
                         ),
-                      ),
+                      ),*/
 
                       // Loading more indicator
                       if (isLoadingMore)
-                        const SliverToBoxAdapter(
+                        SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 24),
+                            padding: EdgeInsets.symmetric(vertical: 20.h),
                             child: Center(
                               child: SizedBox(
-                                width: 24,
-                                height: 24,
+                                width: 20.w,
+                                height: 20.h,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   color: Color(0xFFFF5C9A),
@@ -509,23 +528,23 @@ class _SortBottomSheet extends StatelessWidget {
           // Drag handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 16),
-              width: 40,
-              height: 4,
+              margin: EdgeInsets.only(top: 10.h, bottom: 14.h),
+              width: 34.w,
+              height: 3.h,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
           ),
 
           // Title
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
             child: Text(
               'Sort By',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15.fSize,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -547,14 +566,14 @@ class _SortBottomSheet extends StatelessWidget {
                         InkWell(
                           onTap: () => onSelected(index),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
                             child: Row(
                               children: [
                                 Expanded(
                                   child: Text(
                                     option.label,
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 13.fSize,
                                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                                       color: Colors.black,
                                     ),
@@ -565,11 +584,11 @@ class _SortBottomSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (index < options.length - 1) const Divider(height: 1, thickness: 0.5, indent: 20, endIndent: 20),
+                        if (index < options.length - 1) Divider(height: 1.h, thickness: 0.5, indent: 20, endIndent: 20),
                       ],
                     );
                   }),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                 ],
               ),
             ),
@@ -592,20 +611,20 @@ class _RadioCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 24,
-      height: 24,
+      width: 20.w,
+      height: 20.h,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
           color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFD0D0D0),
-          width: 2,
+          width: 2.w,
         ),
       ),
       child: isSelected
           ? Center(
               child: Container(
-                width: 12,
-                height: 12,
+                width: 10.w,
+                height: 10.h,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color(0xFFFF5C9A),
@@ -660,30 +679,30 @@ class _BottomSortBar extends StatelessWidget {
               child: InkWell(
                 onTap: onSortTap,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.swap_vert, size: 20, color: Colors.black),
-                      const SizedBox(width: 8),
+                      Icon(Icons.swap_vert, size: 17.h, color: Colors.black),
+                      SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Text(
+                              Text(
                                 'Sort by',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 11.fSize,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
                                 ),
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 4),
                               Container(
-                                width: 6,
-                                height: 6,
+                                width: 5.w,
+                                height: 5.h,
                                 decoration: BoxDecoration(
                                   color: isSortApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
                                   shape: BoxShape.circle,
@@ -693,8 +712,8 @@ class _BottomSortBar extends StatelessWidget {
                           ),
                           Text(
                             sortLabel,
-                            style: const TextStyle(
-                              fontSize: 11,
+                            style: TextStyle(
+                              fontSize: 9.fSize,
                               color: Color(0xFF777777),
                             ),
                           ),
@@ -707,37 +726,37 @@ class _BottomSortBar extends StatelessWidget {
             ),
 
             // Divider
-            Container(width: 1, height: 40, color: const Color(0xFFE0E0E0)),
+            Container(width: 1.w, height: 34.h, color: Color(0xFFE0E0E0)),
 
             // Filter button (right)
             Expanded(
               child: InkWell(
                 onTap: onFilterTap,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.tune, size: 20, color: Colors.black),
-                      const SizedBox(width: 8),
+                      Icon(Icons.tune, size: 17.h, color: Colors.black),
+                      SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Text(
+                              Text(
                                 'Filter',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 11.fSize,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
                                 ),
                               ),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 4),
                               Container(
-                                width: 6,
-                                height: 6,
+                                width: 5.w,
+                                height: 5.h,
                                 decoration: BoxDecoration(
                                   color: isFilterApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
                                   shape: BoxShape.circle,
@@ -747,8 +766,8 @@ class _BottomSortBar extends StatelessWidget {
                           ),
                           Text(
                             filterLabel,
-                            style: const TextStyle(
-                              fontSize: 11,
+                            style: TextStyle(
+                              fontSize: 9.fSize,
                               color: Color(0xFF777777),
                             ),
                           ),
@@ -820,7 +839,7 @@ class _ProductCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(15.r),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 0.8,
@@ -863,16 +882,16 @@ class _ProductCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Text(
                           '-$discount%',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 9.fSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -882,9 +901,15 @@ class _ProductCard extends StatelessWidget {
               ),
             ),
 
+            // Divider between image and text
+            Container(
+              height: 1,
+              color: Colors.grey.shade200,
+            ),
+
             // Product info
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+              padding: EdgeInsets.all(6.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -893,30 +918,30 @@ class _ProductCard extends StatelessWidget {
                     product.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 11.fSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     product.description,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: 9.fSize,
                       color: Color(0xFF777777),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 4.h),
                   Row(
                     children: [
                       Flexible(
                         child: Text(
                           currentPrice,
-                          style: const TextStyle(
-                            fontSize: 15,
+                          style: TextStyle(
+                            fontSize: 12.fSize,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -924,12 +949,12 @@ class _ProductCard extends StatelessWidget {
                         ),
                       ),
                       if (originalPrice.isNotEmpty) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 4.w),
                         Flexible(
                           child: Text(
                             originalPrice,
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: TextStyle(
+                              fontSize: 9.fSize,
                               color: Color(0xFF999999),
                               decoration: TextDecoration.lineThrough,
                               decorationColor: Color(0xFF999999),
@@ -939,18 +964,18 @@ class _ProductCard extends StatelessWidget {
                         ),
                       ],
                       if (discount > 0) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 4.w),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                           decoration: BoxDecoration(
                             color: const Color(0xFF4CAF50),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(5.r),
                           ),
                           child: Text(
                             '-$discount%',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 8.fSize,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -981,48 +1006,48 @@ class _FullPageShimmer extends StatelessWidget {
       baseColor: Colors.grey[300]!,
       highlightColor: Colors.grey[100]!,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(14.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 180,
-              height: 24,
+              width: 153.w,
+              height: 20.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3.r),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Container(
-              width: 100,
-              height: 14,
+              width: 85.w,
+              height: 12.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3.r),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             SizedBox(
-              height: 38,
+              height: 32.h,
               child: Row(
                 children: List.generate(
                   3,
                   (index) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: EdgeInsets.only(right: 7.w),
                     child: Container(
-                      width: 110,
-                      height: 38,
+                      width: 94.w,
+                      height: 32.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(17.r),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
@@ -1037,7 +1062,7 @@ class _FullPageShimmer extends StatelessWidget {
                   return Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(15.r),
                     ),
                   );
                 },

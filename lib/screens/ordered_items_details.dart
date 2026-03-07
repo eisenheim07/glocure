@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/size_utils.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/utils/format_utils.dart';
@@ -20,19 +21,19 @@ class OrderedItemsDetails extends StatelessWidget {
         showBackButton: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(14.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Order Header Card
             _buildOrderHeaderCard(),
             
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             
             // Order Details Card
             _buildOrderDetailsCard(),
             
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             
             // Ordered Items Section
             _buildOrderedItemsSection(),
@@ -45,13 +46,13 @@ class OrderedItemsDetails extends StatelessWidget {
   Widget _buildOrderHeaderCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Row(
@@ -62,18 +63,18 @@ class OrderedItemsDetails extends StatelessWidget {
             children: [
               Text(
                 order.name,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: 20.fSize,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF1A1A1A),
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 'Placed on ${_formatDate(order.createdAt)}',
-                style: const TextStyle(
-                  fontSize: 13,
+                style: TextStyle(
+                  fontSize: 11.fSize,
                   color: Color(0xFF777777),
                   fontFamily: 'Inter',
                 ),
@@ -81,19 +82,19 @@ class OrderedItemsDetails extends StatelessWidget {
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
             decoration: BoxDecoration(
               color: const Color(0xFFFFF3E0),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(5.r),
               border: Border.all(
                 color: const Color(0xFFFFE0B2),
-                width: 1,
+                width: 1.w,
               ),
             ),
             child: Text(
               _getStatusText(order),
-              style: const TextStyle(
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: 11.fSize,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFFF9800),
                 fontFamily: 'Inter',
@@ -108,13 +109,13 @@ class OrderedItemsDetails extends StatelessWidget {
   Widget _buildOrderDetailsCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Column(
@@ -126,19 +127,19 @@ class OrderedItemsDetails extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Total Amount',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11.fSize,
                       color: Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     formatIndianCurrency(order.totalPrice),
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: TextStyle(
+                      fontSize: 20.fSize,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
@@ -149,19 +150,19 @@ class OrderedItemsDetails extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
+                  Text(
                     'Items',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11.fSize,
                       color: Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     '${order.lineItems.length} items',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 14.fSize,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
@@ -172,15 +173,15 @@ class OrderedItemsDetails extends StatelessWidget {
             ],
           ),
           
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           
           Divider(
-            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            color: Color(0xFFE5E5E5).withOpacity(0.5),
             thickness: 1,
-            height: 1,
+            height: 1.h,
           ),
           
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,19 +189,19 @@ class OrderedItemsDetails extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Financial Status',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11.fSize,
                       color: Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     order.financialStatus.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
@@ -211,19 +212,19 @@ class OrderedItemsDetails extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
+                  Text(
                     'Fulfillment',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11.fSize,
                       color: Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     order.fulfillmentStatus.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
@@ -242,17 +243,17 @@ class OrderedItemsDetails extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Ordered Items',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 15.fSize,
             fontWeight: FontWeight.w700,
             color: Color(0xFF1A1A1A),
             fontFamily: 'Inter',
           ),
         ),
         
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         
         // Items List
         ...order.lineItems.map((item) => _buildItemCard(item)).toList(),
@@ -262,14 +263,14 @@ class OrderedItemsDetails extends StatelessWidget {
 
   Widget _buildItemCard(ShopifyLineItem item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Row(
@@ -277,20 +278,20 @@ class OrderedItemsDetails extends StatelessWidget {
         children: [
           // Product Image Placeholder
           Container(
-            width: 56,
-            height: 56,
+            width: 48.w,
+            height: 48.h,
             decoration: BoxDecoration(
               color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.shopping_bag_outlined,
               color: Color(0xFFCCCCCC),
-              size: 28,
+              size: 24.h,
             ),
           ),
           
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           
           // Product Details
           Expanded(
@@ -299,8 +300,8 @@ class OrderedItemsDetails extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 12.fSize,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1A1A1A),
                     fontFamily: 'Inter',
@@ -309,19 +310,19 @@ class OrderedItemsDetails extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 
                 // Quantity Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF0F5),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(3.r),
                   ),
                   child: Text(
                     'Qty: ${item.quantity}',
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: 10.fSize,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFFFF5C9A),
                       fontFamily: 'Inter',
@@ -329,21 +330,21 @@ class OrderedItemsDetails extends StatelessWidget {
                   ),
                 ),
                 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 
                 // Sold by text
                 Row(
                   children: [
                     Icon(
                       Icons.store_outlined,
-                      size: 14,
+                      size: 12.h,
                       color: Colors.grey[600],
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     Text(
                       'Sold by Glo Cure',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 10.fSize,
                         color: Colors.grey[600],
                         fontFamily: 'Inter',
                       ),
@@ -354,25 +355,25 @@ class OrderedItemsDetails extends StatelessWidget {
             ),
           ),
           
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           
           // Unit Price
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
+              Text(
                 'Unit Price',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 9.fSize,
                   color: Color(0xFF777777),
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 formatIndianCurrency(item.price),
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 12.fSize,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF1A1A1A),
                   fontFamily: 'Inter',

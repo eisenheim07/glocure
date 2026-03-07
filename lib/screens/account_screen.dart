@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
+import 'package:glocure/utils/size_utils.dart';
 import '../utils/auth_storage.dart';
 import '../utils/wishlist_storage.dart';
 import 'address_list_screen.dart';
@@ -88,7 +89,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(12.w),
               children: [
                 // My Profile
                 _AccountMenuItem(
@@ -103,20 +104,20 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 // Order
-                _AccountMenuItem(
-                  icon: Icons.receipt_long_outlined,
-                  title: 'Order',
-                  onTap: () {
-                    // TODO: Navigate to orders screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Orders - Coming Soon')),
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
+                // _AccountMenuItem(
+                //   icon: Icons.receipt_long_outlined,
+                //   title: 'Order',
+                //   onTap: () {
+                //     // TODO: Navigate to orders screen
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('Orders - Coming Soon')),
+                //     );
+                //   },
+                // ),
+                // const SizedBox(height: 8),
 
                 // Scan your progress
                 _AccountMenuItem(
@@ -129,7 +130,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 // Saved reports
                 _AccountMenuItem(
@@ -142,7 +143,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 // Address
                 _AccountMenuItem(
@@ -157,20 +158,20 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 // Notifications
-                _AccountMenuItem(
-                  icon: Icons.notifications_outlined,
-                  title: 'Notifications',
-                  onTap: () {
-                    // TODO: Navigate to notifications screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Notifications - Coming Soon')),
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
+                // _AccountMenuItem(
+                //   icon: Icons.notifications_outlined,
+                //   title: 'Notifications',
+                //   onTap: () {
+                //     // TODO: Navigate to notifications screen
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('Notifications - Coming Soon')),
+                //     );
+                //   },
+                // ),
+                // const SizedBox(height: 8),
 
                 // Help Center
                 _AccountMenuItem(
@@ -183,7 +184,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 // GloCure Disclaimer
                 _AccountMenuItem(
@@ -198,31 +199,31 @@ class _AccountScreenState extends State<AccountScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 20.h),
 
                 // Log Out
                 GestureDetector(
                   onTap: _showLogoutBottomSheet,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.power_settings_new,
-                          color: const Color(0xFFFF5C9A),
-                          size: 24,
+                          color: Color(0xFFFF5C9A),
+                          size: 22,
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 12.w),
                         Text(
                           'Log Out',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 14.fSize,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFFFF5C9A),
+                            color: const Color(0xFFFF5C9A),
                           ),
                         ),
                       ],
@@ -252,10 +253,10 @@ class _AccountMenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 1,
@@ -266,14 +267,14 @@ class _AccountMenuItem extends StatelessWidget {
             Icon(
               icon,
               color: Colors.black87,
-              size: 24,
+              size: 22,
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 12.w),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 14.fSize,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
                 ),
@@ -282,7 +283,7 @@ class _AccountMenuItem extends StatelessWidget {
             Icon(
               Icons.chevron_right,
               color: Colors.grey.shade400,
-              size: 24,
+              size: 22,
             ),
           ],
         ),

@@ -6,21 +6,25 @@ import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/orders/orders_state.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/utils/format_utils.dart';
+import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'main_navigation_screen.dart';
 import 'ordered_items_details.dart';
 
 class OrderScreen extends StatefulWidget {
-  const OrderScreen({super.key});
+  final bool isVisible;
+
+  const OrderScreen({super.key, this.isVisible = false});
 
   @override
-  State<OrderScreen> createState() => _OrderScreenState();
+  State<OrderScreen> createState() => OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStateMixin {
+class OrderScreenState extends State<OrderScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
   int _currentIndex = 0;
+  bool _hasLoadedData = false;
 
   @override
   void initState() {
@@ -28,17 +32,24 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
     _tabController = TabController(length: 4, vsync: this);
     _pageController = PageController();
 
-    // Initialize orders when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<OrdersCubit>().initializeOrders();
-    });
+    print('OrderScreen: initState called');
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    _pageController.dispose();
-    super.dispose();
+  void didUpdateWidget(OrderScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Check if screen just became visible
+    if (widget.isVisible && !oldWidget.isVisible && !_hasLoadedData) {
+      _hasLoadedData = true;
+      print('OrderScreen: Screen became visible - loading data');
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<OrdersCubit>().showAllTab();
+        }
+      });
+    }
   }
 
   void _onTabTapped(int index) {
@@ -92,6 +103,8 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    print('OrderScreen: build() called, _currentIndex=$_currentIndex, isVisible=${widget.isVisible}');
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -120,15 +133,15 @@ class _OrderScreenState extends State<OrderScreen> with SingleTickerProviderStat
                 labelColor: const Color(0xFFFF5C9A),
                 unselectedLabelColor: const Color(0xFF777777),
                 indicatorColor: const Color(0xFFFF5C9A),
-                indicatorWeight: 2.5,
+                indicatorWeight: 2.h,
                 indicatorSize: TabBarIndicatorSize.tab,
-                labelStyle: const TextStyle(
-                  fontSize: 14,
+                labelStyle: TextStyle(
+                  fontSize: 13.fSize,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'Inter',
                 ),
-                unselectedLabelStyle: const TextStyle(
-                  fontSize: 14,
+                unselectedLabelStyle: TextStyle(
+                  fontSize: 13.fSize,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Inter',
                 ),
@@ -175,6 +188,8 @@ class _OrdersTabContent extends StatelessWidget {
       builder: (context, state) {
         if (state is OrdersLoading) {
           return _buildShimmerEffect();
+        } else if (state is OrdersNoCustomer) {
+          return _buildNoCustomerState(context);
         } else if (state is OrdersError) {
           return _buildErrorState(context, state.message);
         } else if (state is OrdersLoaded) {
@@ -186,7 +201,7 @@ class _OrdersTabContent extends StatelessWidget {
             onRefresh: () => context.read<OrdersCubit>().refreshOrders(),
             color: const Color(0xFFFF5C9A),
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(14.w),
               itemCount: state.orders.length,
               itemBuilder: (context, index) {
                 return _OrderCard(order: state.orders[index]);
@@ -202,7 +217,7 @@ class _OrdersTabContent extends StatelessWidget {
 
   Widget _buildShimmerEffect() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
@@ -210,11 +225,11 @@ class _OrdersTabContent extends StatelessWidget {
           highlightColor: Colors.grey[100]!,
           period: const Duration(milliseconds: 1200),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            height: 180,
+            margin: EdgeInsets.only(bottom: 10.h),
+            height: 150.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
           ),
         );
@@ -225,43 +240,93 @@ class _OrdersTabContent extends StatelessWidget {
   Widget _buildErrorState(BuildContext context, String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Color(0xFFE0E0E0)),
-            const SizedBox(height: 16),
-            const Text(
+            Icon(Icons.error_outline, size: 56.h, color: const Color(0xFFE0E0E0)),
+            SizedBox(height: 14.h),
+            Text(
               'Error loading orders',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A1A),
+                color: const Color(0xFF1A1A1A),
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 6.h),
             Text(
               message,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF777777),
+              style: TextStyle(
+                fontSize: 13.fSize,
+                color: const Color(0xFF777777),
                 fontFamily: 'Inter',
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 20.h),
             ElevatedButton(
               onPressed: () => context.read<OrdersCubit>().refreshOrders(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
-              child: const Text(
+              child: Text(
                 'Retry',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, fontFamily: 'Inter'),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.fSize, fontFamily: 'Inter'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoCustomerState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.shopping_bag_outlined, size: 56.h, color: const Color(0xFFE0E0E0)),
+            SizedBox(height: 14.h),
+            Text(
+              'No orders available',
+              style: TextStyle(
+                fontSize: 16.fSize,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1A1A1A),
+                fontFamily: 'Inter',
+              ),
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              'Start shopping to see your orders here',
+              style: TextStyle(
+                fontSize: 13.fSize,
+                color: const Color(0xFF777777),
+                fontFamily: 'Inter',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20.h),
+            ElevatedButton(
+              onPressed: () {
+                MainNavigationScreen.navigateToHome(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF5C9A),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+              ),
+              child: Text(
+                'Start Shopping',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.fSize, fontFamily: 'Inter'),
               ),
             ),
           ],
@@ -273,27 +338,27 @@ class _OrdersTabContent extends StatelessWidget {
   Widget _buildEmptyState(String currentTab) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.shopping_bag_outlined, size: 64, color: Color(0xFFE0E0E0)),
-            const SizedBox(height: 16),
+            Icon(Icons.shopping_bag_outlined, size: 56.h, color: const Color(0xFFE0E0E0)),
+            SizedBox(height: 14.h),
             Text(
               'No ${currentTab.toLowerCase()} orders',
-              style: const TextStyle(
-                fontSize: 18,
+              style: TextStyle(
+                fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A1A),
+                color: const Color(0xFF1A1A1A),
                 fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 6.h),
             Text(
               'Your ${currentTab.toLowerCase()} orders will appear here',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF777777),
+              style: TextStyle(
+                fontSize: 13.fSize,
+                color: const Color(0xFF777777),
                 fontFamily: 'Inter',
               ),
               textAlign: TextAlign.center,
@@ -323,11 +388,11 @@ class _OrderCardState extends State<_OrderCard> {
     final itemsToShow = _showAllItems ? widget.order.lineItems : widget.order.lineItems.take(2).toList();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
           width: 1,
@@ -341,19 +406,19 @@ class _OrderCardState extends State<_OrderCard> {
             children: [
               Text(
                 widget.order.name,
-                style: const TextStyle(
-                  fontSize: 18,
+                style: TextStyle(
+                  fontSize: 16.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
+                  color: const Color(0xFF1A1A1A),
                   fontFamily: 'Inter',
                 ),
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFF3E0),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
                     color: const Color(0xFFFFE0B2),
                     width: 1,
@@ -361,24 +426,24 @@ class _OrderCardState extends State<_OrderCard> {
                 ),
                 child: Text(
                   _getStatusText(widget.order),
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: 11.fSize,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFFFF9800),
+                    color: const Color(0xFFFF9800),
                     fontFamily: 'Inter',
                   ),
                 ),
               ),
               PopupMenuButton<String>(
                 padding: EdgeInsets.zero,
-                icon: const Icon(
+                icon: Icon(
                   Icons.more_vert,
-                  color: Color(0xFF666666),
-                  size: 20,
+                  color: const Color(0xFF666666),
+                  size: 18.h,
                 ),
-                offset: const Offset(0, 40),
+                offset: Offset(0, 36.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 onSelected: (value) {
                   if (value == 'view_details') {
@@ -390,64 +455,64 @@ class _OrderCardState extends State<_OrderCard> {
                   }
                 },
                 itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'view_details',
                     child: Row(
                       children: [
                         Icon(
                           Icons.visibility_outlined,
-                          color: Color(0xFFFF5C9A),
-                          size: 20,
+                          color: const Color(0xFFFF5C9A),
+                          size: 18.h,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: 10.w),
                         Text(
                           'View Details',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: Color(0xFF333333),
+                            color: const Color(0xFF333333),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'track_order',
                     child: Row(
                       children: [
                         Icon(
                           Icons.local_shipping_outlined,
-                          color: Color(0xFFFF5C9A),
-                          size: 20,
+                          color: const Color(0xFFFF5C9A),
+                          size: 18.h,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: 10.w),
                         Text(
                           'Track Order',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: Color(0xFF333333),
+                            color: const Color(0xFF333333),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'delete_order',
                     child: Row(
                       children: [
                         Icon(
                           Icons.delete_outline,
-                          color: Color(0xFFF44336),
-                          size: 20,
+                          color: const Color(0xFFF44336),
+                          size: 18.h,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: 10.w),
                         Text(
                           'Delete Order',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: Color(0xFF333333),
+                            color: const Color(0xFF333333),
                           ),
                         ),
                       ],
@@ -461,14 +526,14 @@ class _OrderCardState extends State<_OrderCard> {
           // Placed on date
           Text(
             'Placed on ${_formatDate(widget.order.createdAt)}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF777777),
+            style: TextStyle(
+              fontSize: 11.fSize,
+              color: const Color(0xFF777777),
               fontFamily: 'Inter',
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
 
           // Divider before amount section
           Divider(
@@ -477,7 +542,7 @@ class _OrderCardState extends State<_OrderCard> {
             height: 1,
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
 
           // Total Amount and Items row
           Row(
@@ -485,21 +550,21 @@ class _OrderCardState extends State<_OrderCard> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Total Amount',
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF777777),
+                      fontSize: 11.fSize,
+                      color: const Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 3.h),
                   Text(
                     formatIndianCurrency(widget.order.totalPrice),
-                    style: const TextStyle(
-                      fontSize: 20,
+                    style: TextStyle(
+                      fontSize: 18.fSize,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
+                      color: const Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -509,21 +574,21 @@ class _OrderCardState extends State<_OrderCard> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
+                  Text(
                     'Items',
                     style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF777777),
+                      fontSize: 11.fSize,
+                      color: const Color(0xFF777777),
                       fontFamily: 'Inter',
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 3.h),
                   Text(
                     '${widget.order.lineItems.length} ${widget.order.lineItems.length == 1 ? 'item' : 'items'}',
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: TextStyle(
+                      fontSize: 14.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
+                      color: const Color(0xFF1A1A1A),
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -532,7 +597,7 @@ class _OrderCardState extends State<_OrderCard> {
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
 
           // Divider before items list
           Divider(
@@ -541,42 +606,42 @@ class _OrderCardState extends State<_OrderCard> {
             height: 1,
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 8.h),
 
           // Product items list
           ...itemsToShow.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: EdgeInsets.only(bottom: 5.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(top: 6),
-                      width: 4,
-                      height: 4,
+                      margin: EdgeInsets.only(top: 5.h),
+                      width: 3.5.w,
+                      height: 3.5.h,
                       decoration: const BoxDecoration(
                         color: Color(0xFF333333),
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 7.w),
                     Expanded(
                       child: Text(
                         item.title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF333333),
+                        style: TextStyle(
+                          fontSize: 12.fSize,
+                          color: const Color(0xFF333333),
                           fontFamily: 'Inter',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 7.w),
                     Text(
                       '... Qty: ${item.quantity}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF333333),
+                      style: TextStyle(
+                        fontSize: 12.fSize,
+                        color: const Color(0xFF333333),
                         fontFamily: 'Inter',
                       ),
                     ),
@@ -587,33 +652,31 @@ class _OrderCardState extends State<_OrderCard> {
           // View More/Less button if more than 2 items
           if (widget.order.lineItems.length > 2)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: EdgeInsets.only(top: 3.h),
               child: Center(
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
                       _showAllItems = !_showAllItems;
                     });
-                    // Future functionality: Navigate to order details screen
-                    // _onViewDetails(context, widget.order);
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         _showAllItems ? 'View Less' : 'View More',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFFFF5C9A),
+                        style: TextStyle(
+                          fontSize: 12.fSize,
+                          color: const Color(0xFFFF5C9A),
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inter',
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 3.w),
                       Icon(
                         _showAllItems ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         color: const Color(0xFFFF5C9A),
-                        size: 18,
+                        size: 16.h,
                       ),
                     ],
                   ),
@@ -644,7 +707,7 @@ class _OrderCardState extends State<_OrderCard> {
         content: Text('Track order ${order.name}'),
         backgroundColor: const Color(0xFFFF5C9A),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
     );
   }
@@ -655,10 +718,10 @@ class _OrderCardState extends State<_OrderCard> {
       context: context,
       title: 'Delete Order',
       message: 'Are you sure you want to delete order ${order.name}? This action cannot be undone.',
-      icon: const Icon(
+      icon: Icon(
         Icons.delete_outline,
-        size: 48,
-        color: Color(0xFFFF5C9A),
+        size: 44.h,
+        color: const Color(0xFFFF5C9A),
       ),
       isIconEnabled: false,
       primaryButtonText: 'Delete',
@@ -677,7 +740,7 @@ class _OrderCardState extends State<_OrderCard> {
                 content: Text('Order ${order.name} deleted successfully'),
                 backgroundColor: const Color(0xFF4CAF50),
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
             );
           }
@@ -689,7 +752,7 @@ class _OrderCardState extends State<_OrderCard> {
                 content: Text('Failed to delete order: ${e.toString()}'),
                 backgroundColor: const Color(0xFFF44336),
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
             );
           }

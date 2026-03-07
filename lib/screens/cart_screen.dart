@@ -7,6 +7,7 @@ import '../models/cart_model.dart';
 import '../models/customer_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/auth_storage.dart';
+import '../utils/size_utils.dart';
 import '../services/api_service.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/custom_app_bar.dart';
@@ -174,9 +175,9 @@ class _CartScreenState extends State<CartScreen> {
             },
             color: const Color(0xFFFF5C9A),
             child: ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(14.w),
               itemCount: cart.lines.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              separatorBuilder: (_, __) => SizedBox(height: 14.h),
               itemBuilder: (context, index) {
                 final cartLine = cart.lines[index];
                 final isUpdating = context.watch<CartCubit>().isLineUpdating(cartLine.id);
@@ -220,7 +221,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       child: SafeArea(
         top: false,
         child: Column(
@@ -235,19 +236,19 @@ class _CartScreenState extends State<CartScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          width: 60,
-                          height: 24,
+                          width: 55.w,
+                          height: 22.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
                         Container(
-                          width: 100,
-                          height: 24,
+                          width: 90.w,
+                          height: 22.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
                       ],
@@ -256,18 +257,18 @@ class _CartScreenState extends State<CartScreen> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Total',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18.fSize,
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
                       ),
                       Text(
                         formattedTotal,
-                        style: const TextStyle(
-                          fontSize: 20,
+                        style: TextStyle(
+                          fontSize: 18.fSize,
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
@@ -275,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 14.h),
 
             // Button with shimmer until text is ready or while updating
             showShimmer
@@ -284,16 +285,16 @@ class _CartScreenState extends State<CartScreen> {
                     highlightColor: Colors.grey[100]!,
                     child: Container(
                       width: double.infinity,
-                      height: 56,
+                      height: 50.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
                     ),
                   )
                 : SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: 50.h,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_hasCompleteAddress) {
@@ -320,7 +321,7 @@ class _CartScreenState extends State<CartScreen> {
                         backgroundColor: const Color(0xFFFF5C9A),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
                         elevation: 0,
                       ),
@@ -329,13 +330,13 @@ class _CartScreenState extends State<CartScreen> {
                         children: [
                           Text(
                             _hasCompleteAddress ? 'Proceed to Pay' : 'Add Address',
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: TextStyle(
+                              fontSize: 15.fSize,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.arrow_forward, size: 20),
+                          SizedBox(width: 7.w),
+                          Icon(Icons.arrow_forward, size: 18.h),
                         ],
                       ),
                     ),
@@ -363,45 +364,45 @@ class _CartScreenState extends State<CartScreen> {
                 children: [
                   Icon(
                     Icons.shopping_cart_outlined,
-                    size: 80,
+                    size: 70.h,
                     color: Colors.grey.shade300,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 14.h),
                   Text(
                     'Your cart is empty',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16.fSize,
                       fontWeight: FontWeight.w600,
                       color: Colors.grey.shade700,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 7.h),
                   Text(
                     'Add products to get started',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13.fSize,
                       color: Colors.grey.shade500,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF5C9A),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 28.w,
+                        vertical: 10.h,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Start Shopping',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14.fSize,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -418,34 +419,34 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.error_outline,
-              size: 80,
+              size: 70.h,
               color: Colors.red.shade300,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 14.h),
             Text(
               'Failed to load cart',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 7.h),
             Text(
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13.fSize,
                 color: Colors.grey.shade500,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 20.h),
             ElevatedButton(
               onPressed: () {
                 context.read<CartCubit>().fetchCart();
@@ -453,9 +454,9 @@ class _CartScreenState extends State<CartScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
               child: const Text('Retry'),
@@ -472,9 +473,9 @@ class _CartScreenState extends State<CartScreen> {
         // Cart items shimmer
         Expanded(
           child: ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(14.w),
             itemCount: 3,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
+            separatorBuilder: (_, __) => SizedBox(height: 14.h),
             itemBuilder: (context, index) {
               return const _CartItemShimmer();
             },
@@ -493,7 +494,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(14.w),
           child: SafeArea(
             top: false,
             child: Column(
@@ -507,26 +508,26 @@ class _CartScreenState extends State<CartScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 60,
-                        height: 24,
+                        width: 55.w,
+                        height: 22.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
                       Container(
-                        width: 100,
-                        height: 24,
+                        width: 90.w,
+                        height: 22.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 14.h),
 
                 // Button shimmer
                 Shimmer.fromColors(
@@ -534,10 +535,10 @@ class _CartScreenState extends State<CartScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 56,
+                    height: 50.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
@@ -652,28 +653,28 @@ class _CartItemCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
           width: 1,
         ),
       ),
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(10.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product image
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8.r),
             child: Container(
-              width: 100,
-              height: 100,
+              width: 85.w,
+              height: 85.h,
               color: Colors.grey.shade50,
               child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                   ? NetworkImageLoader(
                       imageUrl: product.imageUrl!,
-                      width: 100,
-                      height: 100,
+                      width: 85.w,
+                      height: 85.h,
                       fit: BoxFit.cover,
                     )
                   : Container(
@@ -685,7 +686,7 @@ class _CartItemCard extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 10.w),
 
           // Product details
           Expanded(
@@ -697,33 +698,33 @@ class _CartItemCard extends StatelessWidget {
                   product.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 14.fSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                     height: 1.3,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 7.h),
 
                 // Price row
                 Row(
                   children: [
                     Text(
                       currentPrice,
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: 16.fSize,
                         fontWeight: FontWeight.w700,
                         color: Colors.black,
                       ),
                     ),
                     if (originalPrice.isNotEmpty) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: 7.w),
                       Text(
                         originalPrice,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 12.fSize,
                           color: Colors.grey.shade400,
                           decoration: TextDecoration.lineThrough,
                           decorationColor: Colors.grey.shade400,
@@ -731,17 +732,17 @@ class _CartItemCard extends StatelessWidget {
                       ),
                     ],
                     if (discount > 0) ...[
-                      const SizedBox(width: 8),
+                      SizedBox(width: 7.w),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Text(
                           '-$discount%',
-                          style: const TextStyle(
-                            fontSize: 12,
+                          style: TextStyle(
+                            fontSize: 11.fSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
@@ -751,7 +752,7 @@ class _CartItemCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 7.h),
 
                 // Quantity controls and variant info
                 Row(
@@ -759,14 +760,14 @@ class _CartItemCard extends StatelessWidget {
                     Text(
                       'Quantity: ',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12.fSize,
                         color: Colors.grey.shade600,
                       ),
                     ),
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -784,30 +785,30 @@ class _CartItemCard extends StatelessWidget {
                                   },
                             icon: Icon(
                               cartLine.quantity == 1 ? Icons.delete_outline : Icons.remove,
-                              size: 16,
+                              size: 14.h,
                               color: isAnyOperationInProgress
                                   ? Colors.grey.shade300
                                   : (cartLine.quantity == 1 ? Colors.red : Colors.grey.shade700),
                             ),
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
+                            constraints: BoxConstraints(
+                              minWidth: 28.w,
+                              minHeight: 28.h,
                             ),
-                            splashRadius: 20,
+                            splashRadius: 18,
                           ),
                           Container(
                             width: 1,
-                            height: 20,
+                            height: 18.h,
                             color: Colors.grey.shade300,
                           ),
                           // Quantity display with loading indicator
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: isUpdating
                                 ? SizedBox(
-                                    width: 14,
-                                    height: 14,
+                                    width: 12.w,
+                                    height: 12.h,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -817,8 +818,8 @@ class _CartItemCard extends StatelessWidget {
                                   )
                                 : Text(
                                     '${cartLine.quantity}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
+                                    style: TextStyle(
+                                      fontSize: 13.fSize,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black,
                                     ),
@@ -826,7 +827,7 @@ class _CartItemCard extends StatelessWidget {
                           ),
                           Container(
                             width: 1,
-                            height: 20,
+                            height: 18.h,
                             color: Colors.grey.shade300,
                           ),
                           // Increase button
@@ -836,26 +837,26 @@ class _CartItemCard extends StatelessWidget {
                                 : () => _updateQuantity(context, cartLine.quantity + 1),
                             icon: Icon(
                               Icons.add,
-                              size: 16,
+                              size: 14.h,
                               color: isAnyOperationInProgress ? Colors.grey.shade300 : Colors.grey.shade700,
                             ),
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
+                            constraints: BoxConstraints(
+                              minWidth: 28.w,
+                              minHeight: 28.h,
                             ),
-                            splashRadius: 20,
+                            splashRadius: 18,
                           ),
                         ],
                       ),
                     ),
                     if (merchandise.title.isNotEmpty && merchandise.title != 'Default Title') ...[
-                      const SizedBox(width: 12),
+                      SizedBox(width: 10.w),
                       Flexible(
                         child: Text(
                           '| ${merchandise.title}',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.fSize,
                             color: Colors.grey.shade600,
                           ),
                           maxLines: 1,
@@ -875,7 +876,7 @@ class _CartItemCard extends StatelessWidget {
             icon: Icon(
               Icons.delete_outline,
               color: isAnyOperationInProgress ? Colors.grey.shade300 : Colors.grey.shade400,
-              size: 24,
+              size: 20.h,
             ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -898,40 +899,40 @@ class _CartItemShimmer extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
         ),
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(10.w),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 100,
-              height: 100,
+              width: 85.w,
+              height: 85.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 10.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 16,
+                    height: 14.h,
                     color: Colors.white,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 7.h),
                   Container(
-                    width: 150,
-                    height: 16,
+                    width: 130.w,
+                    height: 14.h,
                     color: Colors.white,
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 10.h),
                   Container(
-                    width: 100,
-                    height: 20,
+                    width: 90.w,
+                    height: 18.h,
                     color: Colors.white,
                   ),
                 ],

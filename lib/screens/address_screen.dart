@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/size_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -198,20 +199,20 @@ class _AddressScreenState extends State<AddressScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14.r),
           ),
-          title: const Text(
+          title: Text(
             'Confirm Address',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 15.fSize,
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
-          content: const Text(
+          content: Text(
             'The address was fetched from your current location and might not be accurate. Do you want to proceed?',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12.fSize,
               color: Colors.black87,
               height: 1.5,
             ),
@@ -224,12 +225,12 @@ class _AddressScreenState extends State<AddressScreen> {
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.grey.shade700,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
               ),
-              child: const Text(
+              child: Text(
                 'No',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12.fSize,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -243,16 +244,16 @@ class _AddressScreenState extends State<AddressScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7.r),
                 ),
                 elevation: 0,
               ),
-              child: const Text(
+              child: Text(
                 'Yes, No Issue',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12.fSize,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -946,16 +947,16 @@ class _AddressScreenState extends State<AddressScreen> {
                       controller: _scrollController,
                       child: Column(
                         children: [
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
 
                           // Current Location Section
                           _buildCurrentLocationSection(),
 
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
 
                           // User Information Form
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: EdgeInsets.symmetric(horizontal: 14.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -966,21 +967,21 @@ class _AddressScreenState extends State<AddressScreen> {
                                   hint: 'Enter your full name',
                                   enabled: false,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _firstNameController,
                                   label: 'First Name',
                                   hint: 'Enter your first name',
                                   enabled: false,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _lastNameController,
                                   label: 'Last Name',
                                   hint: 'Enter your last name',
                                   enabled: false,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _emailController,
                                   label: 'Email',
@@ -989,7 +990,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   enabled: false,
                                 ),
 
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
 
                                 // Address Information Section
                                 _buildTextField(
@@ -1000,7 +1001,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _address1FocusNode,
                                   errorText: _address1Error,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _address2Controller,
                                   label: 'Address Line 2',
@@ -1009,7 +1010,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _address2FocusNode,
                                   errorText: _address2Error,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _cityController,
                                   label: 'City',
@@ -1018,7 +1019,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _cityFocusNode,
                                   errorText: _cityError,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _provinceController,
                                   label: 'State/Province',
@@ -1026,7 +1027,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _provinceFocusNode,
                                   errorText: _provinceError,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _countryController,
                                   label: 'Country',
@@ -1035,7 +1036,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _countryFocusNode,
                                   errorText: _countryError,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _zipController,
                                   label: 'ZIP/Postal Code',
@@ -1045,13 +1046,13 @@ class _AddressScreenState extends State<AddressScreen> {
                                   focusNode: _zipFocusNode,
                                   errorText: _zipError,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _companyController,
                                   label: 'Company (Optional)',
                                   hint: 'Enter company name',
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 _buildTextField(
                                   controller: _phoneController,
                                   label: 'Phone',
@@ -1065,7 +1066,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   ],
                                 ),
 
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
 
                                 // Make Default Address Checkbox
                                 Row(
@@ -1082,13 +1083,13 @@ class _AddressScreenState extends State<AddressScreen> {
                                                 });
                                               },
                                         activeColor: _isDefaultAddressDisabled
-                                            ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                            ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
                                             : const Color(0xFFFF5C9A), // Full pink for enabled
                                         checkColor: Colors.white,
                                         fillColor: WidgetStateProperty.resolveWith<Color>((states) {
                                           if (states.contains(WidgetState.selected)) {
                                             return _isDefaultAddressDisabled
-                                                ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
                                                 : const Color(0xFFFF5C9A); // Full pink for enabled
                                           }
                                           return Colors.transparent;
@@ -1096,13 +1097,13 @@ class _AddressScreenState extends State<AddressScreen> {
                                         side: WidgetStateBorderSide.resolveWith((states) {
                                           return BorderSide(
                                             color: _isDefaultAddressDisabled
-                                                ? const Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
+                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
                                                 : const Color(0xFFFF5C9A), // Full pink border for enabled
-                                            width: 2,
+                                            width: 2.w,
                                           );
                                         }),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius: BorderRadius.circular(3.r),
                                         ),
                                       ),
                                     ),
@@ -1110,7 +1111,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                       child: Text(
                                         'Make this my default address', // Keep same text for both states
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 12.fSize,
                                           fontWeight: FontWeight.w500,
                                           color: _isDefaultAddressDisabled 
                                               ? Colors.black.withOpacity(0.5) // Faded text for disabled
@@ -1121,7 +1122,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   ],
                                 ),
 
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                               ],
                             ),
                           ),
@@ -1150,28 +1151,28 @@ class _AddressScreenState extends State<AddressScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       child: SafeArea(
         top: false,
         child: SizedBox(
           width: double.infinity,
-          height: 56,
+          height: 48.h,
           child: ElevatedButton(
             onPressed: _handleAddAddress,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isFormValid ? const Color(0xFFFF5C9A) : const Color(0xFFFF5C9A).withValues(alpha: 0.4),
+              backgroundColor: _isFormValid ? Color(0xFFFF5C9A) : const Color(0xFFFF5C9A).withValues(alpha: 0.4),
               foregroundColor: Colors.white,
-              disabledBackgroundColor: const Color(0xFFFF5C9A).withValues(alpha: 0.4),
+              disabledBackgroundColor: Color(0xFFFF5C9A).withValues(alpha: 0.4),
               disabledForegroundColor: Colors.white.withValues(alpha: 0.6),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10.r),
               ),
               elevation: 0,
             ),
             child: Text(
               widget.existingAddress != null ? 'Update Address' : 'Add Address',
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14.fSize,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1197,13 +1198,13 @@ class _AddressScreenState extends State<AddressScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: 12.fSize,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
@@ -1219,7 +1220,7 @@ class _AddressScreenState extends State<AddressScreen> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              fontSize: 14,
+              fontSize: 12.fSize,
               color: Colors.grey.shade400,
             ),
             filled: true,
@@ -1229,41 +1230,41 @@ class _AddressScreenState extends State<AddressScreen> {
               vertical: 14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
                 color: errorText != null ? Colors.red : Colors.grey.shade300,
-                width: 1,
+                width: 1.w,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
                 color: errorText != null ? Colors.red : Colors.grey.shade300,
-                width: 1,
+                width: 1.w,
               ),
             ),
             disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
                 color: Colors.grey.shade300,
-                width: 1,
+                width: 1.w,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : const Color(0xFFFF5C9A),
-                width: 2,
+                color: errorText != null ? Colors.red : Color(0xFFFF5C9A),
+                width: 2.w,
               ),
             ),
           ),
         ),
         if (errorText != null) ...[
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             errorText,
-            style: const TextStyle(
-              fontSize: 12,
+            style: TextStyle(
+              fontSize: 10.fSize,
               color: Colors.red,
             ),
           ),
@@ -1274,16 +1275,16 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Widget _buildCurrentLocationSection() {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
           color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: Colors.grey.shade200,
-            width: 1,
+            width: 1.w,
           ),
         ),
         child: Column(
@@ -1292,20 +1293,20 @@ class _AddressScreenState extends State<AddressScreen> {
               children: [
                 // Location Icon
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 41.w,
+                  height: 41.h,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF5C9A).withValues(alpha: 0.1),
+                    color: Color(0xFFFF5C9A).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on,
                     color: Color(0xFFFF5C9A),
-                    size: 24,
+                    size: 20.h,
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
 
                 // Location Details
                 Expanded(
@@ -1314,20 +1315,20 @@ class _AddressScreenState extends State<AddressScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              width: 120,
-                              height: 16,
+                              width: 102.w,
+                              height: 14.h,
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Container(
                               width: double.infinity,
-                              height: 14,
+                              height: 12.h,
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
                           ],
@@ -1337,17 +1338,17 @@ class _AddressScreenState extends State<AddressScreen> {
                           children: [
                             Text(
                               _currentLocationName.isNotEmpty ? _currentLocationName : 'Fetching location...',
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: TextStyle(
+                                fontSize: 14.fSize,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               _currentLocationAddress.isNotEmpty ? _currentLocationAddress : 'Please wait...',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12.fSize,
                                 color: Colors.grey.shade600,
                               ),
                               maxLines: 2,
@@ -1357,7 +1358,7 @@ class _AddressScreenState extends State<AddressScreen> {
                         ),
                 ),
 
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
 
                 // Retry Button
                 IconButton(
@@ -1365,7 +1366,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   icon: Icon(
                     Icons.refresh,
                     color: _isFetchingLocation ? Colors.grey.shade400 : const Color(0xFFFF5C9A),
-                    size: 24,
+                    size: 20.h,
                   ),
                   tooltip: 'Refresh location',
                   splashRadius: 24,
@@ -1375,7 +1376,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
             // Use this location text
             if (_currentPlacemark != null && !_isFetchingLocation) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
@@ -1397,7 +1398,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   child: Text(
                     'Use this location',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11.fSize,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFFFF5C9A),
                       decoration: TextDecoration.underline,
@@ -1417,34 +1418,34 @@ class _AddressScreenState extends State<AddressScreen> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           // Location card shimmer
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(14.w),
             child: Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,
               child: Container(
                 width: double.infinity,
-                height: 80,
+                height: 68.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           // Form fields shimmer
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
             child: Column(
               children: List.generate(12, (index) {
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 14.h),
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
@@ -1452,20 +1453,20 @@ class _AddressScreenState extends State<AddressScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: 100,
-                          height: 14,
+                          width: 85.w,
+                          height: 12.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(3.r),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Container(
                           width: double.infinity,
-                          height: 48,
+                          height: 41.h,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(7.r),
                           ),
                         ),
                       ],
@@ -1478,27 +1479,27 @@ class _AddressScreenState extends State<AddressScreen> {
 
           // Checkbox shimmer
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
             child: Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,
               child: Row(
                 children: [
                   Container(
-                    width: 24,
-                    height: 24,
+                    width: 20.w,
+                    height: 20.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Container(
-                    width: 180,
-                    height: 14,
+                    width: 153.w,
+                    height: 12.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
                 ],
@@ -1506,26 +1507,26 @@ class _AddressScreenState extends State<AddressScreen> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
 
           // Button shimmer
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
             child: Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,
               child: Container(
                 width: double.infinity,
-                height: 56,
+                height: 48.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
         ],
       ),
     );

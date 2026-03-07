@@ -48,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// Build loading shimmer state
   Widget _buildLoadingState() {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       children: [
         // Personal Information Section Shimmer
         Shimmer.fromColors(
@@ -59,80 +59,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // Section title shimmer
               Container(
-                width: 150,
-                height: 20,
+                width: 128.w,
+                height: 17.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               
               // Field shimmers (3 fields for personal info)
               ...List.generate(3, (index) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: EdgeInsets.only(bottom: 14.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Label shimmer
                     Container(
-                      width: 80,
-                      height: 14,
+                      width: 68.w,
+                      height: 12.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3.r),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     // Field shimmer
                     Container(
                       width: double.infinity,
-                      height: 48,
+                      height: 41.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(7.r),
                       ),
                     ),
                   ],
                 ),
               )),
               
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               
               // Address Section title shimmer
               Container(
-                width: 180,
-                height: 20,
+                width: 153.w,
+                height: 17.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               
               // Field shimmers (8 fields for address info)
               ...List.generate(8, (index) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: EdgeInsets.only(bottom: 14.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Label shimmer
                     Container(
-                      width: 100,
-                      height: 14,
+                      width: 85.w,
+                      height: 12.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3.r),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     // Field shimmer
                     Container(
                       width: double.infinity,
-                      height: 48,
+                      height: 41.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(7.r),
                       ),
                     ),
                   ],
@@ -149,33 +149,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildErrorState(String errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
-              size: 64,
+              size: 54.h,
               color: Colors.red,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               errorMessage,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14.fSize,
                 color: Colors.red,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.read<CustomerCubit>().fetchCustomer(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
               child: const Text('Retry'),
@@ -189,86 +189,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// Build profile content
   Widget _buildProfileContent(Customer customer) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       children: [
         // Personal Information Section
         _buildSectionTitle('Personal Information'),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // First Name
         _buildTextField(
           label: 'First Name',
           value: customer.firstName,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Last Name
         _buildTextField(
           label: 'Last Name',
           value: customer.lastName,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Email
         _buildTextField(
           label: 'Email',
           value: customer.email,
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
 
         // Address Information Section (only if defaultAddress exists)
         if (customer.defaultAddress != null) ...[
           _buildSectionTitle('Address Information'),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Address Line 1
           _buildTextField(
             label: 'Address Line 1',
             value: customer.defaultAddress!.address1,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Address Line 2
           _buildTextField(
             label: 'Address Line 2',
             value: customer.defaultAddress!.address2,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // City
           _buildTextField(
             label: 'City',
             value: customer.defaultAddress!.city,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Country
           _buildTextField(
             label: 'Country',
             value: customer.defaultAddress!.country,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // ZIP Code
           _buildTextField(
             label: 'ZIP Code',
             value: customer.defaultAddress!.zip,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Company
           _buildTextField(
             label: 'Company',
             value: customer.defaultAddress!.company,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Province/State
           _buildTextField(
             label: 'Province/State',
             value: customer.defaultAddress!.province,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Phone
           _buildTextField(
@@ -304,28 +304,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: 12.fSize,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(7.r),
             border: Border.all(
               color: Colors.grey.shade300,
-              width: 1,
+              width: 1.w,
             ),
           ),
           child: Text(
             isEmpty ? 'Not provided' : value,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12.fSize,
               fontWeight: FontWeight.w400,
               color: isEmpty ? Colors.grey.shade400 : Colors.black87,
             ),

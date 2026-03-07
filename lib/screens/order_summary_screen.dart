@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/size_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/screens/product_details_screen.dart';
 import 'package:shimmer/shimmer.dart';
@@ -321,31 +322,31 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           color: const Color(0xFFFF5C9A),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(14.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Shipping Address Card
                 _buildShippingAddressCard(customer),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Contact Information Card
                 _buildContactInformationCard(customer),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Cart Products Card
                 if (cartState is CartSuccess) _buildCartProductsCard(cartState.cart),
 
                 if (cartState is CartLoading) _buildCartProductsShimmer(),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Related Products Section
                 if (_isLoadingRelatedProducts) _buildRelatedProductsShimmer() else if (_relatedProducts.isNotEmpty) _buildRelatedProductsSection(),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
               ],
             ),
           ),
@@ -369,7 +370,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       child: SafeArea(
         top: false,
         child: Column(
@@ -379,18 +380,18 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Total',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 17.fSize,
                     fontWeight: FontWeight.w700,
                     color: Colors.black,
                   ),
                 ),
                 Text(
                   formattedTotal,
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: TextStyle(
+                    fontSize: 17.fSize,
                     fontWeight: FontWeight.w700,
                     color: Colors.black,
                   ),
@@ -398,34 +399,34 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ],
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Proceed to Pay button
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 48.h,
               child: ElevatedButton(
                 onPressed: () => _handleProceedToPay(context, cart, customer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                   elevation: 0,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Proceed to Pay',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14.fSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, size: 20),
+                    SizedBox(width: 8),
+                    Icon(Icons.arrow_forward, size: 20.h),
                   ],
                 ),
               ),
@@ -465,13 +466,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Column(
@@ -480,27 +481,27 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Shipping Address',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14.fSize,
                   fontWeight: FontWeight.w700,
                   color: Colors.black,
                 ),
               ),
               // Edit button
               Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
+                width: 34.w,
+                height: 34.h,
+                decoration: BoxDecoration(
                   color: Color(0xFFFF5C9A),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.edit_outlined,
                     color: Colors.white,
-                    size: 20,
+                    size: 17.h,
                   ),
                   onPressed: () async {
                     // Navigate to address list screen
@@ -527,7 +528,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           Text(
             fullAddress.isNotEmpty ? fullAddress : 'Address not available',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12.fSize,
               color: Colors.grey.shade700,
               height: 1.5,
             ),
@@ -546,42 +547,42 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Contact Information',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14.fSize,
                   fontWeight: FontWeight.w700,
                   color: Colors.black,
                 ),
               ),
               // Edit button for contact info
               // Container(
-              //   width: 40,
-              //   height: 40,
-              //   decoration: const BoxDecoration(
+              //   width: 34.w,
+              //   height: 34.h,
+              //   decoration: BoxDecoration(
               //     color: Color(0xFFFF5C9A),
               //     shape: BoxShape.circle,
               //   ),
               //   child: IconButton(
-              //     icon: const Icon(
+              //     icon: Icon(
               //       Icons.edit_outlined,
               //       color: Colors.white,
-              //       size: 20,
+              //       size: 17.h,
               //     ),
               //     onPressed: () {
               //       // TODO: Navigate to edit contact screen
@@ -596,7 +597,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Text(
               phone,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.fSize,
                 color: Colors.grey.shade700,
                 height: 1.5,
               ),
@@ -606,7 +607,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Text(
               email,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.fSize,
                 color: Colors.grey.shade700,
                 height: 1.5,
               ),
@@ -619,13 +620,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   Widget _buildEmptyCard(String title, String message) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Column(
@@ -633,17 +634,17 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: 14.fSize,
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
             message,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12.fSize,
               color: Colors.grey.shade500,
             ),
           ),
@@ -660,22 +661,22 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: true,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          childrenPadding: const EdgeInsets.only(bottom: 16),
+          tilePadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+          childrenPadding: EdgeInsets.only(bottom: 14.h),
           title: Text(
             'Products (${cart.lines.length})',
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: 14.fSize,
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
@@ -687,7 +688,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             // View More/Less button
             if (totalItems > 2)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
                 child: TextButton(
                   onPressed: () {
                     setState(() {
@@ -703,15 +704,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     children: [
                       Text(
                         _showAllProducts ? 'View Less' : 'View More',
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: 12.fSize,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Icon(
                         _showAllProducts ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        size: 20,
+                        size: 17.h,
                       ),
                     ],
                   ),
@@ -733,14 +734,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     final discount = _discountPercent(cartLine);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+      padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(7.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Row(
@@ -748,28 +749,28 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         children: [
           // Product image
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(5.r),
             child: Container(
-              width: 80,
-              height: 80,
+              width: 68.w,
+              height: 68.h,
               color: Colors.grey.shade50,
               child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                   ? NetworkImageLoader(
                       imageUrl: product.imageUrl!,
-                      width: 80,
-                      height: 80,
+                      width: 68.w,
+                      height: 68.h,
                       fit: BoxFit.cover,
                     )
                   : Container(
                       color: Colors.grey.shade200,
-                      child: const Center(
+                      child: Center(
                         child: Icon(Icons.image_outlined, color: Colors.grey),
                       ),
                     ),
             ),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
 
           // Product details
           Expanded(
@@ -781,44 +782,44 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   product.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 12.fSize,
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                     height: 1.3,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
 
                 // Quantity
                 Text(
                   'Qty: ${cartLine.quantity}',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11.fSize,
                     color: Colors.grey.shade600,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
 
                 // Price row
                 Row(
                   children: [
                     Text(
                       currentPrice,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 14.fSize,
                         fontWeight: FontWeight.w700,
                         color: Colors.black,
                       ),
                     ),
                     if (originalPrice.isNotEmpty) ...[
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Text(
                         originalPrice,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 10.fSize,
                           color: Colors.grey.shade400,
                           decoration: TextDecoration.lineThrough,
                           decorationColor: Colors.grey.shade400,
@@ -826,17 +827,17 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       ),
                     ],
                     if (discount > 0) ...[
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                         child: Text(
                           '-$discount%',
-                          style: const TextStyle(
-                            fontSize: 10,
+                          style: TextStyle(
+                            fontSize: 9.fSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
@@ -870,10 +871,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       highlightColor: Colors.grey[100]!,
       child: Container(
         width: double.infinity,
-        height: 250,
+        height: 213.h,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
         ),
       ),
     );
@@ -884,16 +885,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
-        const Text(
+        Text(
           'Last Minute Addition',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 17.fSize,
             fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Horizontal scrollable product list
         SingleChildScrollView(
@@ -962,11 +963,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         }
       },
       child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 12),
+        width: 136.w,
+        margin: EdgeInsets.only(right: 10.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 0.8,
@@ -980,7 +981,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Stack(
               children: [
                 Container(
-                  height: 160,
+                  height: 136.h,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
@@ -998,13 +999,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                         ? NetworkImageLoader(
                             imageUrl: imageUrl,
                             width: double.infinity,
-                            height: 160,
+                            height: 136.h,
                             fit: BoxFit.cover,
                           )
                         : Center(
                             child: Icon(
                               Icons.image_outlined,
-                              size: 40,
+                              size: 34.h,
                               color: Colors.grey.shade400,
                             ),
                           ),
@@ -1023,12 +1024,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF4CAF50),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(3.r),
                       ),
                       child: Text(
                         '-$discountPercent%',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: 10.fSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -1038,9 +1039,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ],
             ),
 
+            // Divider between image and text
+            Container(
+              height: 1,
+              color: Colors.grey.shade200,
+            ),
+
             // Product details
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(10.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1049,34 +1056,34 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 12.fSize,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                       height: 1.3,
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
 
                   // Price row
                   Row(
                     children: [
                       Text(
                         currentPrice,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 14.fSize,
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
                       ),
                       if (originalPrice.isNotEmpty) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Flexible(
                           child: Text(
                             originalPrice,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10.fSize,
                               color: Colors.grey.shade400,
                               decoration: TextDecoration.lineThrough,
                               decorationColor: Colors.grey.shade400,
@@ -1105,16 +1112,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
           child: Container(
-            width: 150,
-            height: 24,
+            width: 128.w,
+            height: 20.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(3.r),
             ),
           ),
         ),
 
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Product cards shimmer
         SingleChildScrollView(
@@ -1123,11 +1130,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(4, (index) {
               return Container(
-                width: 160,
-                margin: const EdgeInsets.only(right: 12),
+                width: 136.w,
+                margin: EdgeInsets.only(right: 10.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                   border: Border.all(
                     color: Colors.grey.shade200,
                     width: 0.8,
@@ -1141,7 +1148,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     children: [
                       // Image shimmer
                       Container(
-                        height: 160,
+                        height: 136.h,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
@@ -1154,34 +1161,34 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
                       // Content shimmer
                       Padding(
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(10.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
                               width: double.infinity,
-                              height: 14,
+                              height: 12.h,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6),
                             Container(
-                              width: 100,
-                              height: 14,
+                              width: 85.w,
+                              height: 12.h,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12),
                             Container(
-                              width: 80,
-                              height: 18,
+                              width: 68.w,
+                              height: 15.h,
                               decoration: BoxDecoration(
                                 color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
                           ],
@@ -1201,25 +1208,25 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   Widget _buildErrorState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.error_outline,
-              size: 80,
+              size: 68.h,
               color: Colors.red.shade300,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'Failed to load customer data',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15.fSize,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey.shade700,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 _initializeScreen();
@@ -1227,9 +1234,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7.r),
                 ),
               ),
               child: const Text('Retry'),
@@ -1246,7 +1253,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         // Scrollable shimmer content
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(14.w),
             child: Column(
               children: [
                 // Shipping Address Card Shimmer
@@ -1255,15 +1262,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 120,
+                    height: 102.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Contact Information Card Shimmer
                 Shimmer.fromColors(
@@ -1271,15 +1278,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 120,
+                    height: 102.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Cart Products Card Shimmer
                 Shimmer.fromColors(
@@ -1287,15 +1294,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 250,
+                    height: 213.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Related Products Shimmer
                 Shimmer.fromColors(
@@ -1303,10 +1310,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 250,
+                    height: 213.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
@@ -1327,7 +1334,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(14.w),
           child: SafeArea(
             top: false,
             child: Column(
@@ -1341,26 +1348,26 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 60,
-                        height: 24,
+                        width: 51.w,
+                        height: 20.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                       Container(
-                        width: 100,
-                        height: 24,
+                        width: 85.w,
+                        height: 20.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Button shimmer
                 Shimmer.fromColors(
@@ -1368,10 +1375,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 56,
+                    height: 48.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),

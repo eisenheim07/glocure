@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/size_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/customer_model.dart';
@@ -103,8 +104,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -113,20 +114,20 @@ class _AddressListScreenState extends State<AddressListScreen> {
           children: [
             // Handle bar
             Container(
-              width: 40,
-              height: 4,
+              width: 34.w,
+              height: 3.h,
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(2.r),
               ),
             ),
             const SizedBox(height: 24),
 
             // Title
-            const Text(
+            Text(
               'Delete Address',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 17.fSize,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
               ),
@@ -138,7 +139,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               'Are you sure you want to delete this address?',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.fSize,
                 color: Colors.grey.shade600,
                 height: 1.4,
               ),
@@ -153,20 +154,20 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context, false),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(
                           color: Colors.grey.shade300,
-                          width: 1,
+                          width: 1.w,
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Center(
                         child: Text(
                           'Cancel',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14.fSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey.shade700,
                           ),
@@ -182,16 +183,16 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context, true),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'Delete',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14.fSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
@@ -302,19 +303,19 @@ class _AddressListScreenState extends State<AddressListScreen> {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(14.w),
             children: List.generate(
               3,
               (index) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: EdgeInsets.only(bottom: 14.h),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey.shade300,
                   highlightColor: Colors.grey.shade100,
                   child: Container(
-                    height: 120,
+                    height: 102.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
@@ -324,7 +325,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Bottom button shimmer
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -341,10 +342,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
               highlightColor: Colors.grey.shade100,
               child: Container(
                 width: double.infinity,
-                height: 56,
+                height: 48.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
             ),
@@ -358,21 +359,21 @@ class _AddressListScreenState extends State<AddressListScreen> {
   Widget _buildErrorState(String errorMessage) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
-              size: 64,
+              size: 54.h,
               color: Colors.red,
             ),
             const SizedBox(height: 16),
             Text(
               errorMessage,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14.fSize,
                 color: Colors.red,
               ),
             ),
@@ -382,9 +383,9 @@ class _AddressListScreenState extends State<AddressListScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5C9A),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
               child: const Text('Retry'),
@@ -411,7 +412,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
             color: const Color(0xFFFF5C9A),
             onRefresh: _refreshCustomerData,
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(14.w),
               itemCount: addresses.length,
               itemBuilder: (context, index) {
                 final address = addresses[index];
@@ -419,7 +420,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 final isSelected = address.id == _selectedAddressId;
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: EdgeInsets.only(bottom: 14.h),
                   child: _buildAddressCard(
                     address: address,
                     isDefault: isDefault,
@@ -439,7 +440,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button or Done Button
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -475,29 +476,29 @@ class _AddressListScreenState extends State<AddressListScreen> {
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(
                                 color: const Color(0xFFFF5C9A),
-                                width: 2,
+                                width: 2.w,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     Icons.add,
                                     color: Color(0xFFFF5C9A),
-                                    size: 20,
+                                    size: 17.h,
                                   ),
                                   SizedBox(width: 8),
                                   Text(
                                     'Add New',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14.fSize,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFFFF5C9A),
                                     ),
@@ -517,16 +518,16 @@ class _AddressListScreenState extends State<AddressListScreen> {
                             Navigator.pop(context, customer);
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFF5C9A),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
                                 'Done',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14.fSize,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
@@ -557,25 +558,25 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.add,
                               color: Colors.white,
-                              size: 20,
+                              size: 17.h,
                             ),
                             SizedBox(width: 8),
                             Text(
                               'Add New Address',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14.fSize,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
@@ -640,30 +641,30 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 height: MediaQuery.of(context).size.height - 200,
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(20.w),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.location_off_outlined,
-                          size: 64,
+                          size: 54.h,
                           color: Colors.grey.shade400,
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           'No addresses found',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 15.fSize,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Text(
                           'Add your first address to continue',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.fSize,
                             color: Colors.grey.shade600,
                           ),
                         ),
@@ -677,7 +678,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -709,25 +710,25 @@ class _AddressListScreenState extends State<AddressListScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 14.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF5C9A),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: const Center(
+                child: Center(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.add,
                         color: Colors.white,
-                        size: 20,
+                        size: 17.h,
                       ),
                       SizedBox(width: 8),
                       Text(
                         'Add New Address',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14.fSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -780,10 +781,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
@@ -801,8 +802,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
           children: [
             // Location icon
             Container(
-              width: 40,
-              height: 40,
+              width: 34.w,
+              height: 34.h,
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 shape: BoxShape.circle,
@@ -810,7 +811,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               child: Icon(
                 Icons.location_on_outlined,
                 color: Colors.grey.shade600,
-                size: 24,
+                size: 20.h,
               ),
             ),
             const SizedBox(width: 12),
@@ -823,10 +824,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   // Address type and default badge
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Home',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14.fSize,
                           fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
@@ -834,15 +835,15 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       const SizedBox(width: 8),
                       if (isDefault)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(3.r),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Default',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10.fSize,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey,
                             ),
@@ -856,7 +857,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   Text(
                     fullAddress.isNotEmpty ? fullAddress : 'No address available',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12.fSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey.shade600,
                       height: 1.4,
@@ -898,7 +899,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           : null,
                       child: Icon(
                         Icons.edit_outlined,
-                        size: 24,
+                        size: 20.h,
                         color: isSelected ? Colors.red : Colors.red.withOpacity(0.3),
                       ),
                     ),
@@ -906,8 +907,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                     // Vertical divider
                     Container(
-                      width: 1,
-                      height: 20,
+                      width: 1.w,
+                      height: 17.h,
                       color: Colors.grey.shade300,
                     ),
                     const SizedBox(width: 8),
@@ -917,7 +918,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       onTap: isSelected ? () => _deleteAddress(address) : null,
                       child: Icon(
                         Icons.delete_outline,
-                        size: 24,
+                        size: 20.h,
                         color: isSelected ? Colors.red : Colors.red.withOpacity(0.3),
                       ),
                     ),
@@ -927,21 +928,21 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
                 // Selection radio button
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: 20.w,
+                  height: 20.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade400,
-                      width: 2,
+                      width: 2.w,
                     ),
                     color: Colors.white,
                   ),
                   child: isSelected
                       ? Center(
                           child: Container(
-                            width: 12,
-                            height: 12,
+                            width: 10.w,
+                            height: 10.h,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Color(0xFFFF5C9A),

@@ -17,22 +17,33 @@ class OrdersCubit extends Cubit<OrdersState> {
       : _apiService = apiService ?? ApiService(),
         super(OrdersInitial());
 
-  /// Initialize orders - only fetch "All" tab by default
+  /// Initialize orders - don't fetch, just set initial state
   Future<void> initializeOrders() async {
-    AppLogger.info('OrdersCubit: Initializing orders...');
-    await showAllTab();
+    AppLogger.info('OrdersCubit: Initializing orders (no API call)');
+    // Don't fetch anything, just stay in initial state
+    // API will be called when user actually navigates to Orders tab
+  }
+
+  /// Check customer ID and emit appropriate state if not found
+  Future<bool> _checkCustomerId() async {
+    final customerId = await _getCustomerId();
+    
+    AppLogger.info('OrdersCubit: _checkCustomerId - customerId=$customerId');
+    
+    if (customerId == null || customerId.isEmpty) {
+      AppLogger.info('OrdersCubit: No customer ID found, showing no customer state');
+      emit(OrdersNoCustomer());
+      return false;
+    }
+    
+    AppLogger.info('OrdersCubit: Customer ID exists, proceeding with API call');
+    return true;
   }
 
   /// Get customer ID from storage (already saved in cart screen)
   Future<String?> _getCustomerId() async {
     final customerId = await AuthStorage.getCustomerId();
     AppLogger.info('OrdersCubit: Retrieved customer ID from storage: $customerId');
-    
-    if (customerId == null || customerId.isEmpty) {
-      AppLogger.error('OrdersCubit: No customer ID found in storage. Please visit cart screen first.');
-      return null;
-    }
-    
     return customerId;
   }
 
@@ -57,6 +68,13 @@ class OrdersCubit extends Cubit<OrdersState> {
     AppLogger.info('OrdersCubit: Showing all orders tab');
     _currentTab = 'All';
     
+    // Check customer ID first
+    final hasCustomerId = await _checkCustomerId();
+    
+    if (!hasCustomerId) {
+      return; // No customer ID, OrdersNoCustomer state already emitted
+    }
+    
     // Always show loading state first
     emit(OrdersLoading());
 
@@ -73,6 +91,11 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> showPendingTab() async {
     AppLogger.info('OrdersCubit: Showing PENDING orders tab with status=open');
     _currentTab = 'Pending';
+    
+    // Check customer ID first
+    if (!await _checkCustomerId()) {
+      return; // No customer ID, state already emitted
+    }
     
     // Always show loading state first
     emit(OrdersLoading());
@@ -92,6 +115,11 @@ class OrdersCubit extends Cubit<OrdersState> {
     AppLogger.info('OrdersCubit: Showing CLOSED orders tab with status=closed');
     _currentTab = 'Closed';
     
+    // Check customer ID first
+    if (!await _checkCustomerId()) {
+      return; // No customer ID, state already emitted
+    }
+    
     // Always show loading state first
     emit(OrdersLoading());
 
@@ -109,6 +137,11 @@ class OrdersCubit extends Cubit<OrdersState> {
   Future<void> showCancelledTab() async {
     AppLogger.info('OrdersCubit: Showing CANCELLED orders tab with status=cancelled');
     _currentTab = 'Cancelled';
+    
+    // Check customer ID first
+    if (!await _checkCustomerId()) {
+      return; // No customer ID, state already emitted
+    }
     
     // Always show loading state first
     emit(OrdersLoading());

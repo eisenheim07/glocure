@@ -108,7 +108,7 @@ class _VerticalTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 82,
+      width: 70.w,
       color: const Color(0xFFFCF5F7),
       child: Column(
         children: List.generate(_tabs.length, (index) {
@@ -119,7 +119,7 @@ class _VerticalTabBar extends StatelessWidget {
             onTap: () => onTabSelected(index),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: 12.h),
               decoration: BoxDecoration(
                 color: isSelected ? const Color(0xFFFFE0EB) : Colors.transparent,
                 border: Border(
@@ -133,24 +133,24 @@ class _VerticalTabBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 34.w,
+                    height: 34.h,
                     decoration: BoxDecoration(
                       color: isSelected ? const Color(0xFFFF5C9A).withOpacity(0.1) : const Color(0xFFF0F0F0),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       tab.icon,
-                      size: 20,
+                      size: 18,
                       color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF888888),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 4.h),
                   Text(
                     tab.label,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.fSize,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                       color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFF555555),
                       height: 1.3,
@@ -210,39 +210,39 @@ class _SkinTypeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(12.w),
       children: [
         Container(
           width: double.infinity,
-          height: 150.h,
+          height: 120.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12.r),
             gradient: const LinearGradient(
               colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               'ALL SKIN TYPES',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF555555),
+                color: const Color(0xFF555555),
                 letterSpacing: 2,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 18),
+        SizedBox(height: 14.h),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 14,
+            crossAxisSpacing: 10.w,
+            mainAxisSpacing: 12.h,
             childAspectRatio: 0.78,
           ),
           itemCount: items.length,
@@ -267,7 +267,7 @@ class _CircularCategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const imageSize = 76.0;
+    const imageSize = 64.0;
 
     return GestureDetector(
       onTap: () {
@@ -298,17 +298,17 @@ class _CircularCategoryItem extends StatelessWidget {
                     )
                   : Container(
                       color: const Color(0xFFF5E6EC),
-                      child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 30),
+                      child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 26),
                     ),
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 6.h),
           Text(
             title,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black),
+            style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.w500, color: Colors.black),
           ),
         ],
       ),
@@ -327,11 +327,11 @@ class _SkinConcernGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(8.w),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        crossAxisSpacing: 8.h,
-        mainAxisSpacing: 8.h,
+        crossAxisSpacing: 6.w,
+        mainAxisSpacing: 6.h,
         childAspectRatio: 1,
       ),
       itemCount: items.length,
@@ -349,7 +349,7 @@ class _SkinConcernGrid extends StatelessWidget {
             );
           },
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10.r),
             child: imageUrl != null && imageUrl.isNotEmpty
                 ? NetworkImageLoader(
                     imageUrl: imageUrl,
@@ -359,7 +359,7 @@ class _SkinConcernGrid extends StatelessWidget {
                   )
                 : Container(
                     color: const Color(0xFFF0E0E8),
-                    child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 30),
+                    child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 26),
                   ),
           ),
         );
@@ -388,11 +388,11 @@ class _ShopCategoriesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(10.w),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 10.h,
-        mainAxisSpacing: 10.h,
+        crossAxisSpacing: 8.w,
+        mainAxisSpacing: 8.h,
         childAspectRatio: 0.85,
       ),
       itemCount: items.length,
@@ -436,19 +436,19 @@ class _ShopCategoryCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 0),
               child: Text(
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
+                style: TextStyle(
+                  fontSize: 12.fSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                 ),
@@ -459,9 +459,9 @@ class _ShopCategoryCard extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                  padding: EdgeInsets.fromLTRB(6.w, 0, 6.w, 6.h),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10.r),
                     child: NetworkImageLoader(
                       imageUrl: imageUrl!,
                       width: double.infinity,
@@ -472,10 +472,10 @@ class _ShopCategoryCard extends StatelessWidget {
                 ),
               )
             else
-              Expanded(
+              const Expanded(
                 flex: 3,
                 child: Center(
-                  child: Icon(Icons.shopping_bag_outlined, size: 40, color: Colors.black26),
+                  child: Icon(Icons.shopping_bag_outlined, size: 34, color: Colors.black26),
                 ),
               ),
           ],
@@ -496,11 +496,11 @@ class _BrandsGrid extends StatelessWidget {
     return Container(
       color: Colors.white,
       child: GridView.builder(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(10.w),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          crossAxisSpacing: 8.h,
-          mainAxisSpacing: 8.h,
+          crossAxisSpacing: 6.w,
+          mainAxisSpacing: 6.h,
           childAspectRatio: 1.3,
         ),
         itemCount: brands.length,
@@ -531,10 +531,10 @@ class _BrandLogoItem extends StatelessWidget {
     final imageUrl = _imageUrl();
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(6.w),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: imageUrl != null && imageUrl.isNotEmpty
           ? NetworkImageLoader(
@@ -543,7 +543,7 @@ class _BrandLogoItem extends StatelessWidget {
               height: double.infinity,
               fit: BoxFit.contain,
             )
-          : const Icon(Icons.business, color: Colors.grey, size: 28),
+          : const Icon(Icons.business, color: Colors.grey, size: 24),
     );
   }
 }
@@ -560,12 +560,12 @@ class _CategoriesShimmer extends StatelessWidget {
         Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
-          child: Container(width: 82, color: Colors.white),
+          child: Container(width: 70.w, color: Colors.white),
         ),
         Container(width: 1, color: const Color(0xFFEEEEEE)),
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(12.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -573,20 +573,20 @@ class _CategoriesShimmer extends StatelessWidget {
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
                   child: Container(
-                    height: 150.h,
+                    height: 120.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: 14.h),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 10.w,
+                      mainAxisSpacing: 12.h,
                       childAspectRatio: 0.78,
                     ),
                     itemCount: 6,
@@ -597,15 +597,15 @@ class _CategoriesShimmer extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              width: 76,
-                              height: 76,
+                              width: 64,
+                              height: 64,
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Container(width: 50, height: 12, color: Colors.white),
+                            SizedBox(height: 6.h),
+                            Container(width: 45, height: 10, color: Colors.white),
                           ],
                         ),
                       );

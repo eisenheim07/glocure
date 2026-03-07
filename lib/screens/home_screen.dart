@@ -1170,7 +1170,39 @@ class _TopProductsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: IntrinsicHeight(
+        child: Row(
+          children: List.generate(products.length, (index) {
+            return Padding(
+              padding: EdgeInsets.only(right: 8.w),
+              child: GestureDetector(
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CategoryProducts(handle: handle),
+                    ),
+                  );
+
+                  // Refresh wishlist status after returning
+                  onNavigationReturn();
+                },
+                child: _TopProductCard(
+                  key: ValueKey('${products[index].id}_$refreshKey'),
+                  product: products[index],
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+
+    /*OLD-CODE*/
+    /*return SizedBox(
       height: 190.h,
       child: ListView.separated(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -1196,7 +1228,7 @@ class _TopProductsList extends StatelessWidget {
           );
         },
       ),
-    );
+    );*/
   }
 }
 

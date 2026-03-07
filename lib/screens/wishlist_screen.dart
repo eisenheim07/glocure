@@ -314,9 +314,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
       onRefresh: _handleRefresh,
       color: const Color(0xFFFF5C9A),
       child: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(12.w),
         itemCount: _wishlistItems.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => SizedBox(height: 10.h),
         itemBuilder: (context, index) {
           final item = _wishlistItems[index];
           return _buildWishlistCard(item);
@@ -341,7 +341,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
                 color: Colors.grey.shade200,
                 width: 1,
@@ -349,7 +349,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
@@ -359,31 +359,31 @@ class _WishlistScreenState extends State<WishlistScreen> {
           children: [
             // Product Image
             Container(
-              width: 120,
-              height: 120,
+              width: 95.w,
+              height: 95.h,
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.r),
+                  bottomLeft: Radius.circular(10.r),
                 ),
               ),
               child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.r),
+                  bottomLeft: Radius.circular(10.r),
                 ),
                 child: item.imageUrl != null
                     ? NetworkImageLoader(
                         imageUrl: item.imageUrl!,
-                        width: 120,
-                        height: 120,
+                        width: 95.w,
+                        height: 95.h,
                         fit: BoxFit.cover,
                       )
                     : Center(
                         child: Icon(
                           Icons.image_outlined,
-                          size: 40,
+                          size: 32,
                           color: Colors.grey.shade400,
                         ),
                       ),
@@ -393,7 +393,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
             // Product Details
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(10.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -402,33 +402,33 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       item.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: TextStyle(
+                        fontSize: 13.fSize,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                         height: 1.3,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    SizedBox(height: 6.h),
 
                     // Price Row
                     Row(
                       children: [
                         Text(
                           currentPrice,
-                          style: const TextStyle(
-                            fontSize: 18,
+                          style: TextStyle(
+                            fontSize: 16.fSize,
                             fontWeight: FontWeight.w800,
                             color: Colors.black,
                           ),
                         ),
                         if (originalPrice != null) ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: 6.w),
                           Text(
                             originalPrice,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12.fSize,
                               color: Colors.grey.shade500,
                               decoration: TextDecoration.lineThrough,
                               decorationColor: Colors.grey.shade500,
@@ -438,7 +438,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       ],
                     ),
 
-                    const SizedBox(height: 6),
+                    SizedBox(height: 5.h),
 
                     // Move to Cart Button and Discount Badge
                     Row(
@@ -447,13 +447,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         GestureDetector(
                           onTap: () => _moveToCart(item),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 5.h,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(5.r),
                               border: Border.all(
                                 color: Colors.grey.shade300,
                                 width: 1,
@@ -464,14 +464,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
                               children: [
                                 Icon(
                                   Icons.shopping_cart_outlined,
-                                  size: 16,
+                                  size: 14,
                                   color: Colors.grey.shade700,
                                 ),
-                                const SizedBox(width: 4),
+                                SizedBox(width: 4.w),
                                 Text(
                                   'Move to cart',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11.fSize,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.grey.shade700,
                                   ),
@@ -483,18 +483,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         const Spacer(),
                         if (discount != null && discount > 0)
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 3.h,
                             ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF00C853),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(4.r),
                             ),
                             child: Text(
                               '-$discount%',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: TextStyle(
+                                fontSize: 11.fSize,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -509,12 +509,12 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
             // Heart Icon (Remove from Wishlist)
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(6.w),
               child: GestureDetector(
                 onTap: isMovingToCart ? null : () => _removeFromWishlist(item),
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: 28.w,
+                  height: 28.h,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
@@ -522,7 +522,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   child: const Icon(
                     Icons.favorite,
                     color: Color(0xFFFF5C9A),
-                    size: 20,
+                    size: 18,
                   ),
                 ),
               ),
@@ -536,7 +536,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10.r),
                   color: Colors.white.withOpacity(0.7),
                 ),
                 child: Shimmer.fromColors(
@@ -545,7 +545,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
@@ -564,45 +564,45 @@ class _WishlistScreenState extends State<WishlistScreen> {
         children: [
           Icon(
             Icons.favorite_border,
-            size: 80,
+            size: 64,
             color: Colors.grey.shade300,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 12.h),
           Text(
             'Your wishlist is empty',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16.fSize,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade700,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 6.h),
           Text(
             'Add products you love to your wishlist',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13.fSize,
               color: Colors.grey.shade500,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 20.h),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF5C9A),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 12,
+              padding: EdgeInsets.symmetric(
+                horizontal: 28.w,
+                vertical: 10.h,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               elevation: 0,
             ),
-            child: const Text(
+            child: Text(
               'Start Shopping',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 14.fSize,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -615,18 +615,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
   /// Build shimmer loading state
   Widget _buildShimmerLoading() {
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(12.w),
       itemCount: 5,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => SizedBox(height: 10.h),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
           child: Container(
-            height: 120,
+            height: 95.h,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
           ),
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/size_utils.dart';
 import '../models/order_model.dart';
 import '../utils/format_utils.dart';
 import '../widgets/custom_app_bar.dart';
@@ -38,20 +39,20 @@ class PaymentStatusScreen extends StatelessWidget {
               // Scrollable content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(20.w),
                   child: Column(
                     children: [
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40),
 
                       // Status icon and message
                       _buildStatusSection(),
 
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40),
 
                       // Order details card
                       _buildOrderDetailsCard(),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -73,39 +74,39 @@ class PaymentStatusScreen extends StatelessWidget {
       children: [
         // Status icon
         Container(
-          width: 120,
-          height: 120,
+          width: 102.w,
+          height: 102.h,
           decoration: BoxDecoration(
             color: statusConfig['backgroundColor'],
             shape: BoxShape.circle,
           ),
           child: Icon(
             statusConfig['icon'],
-            size: 60,
+            size: 51.h,
             color: statusConfig['iconColor'],
           ),
         ),
 
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
 
         // Status title
         Text(
           statusConfig['title'],
-          style: const TextStyle(
-            fontSize: 24,
+          style: TextStyle(
+            fontSize: 20.fSize,
             fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
           textAlign: TextAlign.center,
         ),
 
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
 
         // Status message
         Text(
           statusConfig['message'],
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 13.fSize,
             color: Colors.grey.shade600,
             height: 1.5,
           ),
@@ -125,29 +126,29 @@ class PaymentStatusScreen extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Card title
-          const Text(
+          Text(
             'Order Details',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 15.fSize,
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Order ID
           _buildDetailRow(
@@ -155,7 +156,7 @@ class PaymentStatusScreen extends StatelessWidget {
             '#${order.orderNumber ?? order.id ?? 'N/A'}',
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Order Date
           _buildDetailRow(
@@ -163,7 +164,7 @@ class PaymentStatusScreen extends StatelessWidget {
             createdAt,
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Number of Items
           _buildDetailRow(
@@ -171,7 +172,7 @@ class PaymentStatusScreen extends StatelessWidget {
             '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Payment Method
           _buildDetailRow(
@@ -179,7 +180,7 @@ class PaymentStatusScreen extends StatelessWidget {
             _getPaymentMethod(),
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Divider
           Divider(
@@ -187,24 +188,24 @@ class PaymentStatusScreen extends StatelessWidget {
             thickness: 1,
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Total Amount
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total Amount',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14.fSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
               ),
               Text(
                 formattedTotal,
-                style: const TextStyle(
-                  fontSize: 20,
+                style: TextStyle(
+                  fontSize: 17.fSize,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFFFF5C9A),
                 ),
@@ -224,16 +225,16 @@ class PaymentStatusScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12.fSize,
             color: Colors.grey.shade600,
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         Flexible(
           child: Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: 12.fSize,
               fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
@@ -246,7 +247,7 @@ class PaymentStatusScreen extends StatelessWidget {
 
   Widget _buildBottomButtons(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -280,7 +281,7 @@ class PaymentStatusScreen extends StatelessWidget {
               () => _navigateToHome(context),
             ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           // Secondary button (View Orders)
           _buildSecondaryButton(
@@ -308,21 +309,21 @@ class PaymentStatusScreen extends StatelessWidget {
   ) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 48.h,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFFF5C9A),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           elevation: 0,
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 14.fSize,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -337,7 +338,7 @@ class PaymentStatusScreen extends StatelessWidget {
   ) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 48.h,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
@@ -347,13 +348,13 @@ class PaymentStatusScreen extends StatelessWidget {
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10.r),
           ),
         ),
         child: Text(
           text,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 14.fSize,
             fontWeight: FontWeight.w600,
           ),
         ),

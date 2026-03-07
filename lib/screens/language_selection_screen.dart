@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utils/image_constant.dart';
+import '../utils/size_utils.dart';
 import '../widgets/app_image.dart';
 import '../utils/auth_storage.dart';
 import 'main_navigation_screen.dart';
@@ -80,7 +81,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               children: [
                 // Top Section
                 Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(20.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -88,8 +89,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
-                          width: 48,
-                          height: 48,
+                          width: 42.w,
+                          height: 42.h,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
@@ -102,24 +103,24 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         ),
                       ),
                       
-                      const SizedBox(height: 32),
+                      SizedBox(height: 28.h),
                       
                       // Title
-                      const Text(
+                      Text(
                         'Choose the language',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 24.fSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       
-                      const SizedBox(height: 8),
+                      SizedBox(height: 7.h),
                       
-                      const Text(
+                      Text(
                         'Select your preferred language below',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13.fSize,
                           color: Colors.white,
                         ),
                       ),
@@ -127,23 +128,23 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 16),
+                SizedBox(height: 14.h),
                 
                 // White Card with Languages
                 Expanded(
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
+                        topLeft: Radius.circular(20.r),
+                        topRight: Radius.circular(20.r),
                       ),
                     ),
                     child: Column(
                       children: [
                         Expanded(
                           child: SingleChildScrollView(
-                            padding: const EdgeInsets.all(24),
+                            padding: EdgeInsets.all(20.w),
                             child: Column(
                               children: List.generate(
                                 (_languages.length / 2).ceil(),
@@ -152,13 +153,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                   final secondIndex = firstIndex + 1;
                                   
                                   return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
+                                    padding: EdgeInsets.only(bottom: 14.h),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: _buildLanguageOption(_languages[firstIndex]),
                                         ),
-                                        const SizedBox(width: 16),
+                                        SizedBox(width: 14.w),
                                         if (secondIndex < _languages.length)
                                           Expanded(
                                             child: _buildLanguageOption(_languages[secondIndex]),
@@ -176,23 +177,23 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         
                         // Continue Button
                         Padding(
-                          padding: const EdgeInsets.all(24),
+                          padding: EdgeInsets.all(20.w),
                           child: SizedBox(
                             width: double.infinity,
-                            height: 56,
+                            height: 50.h,
                             child: ElevatedButton(
                               onPressed: _continue,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFF5C9A),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(28),
+                                  borderRadius: BorderRadius.circular(25.r),
                                 ),
                                 elevation: 0,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'CONTINUE',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15.fSize,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   letterSpacing: 1,

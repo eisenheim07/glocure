@@ -66,7 +66,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                 children: [
                   Icon(
                     Icons.error_outline,
-                    size: 64,
+                    size: 54.h,
                     color: Colors.grey.shade400,
                   ),
                   SizedBox(height: 16.h),
@@ -100,7 +100,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         vertical: 12.h,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(7.r),
                       ),
                     ),
                     child: const Text('Retry'),
@@ -118,7 +118,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   children: [
                     Icon(
                       Icons.rate_review_outlined,
-                      size: 64,
+                      size: 54.h,
                       color: Colors.grey.shade400,
                     ),
                     SizedBox(height: 16.h),
@@ -190,14 +190,14 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   /// Individual review shimmer card
   Widget _buildReviewShimmerCard() {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 14.h.h),
       padding: EdgeInsets.all(16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
@@ -242,7 +242,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         height: 14.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                     ),
@@ -255,7 +255,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         height: 12.h,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                     ),
@@ -272,7 +272,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     child: Container(
                       width: 16.h,
                       height: 16.h,
-                      margin: EdgeInsets.only(right: 2.h),
+                      margin: EdgeInsets.only(right: 2.w.h),
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -295,7 +295,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               height: 16.h,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3.r),
               ),
             ),
           ),
@@ -306,7 +306,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           Column(
             children: List.generate(3, (index) {
               return Container(
-                margin: EdgeInsets.only(bottom: 4.h),
+                margin: EdgeInsets.only(bottom: 3.h.h),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -315,7 +315,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     height: 14.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
                 ),
@@ -329,7 +329,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           Row(
             children: List.generate(3, (index) {
               return Container(
-                margin: EdgeInsets.only(right: 8.h),
+                margin: EdgeInsets.only(right: 7.w.h),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -338,7 +338,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     height: 60.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7.r),
                     ),
                   ),
                 ),
@@ -354,19 +354,19 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 class _ReviewCard extends StatelessWidget {
   final JudgemeReview review;
 
-  const _ReviewCard({required this.review});
+  _ReviewCard({required this.review});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+      margin: EdgeInsets.only(bottom: 14.h.h),
       padding: EdgeInsets.all(16.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
           color: Colors.grey.shade200,
-          width: 1,
+          width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
@@ -387,7 +387,7 @@ class _ReviewCard extends StatelessWidget {
                 width: 40.h,
                 height: 40.h,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C9A).withOpacity(0.1),
+                  color: Color(0xFFFF5C9A).withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -482,16 +482,16 @@ class _ReviewCard extends StatelessWidget {
                   return Container(
                     width: 80.h,
                     height: 80.h,
-                    margin: EdgeInsets.only(right: 8.h),
+                    margin: EdgeInsets.only(right: 7.w.h),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7.r),
                       border: Border.all(
                         color: Colors.grey.shade200,
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7.r),
                       child: Image.network(
                         picture.url,
                         fit: BoxFit.cover,
@@ -545,10 +545,10 @@ class _ReviewCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(3.r),
                 border: Border.all(
                   color: Colors.green.shade200,
-                  width: 1,
+                  width: 1.w,
                 ),
               ),
               child: Text(

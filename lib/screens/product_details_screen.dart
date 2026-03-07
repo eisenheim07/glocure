@@ -2032,6 +2032,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
               ],
             ),
 
+            // Divider between image and text
+            Container(
+              height: 1,
+              color: Colors.grey.shade200,
+            ),
+
             // Product details
             Padding(
               padding: const EdgeInsets.all(12),

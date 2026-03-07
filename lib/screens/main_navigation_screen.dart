@@ -12,18 +12,18 @@ import '../widgets/custom_bottom_nav_bar.dart';
 /// Manages bottom navigation and screen switching
 class MainNavigationScreen extends StatefulWidget {
   final int initialIndex;
-  
+
   const MainNavigationScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigationScreen> createState() => MainNavigationScreenState();
-  
+
   /// Static method to navigate to home from anywhere in the widget tree
   static void navigateToHome(BuildContext context) {
     final state = context.findAncestorStateOfType<MainNavigationScreenState>();
     state?.navigateToHome();
   }
-  
+
   /// Static method to navigate to orders from anywhere in the widget tree
   static void navigateToOrders(BuildContext context) {
     final state = context.findAncestorStateOfType<MainNavigationScreenState>();
@@ -34,14 +34,6 @@ class MainNavigationScreen extends StatefulWidget {
 class MainNavigationScreenState extends State<MainNavigationScreen> with WidgetsBindingObserver {
   late int _currentIndex;
   DateTime? _lastBackPressTime;
-
-  // List of screens for each navigation item
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const CategoriesScreen(),
-    const OrderScreen(),
-    const AccountScreen(),
-  ];
   
   /// Public method to navigate to home tab
   void navigateToHome() {
@@ -51,7 +43,7 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
       });
     }
   }
-  
+
   /// Public method to navigate to orders tab
   void navigateToOrders() {
     if (_currentIndex != 3) {
@@ -65,15 +57,16 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+
     WidgetsBinding.instance.addObserver(this);
     // Show status bar on home screen with multiple attempts
     _showStatusBar();
-    
+
     // Try again after a short delay
     Future.delayed(const Duration(milliseconds: 100), () {
       _showStatusBar();
     });
-    
+
     // And once more after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showStatusBar();
@@ -135,11 +128,19 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
     // Adjust index for IndexedStack (since Scan is not in the list)
     final adjustedIndex = _currentIndex > 2 ? _currentIndex - 1 : _currentIndex;
 
+    // Create screens with visibility state
+    final screens = [
+      const HomeScreen(),
+      const CategoriesScreen(),
+      OrderScreen(isVisible: _currentIndex == 3),
+      const AccountScreen(),
+    ];
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) {
         if (didPop) return;
-        
+
         // If not on Home tab, navigate to Home
         if (_currentIndex != 0) {
           setState(() {
@@ -173,7 +174,7 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
       child: Scaffold(
         body: IndexedStack(
           index: adjustedIndex,
-          children: _screens,
+          children: screens,
         ),
         bottomNavigationBar: CustomBottomNavBar(
           currentIndex: _currentIndex,

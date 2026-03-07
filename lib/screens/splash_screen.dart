@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glocure/screens/login_screen.dart';
 import '../utils/image_constant.dart';
+import '../utils/size_utils.dart';
 import '../widgets/app_image.dart';
 import '../utils/auth_storage.dart';
 import '../services/api_service.dart';
@@ -94,8 +95,8 @@ class _SplashScreenState extends State<SplashScreen> {
           Center(
             child: SmartImage(
               source: ImageConstant.icMainLogo,
-              width: 200,
-              height: 200,
+              width: 170.w,
+              height: 170.h,
             ),
           ),
         ],

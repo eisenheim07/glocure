@@ -161,11 +161,11 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             },
           ),
           title: Container(
-            height: 48,
-            margin: const EdgeInsets.only(right: 8),
+            height: 42.h,
+            margin: EdgeInsets.only(right: 8.w),
             decoration: BoxDecoration(
               color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: Center(
               child: TextField(
@@ -174,26 +174,26 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                 readOnly: _isSearchBarReadOnly,
                 autofocus: false,
                 textAlignVertical: TextAlignVertical.center,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 13.fSize,
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Search products',
-                  hintStyle: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF9E9E9E),
+                  hintStyle: TextStyle(
+                    fontSize: 13.fSize,
+                    color: const Color(0xFF9E9E9E),
                     fontWeight: FontWeight.w400,
                   ),
                   prefixIcon: const Icon(
                     Icons.search,
                     color: Color(0xFF9E9E9E),
-                    size: 20,
+                    size: 18,
                   ),
                   suffixIcon: _isSearchBarReadOnly
                       ? IconButton(
-                          icon: const Icon(Icons.close, size: 18, color: Color(0xFF9E9E9E)),
+                          icon: const Icon(Icons.close, size: 16, color: Color(0xFF9E9E9E)),
                           onPressed: _clearSearch,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),

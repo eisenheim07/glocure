@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/filter/filter_cubit.dart';
 import '../cubits/filter/filter_state.dart';
 import '../models/filter_model.dart';
+import '../utils/size_utils.dart';
 
 class FilterScreen extends StatelessWidget {
   final String collectionHandle;
@@ -21,21 +22,21 @@ class FilterScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Filters',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 15.fSize,
           ),
         ),
         actions: [
           TextButton.icon(
             onPressed: () => context.read<FilterCubit>().resetFilters(),
-            icon: const Icon(Icons.refresh, color: Colors.grey, size: 18),
-            label: const Text(
+            icon: Icon(Icons.refresh, color: Colors.grey, size: 15.h),
+            label: Text(
               'Reset Filters',
-              style: TextStyle(color: Colors.grey, fontSize: 13),
+              style: TextStyle(color: Colors.grey, fontSize: 11.fSize),
             ),
           ),
         ],
@@ -52,7 +53,7 @@ class FilterScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(state.message),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => context
                         .read<FilterCubit>()
@@ -71,7 +72,7 @@ class FilterScreen extends StatelessWidget {
 
             return Column(
               children: [
-                const Divider(height: 1, thickness: 0.5),
+                Divider(height: 1.h, thickness: 0.5),
                 Expanded(
                   child: Row(
                     children: [
@@ -82,7 +83,7 @@ class FilterScreen extends StatelessWidget {
                       ),
                       // Vertical divider
                       Container(
-                          width: 1, color: const Color(0xFFEEEEEE)),
+                          width: 1.w, color: Color(0xFFEEEEEE)),
                       // Right panel
                       Expanded(
                         child: _FilterValuePanel(state: state),
@@ -134,18 +135,18 @@ class _FilterCategorySidebar extends StatelessWidget {
                     color: isSelected
                         ? const Color(0xFFFF5C9A)
                         : Colors.transparent,
-                    width: 3,
+                    width: 3.w,
                   ),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 13.h),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       filter.label,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 11.fSize,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                         color: isSelected
@@ -156,16 +157,16 @@ class _FilterCategorySidebar extends StatelessWidget {
                   ),
                   if (selectedCount > 0)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 5.w, vertical: 2.h),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
                         '$selectedCount',
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: TextStyle(
+                          fontSize: 9.fSize,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -199,45 +200,45 @@ class _FilterValuePanel extends StatelessWidget {
       children: [
         // Search bar
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(10.h),
           child: TextField(
             onChanged: (query) =>
                 context.read<FilterCubit>().updateSearch(query),
             decoration: InputDecoration(
               hintText: 'Search in ${currentFilter.label}',
-              hintStyle: const TextStyle(
-                fontSize: 13,
-                color: Color(0xFFAAAAAA),
+              hintStyle: TextStyle(
+                fontSize: 11.fSize,
+                color: const Color(0xFFAAAAAA),
               ),
-              prefixIcon: const Icon(Icons.search,
-                  size: 20, color: Color(0xFFAAAAAA)),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              prefixIcon: Icon(Icons.search,
+                  size: 17.h, color: Color(0xFFAAAAAA)),
+              contentPadding: EdgeInsets.symmetric(vertical: 8.h),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7.r),
                 borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7.r),
                 borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7.r),
                 borderSide: const BorderSide(color: Color(0xFFFF5C9A)),
               ),
               filled: true,
               fillColor: Colors.white,
             ),
-            style: const TextStyle(fontSize: 13),
+            style: TextStyle(fontSize: 11.fSize),
           ),
         ),
 
         // Values list
         Expanded(
           child: values.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
                     'No results found',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF999999)),
+                    style: TextStyle(fontSize: 11.fSize, color: Color(0xFF999999)),
                   ),
                 )
               : ListView.builder(
@@ -285,14 +286,14 @@ class _FilterValueRow extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: isSelected ? const Color(0xFFFFE9F0) : Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 12.h),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 value.label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12.fSize,
                   fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                   color: Colors.black87,
                 ),
@@ -318,18 +319,18 @@ class _FilterCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 22,
-      height: 22,
+      width: 19.h,
+      height: 19.h,
       decoration: BoxDecoration(
         color: isSelected ? const Color(0xFFFF5C9A) : Colors.transparent,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(3.r),
         border: Border.all(
           color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFD0D0D0),
           width: 1.5,
         ),
       ),
       child: isSelected
-          ? const Icon(Icons.check, size: 16, color: Colors.white)
+          ? Icon(Icons.check, size: 13.h, color: Colors.white)
           : null,
     );
   }
@@ -348,7 +349,7 @@ class _ApplyButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(13.w, 10.h, 13.w, 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -363,7 +364,7 @@ class _ApplyButton extends StatelessWidget {
         top: false,
         child: SizedBox(
           width: double.infinity,
-          height: 48,
+          height: 42.h,
           child: ElevatedButton(
             onPressed: () {
               final cubit = context.read<FilterCubit>();
@@ -376,13 +377,13 @@ class _ApplyButton extends StatelessWidget {
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10.r),
               ),
             ),
             child: Text(
               count > 0 ? 'Apply $count filters' : 'Apply filters',
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14.fSize,
                 fontWeight: FontWeight.w600,
               ),
             ),
