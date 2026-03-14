@@ -9,9 +9,11 @@ import '../models/top_products_model.dart';
 import '../services/api_service.dart';
 import '../services/order_service.dart';
 import '../utils/format_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/payment_selection_bottom_sheet.dart';
+import '../widgets/common_bottom_sheet.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
 import '../cubits/customer/customer_cubit.dart';
@@ -259,6 +261,193 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     }
   }
 
+  void _showGrandTotalInfoBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+            width: double.infinity,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drag handle
+                  Container(
+                    margin: EdgeInsets.only(top: 8.h, bottom: 16.h),
+                    width: 32.w,
+                    height: 3.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.borderPrimary,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+
+                  // Icon and Title
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Container(
+                        //   width: 36.w,
+                        //   height: 36.h,
+                        //   decoration: BoxDecoration(
+                        //     color: AppColors.primary.withValues(alpha: 0.1),
+                        //     shape: BoxShape.circle,
+                        //   ),
+                        //   child: Icon(
+                        //     Icons.info_outline,
+                        //     size: 20.h,
+                        //     color: AppColors.primary,
+                        //   ),
+                        // ),
+                        // SizedBox(width: 12.w),
+                        Text(
+                          'Grand Total Breakdown',
+                          style: TextStyle(
+                            fontSize: 17.fSize,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // SizedBox(height: 16.h),
+
+                  // Content
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Item price
+                        _buildInfoRow(
+                          '• Item Price',
+                          'Cost of all products in your cart',
+                        ),
+
+                        SizedBox(height: 12.h),
+
+                        // Delivery charges
+                        _buildInfoRow(
+                          '• Delivery Charges',
+                          '₹99 for orders below ₹1000\nFREE for orders ₹1000 & above',
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Highlight box
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.local_shipping_outlined,
+                                size: 16.h,
+                                color: AppColors.success,
+                              ),
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Text(
+                                  'Enjoy FREE delivery on orders ₹1000+',
+                                  style: TextStyle(
+                                    fontSize: 12.fSize,
+                                    color: AppColors.success,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 16.h),
+
+                  // Close button
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 40.h,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Got it',
+                          style: TextStyle(
+                            fontSize: 14.fSize,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // SizedBox(height: 16.h),
+                ],
+              ),
+            ));
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String title, String description) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13.fSize,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontFamily: 'Inter',
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 12.fSize,
+            color: AppColors.textMuted,
+            fontFamily: 'Inter',
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -357,7 +546,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
   Widget _buildBottomSection(Cart cart, Customer customer) {
     final totalAmount = cart.cost?.totalAmount.amount ?? '0';
-    final formattedTotal = formatIndianCurrency(totalAmount);
+    final subtotal = double.tryParse(totalAmount) ?? 0;
+
+    // Add shipping charges if subtotal is less than 1000
+    const shippingCharges = 99.0;
+    final needsShipping = subtotal < 1000;
+    final finalTotal = needsShipping ? subtotal + shippingCharges : subtotal;
+
+    final formattedSubtotal = formatIndianCurrency(totalAmount);
+    final formattedShipping = formatIndianCurrency(shippingCharges.toString());
+    final formattedTotal = formatIndianCurrency(finalTotal.toString());
 
     return Container(
       decoration: BoxDecoration(
@@ -376,17 +574,92 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Total row
+            // Subtotal row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Grand Total',
+                  'Subtotal',
                   style: TextStyle(
-                    fontSize: 17.fSize,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    fontSize: 14.fSize,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade700,
+                    fontFamily: 'Inter',
                   ),
+                ),
+                Text(
+                  formattedSubtotal,
+                  style: TextStyle(
+                    fontSize: 14.fSize,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
+            ),
+
+            // Shipping charges row (always show)
+            SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Shipping Charges',
+                  style: TextStyle(
+                    fontSize: 14.fSize,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade700,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                Text(
+                  needsShipping ? formatIndianCurrency(shippingCharges.toString()) : 'FREE',
+                  style: TextStyle(
+                    fontSize: 14.fSize,
+                    fontWeight: FontWeight.w600,
+                    color: needsShipping ? Colors.black : const Color(0xFF4CAF50),
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 12),
+
+            // Divider
+            Divider(
+              color: Colors.grey.shade300,
+              thickness: 1,
+            ),
+
+            SizedBox(height: 8),
+
+            // Grand Total row with info icon
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Grand Total',
+                      style: TextStyle(
+                        fontSize: 17.fSize,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () => _showGrandTotalInfoBottomSheet(context),
+                      child: Icon(
+                        Icons.info_outline,
+                        size: 18.h,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
                   formattedTotal,
@@ -394,6 +667,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     fontSize: 17.fSize,
                     fontWeight: FontWeight.w700,
                     color: Colors.black,
+                    fontFamily: 'Inter',
                   ),
                 ),
               ],
@@ -423,6 +697,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       style: TextStyle(
                         fontSize: 14.fSize,
                         fontWeight: FontWeight.w700,
+                        fontFamily: 'Inter',
                       ),
                     ),
                     SizedBox(width: 8),
