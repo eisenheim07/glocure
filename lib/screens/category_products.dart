@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../cubits/category_products/category_products_cubit.dart';
 import '../cubits/category_products/category_products_state.dart';
 import '../cubits/filter/filter_cubit.dart';
-import '../cubits/top_products/top_products_cubit.dart';
 import '../models/top_products_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
@@ -126,20 +123,34 @@ class _CategoryProductsState extends State<CategoryProducts> {
     }
   }
 
-  Future<void> _onRefresh() {
+  Future<void> _onRefresh() async {
     setState(() {
       _selectedSortIndex = -1;
       _appliedFilters = [];
-      _selectedFilterIndex = 0;
+      _selectedFilterIndex = -1;
     });
     context.read<FilterCubit>().clearSavedSelections();
 
-    if (widget.isDiscounted) {
-      return context.read<CategoryProductsCubit>().fetchDiscountedProducts(
-            applyDiscountFilter: !widget.showAllProducts,
-          );
-    } else {
-      return context.read<CategoryProductsCubit>().fetchProducts(widget.handle!);
+    try {
+      if (widget.isDiscounted) {
+        await context.read<CategoryProductsCubit>().fetchDiscountedProducts(
+              applyDiscountFilter: !widget.showAllProducts,
+            );
+      } else {
+        // Try to reset to original products, fallback to widget handle if needed
+        final cubit = context.read<CategoryProductsCubit>();
+        await cubit.resetToOriginalProducts();
+
+        // If resetToOriginalProducts didn't work, fallback to fetchProducts
+        if (cubit.state is! CategoryProductsSuccess) {
+          await cubit.fetchProducts(widget.handle!);
+        }
+      }
+    } catch (e) {
+      // If all else fails, try the basic fetchProducts
+      if (!widget.isDiscounted && widget.handle != null) {
+        await context.read<CategoryProductsCubit>().fetchProducts(widget.handle!);
+      }
     }
   }
 
@@ -164,6 +175,19 @@ class _CategoryProductsState extends State<CategoryProducts> {
             filters: _isFilterApplied ? _appliedFilters : null,
           );
     }
+  }
+
+  void _onFilterTabSelected(int index) {
+    setState(() {
+      _selectedFilterIndex = index;
+      // Reset sort and filters when switching tabs
+      _selectedSortIndex = -1;
+      _appliedFilters = [];
+    });
+
+    final tab = _filterTabs[index];
+    // Fetch products for the selected filter tab
+    context.read<CategoryProductsCubit>().fetchFilterTabProducts(tab.handle);
   }
 
   void _openFilterScreen() async {
@@ -287,6 +311,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
             return RefreshIndicator(
               onRefresh: _onRefresh,
               child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   if (title.isNotEmpty)
                     Padding(
@@ -338,6 +363,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                   onRefresh: _onRefresh,
                   child: CustomScrollView(
                     controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       // Header: title + product count
                       SliverToBoxAdapter(
@@ -367,57 +393,56 @@ class _CategoryProductsState extends State<CategoryProducts> {
                         ),
                       ),
 
-                      // Filter chips
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10.h, bottom: 14.h),
-                          child: SizedBox(
-                            height: 32.h,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(horizontal: 14.w),
-                              itemCount: _filterTabs.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 8),
-                              itemBuilder: (context, index) {
-                                final tab = _filterTabs[index];
-                                final isSelected = index == _selectedFilterIndex;
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedFilterIndex = index;
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.secondary : AppColors.white,
-                                      borderRadius: BorderRadius.circular(17.r),
-                                      border: Border.all(
-                                        color: isSelected ? AppColors.primary : AppColors.borderSecondary,
+                      // Filter chips (only show for regular categories, not discounted products)
+                      if (!widget.isDiscounted && widget.handle != null)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 10.h, bottom: 14.h),
+                            child: SizedBox(
+                              height: 32.h,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                padding: EdgeInsets.symmetric(horizontal: 14.w),
+                                itemCount: _filterTabs.length,
+                                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+                                  final tab = _filterTabs[index];
+                                  final isSelected = index == _selectedFilterIndex;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _onFilterTabSelected(index);
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? AppColors.secondary : AppColors.white,
+                                        borderRadius: BorderRadius.circular(17.r),
+                                        border: Border.all(
+                                          color: isSelected ? AppColors.primary : AppColors.borderSecondary,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(tab.icon, style: const TextStyle(fontSize: 13, fontFamily: 'Inter')),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            tab.label,
+                                            style: TextStyle(
+                                              fontSize: 11.fSize,
+                                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                              color: isSelected ? AppColors.primary : AppColors.textMuted,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(tab.icon, style: const TextStyle(fontSize: 13, fontFamily: 'Inter')),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          tab.label,
-                                          style: TextStyle(
-                                            fontSize: 11.fSize,
-                                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                            color: isSelected ? AppColors.primary : AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
 
                       // Product grid
                       SliverPadding(
@@ -508,13 +533,13 @@ class _CategoryProductsState extends State<CategoryProducts> {
 
               // Bottom sort/filter bar
               _BottomSortBar(
-                sortLabel: _sortLabel,
-                isSortApplied: _isSortApplied,
-                onSortTap: _showSortBottomSheet,
-                filterLabel: _filterLabel,
-                isFilterApplied: _isFilterApplied,
-                onFilterTap: _openFilterScreen,
-              ),
+                  sortLabel: _sortLabel,
+                  isSortApplied: _isSortApplied,
+                  onSortTap: _showSortBottomSheet,
+                  filterLabel: _filterLabel,
+                  isFilterApplied: _isFilterApplied,
+                  onFilterTap: _openFilterScreen,
+                  filteredIndex: _selectedFilterIndex),
             ],
           );
         },
@@ -668,15 +693,16 @@ class _BottomSortBar extends StatelessWidget {
   final String filterLabel;
   final bool isFilterApplied;
   final VoidCallback onFilterTap;
+  final int filteredIndex;
 
-  const _BottomSortBar({
-    required this.sortLabel,
-    required this.isSortApplied,
-    required this.onSortTap,
-    required this.filterLabel,
-    required this.isFilterApplied,
-    required this.onFilterTap,
-  });
+  const _BottomSortBar(
+      {required this.sortLabel,
+      required this.isSortApplied,
+      required this.onSortTap,
+      required this.filterLabel,
+      required this.isFilterApplied,
+      required this.onFilterTap,
+      required this.filteredIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -691,117 +717,119 @@ class _BottomSortBar extends StatelessWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            // Sort button (left)
-            Expanded(
-              child: InkWell(
-                onTap: onSortTap,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.swap_vert, size: 17.h, color: AppColors.textPrimary),
-                      SizedBox(width: 8),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Sort by',
-                                style: TextStyle(
-                                  fontSize: 11.fSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+      child: filteredIndex == -1
+          ? SafeArea(
+              top: false,
+              child: Row(
+                children: [
+                  // Sort button (left)
+                  Expanded(
+                    child: InkWell(
+                      onTap: onSortTap,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.swap_vert, size: 17.h, color: AppColors.textPrimary),
+                            SizedBox(width: 8),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Sort by',
+                                      style: TextStyle(
+                                        fontSize: 11.fSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Container(
+                                      width: 5.w,
+                                      height: 5.h,
+                                      decoration: BoxDecoration(
+                                        color: isSortApplied ? AppColors.primary : AppColors.textDisabled,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              SizedBox(width: 4),
-                              Container(
-                                width: 5.w,
-                                height: 5.h,
-                                decoration: BoxDecoration(
-                                  color: isSortApplied ? AppColors.primary : AppColors.textDisabled,
-                                  shape: BoxShape.circle,
+                                Text(
+                                  sortLabel,
+                                  style: TextStyle(
+                                    fontSize: 9.fSize,
+                                    color: Color(0xFF777777),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            sortLabel,
-                            style: TextStyle(
-                              fontSize: 9.fSize,
-                              color: Color(0xFF777777),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
 
-            // Divider
-            Container(width: 1.w, height: 34.h, color: AppColors.borderSecondary),
+                  // Divider
+                  Container(width: 1.w, height: 34.h, color: AppColors.borderSecondary),
 
-            // Filter button (right)
-            Expanded(
-              child: InkWell(
-                onTap: onFilterTap,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.tune, size: 17.h, color: Colors.black),
-                      SizedBox(width: 8),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Filter',
-                                style: TextStyle(
-                                  fontSize: 11.fSize,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                  // Filter button (right)
+                  Expanded(
+                    child: InkWell(
+                      onTap: onFilterTap,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.tune, size: 17.h, color: Colors.black),
+                            SizedBox(width: 8),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Filter',
+                                      style: TextStyle(
+                                        fontSize: 11.fSize,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Container(
+                                      width: 5.w,
+                                      height: 5.h,
+                                      decoration: BoxDecoration(
+                                        color: isFilterApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              SizedBox(width: 4),
-                              Container(
-                                width: 5.w,
-                                height: 5.h,
-                                decoration: BoxDecoration(
-                                  color: isFilterApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
-                                  shape: BoxShape.circle,
+                                Text(
+                                  filterLabel,
+                                  style: TextStyle(
+                                    fontSize: 9.fSize,
+                                    color: Color(0xFF777777),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            filterLabel,
-                            style: TextStyle(
-                              fontSize: 9.fSize,
-                              color: Color(0xFF777777),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : SizedBox(),
     );
   }
 }
@@ -1051,18 +1079,17 @@ class _FullPageShimmer extends StatelessWidget {
             SizedBox(height: 16),
             SizedBox(
               height: 32.h,
-              child: Row(
-                children: List.generate(
-                  3,
-                  (index) => Padding(
-                    padding: EdgeInsets.only(right: 7.w),
-                    child: Container(
-                      width: 94.w,
-                      height: 32.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(17.r),
-                      ),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                itemBuilder: (context, index) => Padding(
+                  padding: EdgeInsets.only(right: 7.w),
+                  child: Container(
+                    width: 94.w,
+                    height: 32.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(17.r),
                     ),
                   ),
                 ),

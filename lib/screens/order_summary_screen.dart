@@ -370,7 +370,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(10.w),
       child: SafeArea(
         top: false,
         child: Column(
@@ -381,7 +381,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total',
+                  'Grand Total',
                   style: TextStyle(
                     fontSize: 17.fSize,
                     fontWeight: FontWeight.w700,

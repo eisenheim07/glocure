@@ -11,6 +11,7 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
   CategoryProductsCubit() : super(CategoryProductsInitial());
 
   String _handle = '';
+  String _originalHandle = ''; // Track the original category handle
   String _title = '';
   List<TopProduct> _products = [];
   bool _hasNextPage = false;
@@ -27,6 +28,43 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
   List<TopProduct> get allDiscountedProducts => _allDiscountedProducts;
 
   // -------------------------------------------------------------------------
+  // Filter tab mode (for Best sellers, New at GloCure, etc.)
+  // -------------------------------------------------------------------------
+
+  /// Fetch products for filter tab by collection handle
+  Future<void> fetchFilterTabProducts(String handle) async {
+    try {
+      _handle = handle;
+      _sortKey = null;
+      _reverse = null;
+      _filters = null;
+      _isDiscountedMode = false;
+      _products = [];
+      _hasNextPage = false;
+      _endCursor = null;
+
+      emit(CategoryProductsLoading());
+
+      final response = await _apiService.getCollectionByHandle(handle);
+
+      _title = response.collection?.title ?? '';
+      _products = response.collection?.products ?? [];
+      _hasNextPage = response.collection?.hasNextPage ?? false;
+      _endCursor = response.collection?.endCursor;
+
+      emit(CategoryProductsSuccess(
+        title: _title,
+        products: _products,
+        hasNextPage: _hasNextPage,
+      ));
+    } catch (e) {
+      emit(CategoryProductsError(
+        message: e.toString().replaceAll('Exception: ', ''),
+      ));
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Collection mode
   // -------------------------------------------------------------------------
 
@@ -39,6 +77,7 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
   }) async {
     try {
       _handle = handle;
+      _originalHandle = handle; // Store the original category handle
       _sortKey = sortKey;
       _reverse = reverse;
       _filters = filters;
@@ -70,6 +109,20 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
     } catch (e) {
       emit(CategoryProductsError(
         message: e.toString().replaceAll('Exception: ', ''),
+      ));
+    }
+  }
+
+  /// Reset to original category products (used by refresh)
+  Future<void> resetToOriginalProducts() async {
+    if (_originalHandle.isNotEmpty) {
+      await fetchProducts(_originalHandle);
+    } else {
+      // Fallback: emit current state to complete the refresh
+      emit(CategoryProductsSuccess(
+        title: _title,
+        products: _products,
+        hasNextPage: _hasNextPage,
       ));
     }
   }
