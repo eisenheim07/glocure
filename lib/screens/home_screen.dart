@@ -1447,10 +1447,11 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                       ? NetworkImageLoader(
                           imageUrl: imageUrl,
                           width: cardWidth,
+                          height: 180.h,
                           fit: BoxFit.contain,
                         )
                       : Container(
-                          height: 90.h,
+                          height: 180.h,
                           color: Colors.grey[200],
                           child: Center(child: Icon(Icons.image_outlined, color: Colors.grey, size: 22.h)),
                         ),

@@ -1338,6 +1338,26 @@ class ApiService {
     }
   }
 
+  /// Force create a new cart ID (replaces existing one)
+  /// Used after successful payments to start with a fresh cart
+  Future<String> createNewCartId() async {
+    try {
+      AppLogger.info('🛒 Force creating new cart ID (replacing existing)...');
+
+      // Create a new cart
+      final newCartId = await cartCreate();
+
+      // Replace the existing cart ID in preferences
+      await AuthStorage.saveCartId(newCartId);
+
+      AppLogger.success('✅ Successfully created and saved new cart ID: $newCartId');
+      return newCartId;
+    } catch (e) {
+      AppLogger.error('⚠️ Failed to create new cart ID: $e');
+      rethrow;
+    }
+  }
+
   /// Add product to cart
   /// [cartId] - The cart ID to add items to
   /// [merchandiseId] - The variant ID of the product to add

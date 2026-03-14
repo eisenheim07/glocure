@@ -71,7 +71,7 @@ class CategoryProducts extends StatefulWidget {
 
 class _CategoryProductsState extends State<CategoryProducts> {
   final ScrollController _scrollController = ScrollController();
-  int _selectedFilterIndex = 0;
+  int _selectedFilterIndex = -1;
 
   /// -1 means no sort applied (default). 0+ is the index into _sortOptions.
   int _selectedSortIndex = -1;
@@ -80,11 +80,11 @@ class _CategoryProductsState extends State<CategoryProducts> {
   List<Map<String, dynamic>> _appliedFilters = [];
 
   static const List<_FilterTab> _filterTabs = [
-    _FilterTab(label: 'Best sellers', icon: '✨'),
-    _FilterTab(label: 'New at GloCure', icon: '🔥'),
-    _FilterTab(label: 'Price Drop', icon: '💰'),
-    _FilterTab(label: 'Gifts & Offers', icon: '🎁'),
-    _FilterTab(label: 'Top Rated', icon: '⭐'),
+    _FilterTab(label: 'Best sellers', icon: '✨', handle: 'best-sellers'),
+    _FilterTab(label: 'New at GloCure', icon: '🔥', handle: 'new-at-glocure'),
+    // _FilterTab(label: 'Price Drop', icon: '💰', handle : ''),
+    _FilterTab(label: 'Gifts & Offers', icon: '🎁', handle: 'gifts-offers'),
+    _FilterTab(label: 'Top Rated', icon: '⭐', handle: 'top-rated'),
   ];
 
   /// Active sort options list based on mode
@@ -424,7 +424,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                         padding: EdgeInsets.symmetric(horizontal: 14.w),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
-                                (context, index) {
+                            (context, index) {
                               final leftIndex = index * 2;
                               final rightIndex = leftIndex + 1;
 
@@ -439,9 +439,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                         handle: widget.handle,
                                       ),
                                     ),
-
                                     SizedBox(width: 12.w),
-
                                     if (rightIndex < products.length)
                                       Expanded(
                                         child: _ProductCard(
@@ -1105,6 +1103,7 @@ class _FullPageShimmer extends StatelessWidget {
 class _FilterTab {
   final String label;
   final String icon;
+  final String handle;
 
-  const _FilterTab({required this.label, required this.icon});
+  const _FilterTab({required this.label, required this.icon, required this.handle});
 }

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import '../utils/size_utils.dart';
 import '../models/order_model.dart';
 import '../utils/format_utils.dart';
+import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
+import '../cubits/payment_status/payment_status_cubit.dart';
+import '../cubits/payment_status/payment_status_state.dart';
 import 'main_navigation_screen.dart';
 
 /// Payment Status Screen
 /// Shows payment result (success, failed, cancelled) with order details
-class PaymentStatusScreen extends StatelessWidget {
+class PaymentStatusScreen extends StatefulWidget {
   final String status; // 'success', 'failed', 'cancelled'
   final OrderModel order;
 
@@ -16,6 +21,20 @@ class PaymentStatusScreen extends StatelessWidget {
     required this.status,
     required this.order,
   });
+
+  @override
+  State<PaymentStatusScreen> createState() => _PaymentStatusScreenState();
+}
+
+class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Generate new cart ID if payment is successful
+    if (widget.status.toLowerCase() == 'success') {
+      context.read<PaymentStatusCubit>().generateNewCartId();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,43 +46,185 @@ class PaymentStatusScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         appBar: CustomAppBar(
           type: AppBarType.simple,
           title: 'Payment Status',
           onBackPressed: () => _navigateToHome(context),
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              // Scrollable content
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(20.w),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 40),
-
-                      // Status icon and message
-                      _buildStatusSection(),
-
-                      SizedBox(height: 40),
-
-                      // Order details card
-                      _buildOrderDetailsCard(),
-
-                      SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Bottom buttons
-              _buildBottomButtons(context),
-            ],
+          child: BlocBuilder<PaymentStatusCubit, PaymentStatusState>(
+            builder: (context, state) {
+              final isGeneratingCart = state is PaymentStatusGeneratingCart;
+              return isGeneratingCart ? _buildLoadingShimmer() : _buildContent(context);
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      children: [
+        // Scrollable content
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              children: [
+                SizedBox(height: 40),
+
+                // Status icon and message
+                _buildStatusSection(),
+
+                SizedBox(height: 40),
+
+                // Order details card
+                _buildOrderDetailsCard(),
+
+                SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+
+        // Bottom buttons
+        _buildBottomButtons(context),
+      ],
+    );
+  }
+
+  Widget _buildLoadingShimmer() {
+    return Column(
+      children: [
+        // Scrollable shimmer content
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              children: [
+                SizedBox(height: 40),
+
+                // Status section shimmer
+                Shimmer.fromColors(
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
+                  child: Column(
+                    children: [
+                      // Status icon shimmer
+                      Container(
+                        width: 102.w,
+                        height: 102.h,
+                        decoration: const BoxDecoration(
+                          color: AppColors.white,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+
+                      SizedBox(height: 24),
+
+                      // Status title shimmer
+                      Container(
+                        width: 200.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+
+                      SizedBox(height: 12),
+
+                      // Status message shimmer
+                      Container(
+                        width: double.infinity,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Container(
+                        width: 250.w,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 40),
+
+                // Order details card shimmer
+                Shimmer.fromColors(
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
+                  child: Container(
+                    width: double.infinity,
+                    height: 300.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+
+        // Bottom buttons shimmer
+        Container(
+          padding: EdgeInsets.all(17.w),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: Shimmer.fromColors(
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Primary button shimmer
+                Container(
+                  width: double.infinity,
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+
+                SizedBox(height: 12),
+
+                // Secondary button shimmer
+                Container(
+                  width: double.infinity,
+                  height: 48.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -95,7 +256,8 @@ class PaymentStatusScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 20.fSize,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: AppColors.black,
+            fontFamily: 'Inter',
           ),
           textAlign: TextAlign.center,
         ),
@@ -107,7 +269,8 @@ class PaymentStatusScreen extends StatelessWidget {
           statusConfig['message'],
           style: TextStyle(
             fontSize: 13.fSize,
-            color: Colors.grey.shade600,
+            color: AppColors.gray600,
+            fontFamily: 'Inter',
             height: 1.5,
           ),
           textAlign: TextAlign.center,
@@ -117,21 +280,19 @@ class PaymentStatusScreen extends StatelessWidget {
   }
 
   Widget _buildOrderDetailsCard() {
-    final totalAmount = order.totalPrice ?? '0';
+    final totalAmount = widget.order.totalPrice ?? '0';
     final formattedTotal = formatIndianCurrency(totalAmount);
-    final itemCount = order.lineItems.length;
-    final createdAt = order.createdAt != null
-        ? _formatDateTime(order.createdAt!)
-        : 'N/A';
+    final itemCount = widget.order.lineItems.length;
+    final createdAt = widget.order.createdAt != null ? _formatDateTime(widget.order.createdAt!) : 'N/A';
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray200,
           width: 1.w,
         ),
       ),
@@ -144,7 +305,8 @@ class PaymentStatusScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 15.fSize,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.black,
+              fontFamily: 'Inter',
             ),
           ),
 
@@ -153,7 +315,7 @@ class PaymentStatusScreen extends StatelessWidget {
           // Order ID
           _buildDetailRow(
             'Order ID',
-            '#${order.orderNumber ?? order.id ?? 'N/A'}',
+            '#${widget.order.orderNumber ?? widget.order.id ?? 'N/A'}',
           ),
 
           SizedBox(height: 16),
@@ -184,7 +346,7 @@ class PaymentStatusScreen extends StatelessWidget {
 
           // Divider
           Divider(
-            color: Colors.grey.shade300,
+            color: AppColors.gray300,
             thickness: 1,
           ),
 
@@ -199,7 +361,8 @@ class PaymentStatusScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.fSize,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: AppColors.black,
+                  fontFamily: 'Inter',
                 ),
               ),
               Text(
@@ -207,7 +370,8 @@ class PaymentStatusScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
+                  fontFamily: 'Inter',
                 ),
               ),
             ],
@@ -226,7 +390,8 @@ class PaymentStatusScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12.fSize,
-            color: Colors.grey.shade600,
+            color: AppColors.gray600,
+            fontFamily: 'Inter',
           ),
         ),
         SizedBox(width: 16),
@@ -236,7 +401,8 @@ class PaymentStatusScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.fSize,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: AppColors.black,
+              fontFamily: 'Inter',
             ),
             textAlign: TextAlign.right,
           ),
@@ -249,10 +415,10 @@ class PaymentStatusScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -262,13 +428,13 @@ class PaymentStatusScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Primary button (based on status)
-          if (status == 'success')
+          if (widget.status == 'success')
             _buildPrimaryButton(
               context,
               'Continue Shopping',
               () => _navigateToHome(context),
             )
-          else if (status == 'failed')
+          else if (widget.status == 'failed')
             _buildPrimaryButton(
               context,
               'Try Again',
@@ -313,8 +479,8 @@ class PaymentStatusScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFF5C9A),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
           ),
@@ -325,6 +491,7 @@ class PaymentStatusScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.fSize,
             fontWeight: FontWeight.w700,
+            fontFamily: 'Inter',
           ),
         ),
       ),
@@ -342,9 +509,9 @@ class PaymentStatusScreen extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFFFF5C9A),
+          foregroundColor: AppColors.primary,
           side: const BorderSide(
-            color: Color(0xFFFF5C9A),
+            color: AppColors.primary,
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
@@ -356,6 +523,7 @@ class PaymentStatusScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.fSize,
             fontWeight: FontWeight.w600,
+            fontFamily: 'Inter',
           ),
         ),
       ),
@@ -363,39 +531,36 @@ class PaymentStatusScreen extends StatelessWidget {
   }
 
   Map<String, dynamic> _getStatusConfig() {
-    switch (status.toLowerCase()) {
+    switch (widget.status.toLowerCase()) {
       case 'success':
         return {
           'icon': Icons.check_circle_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': const Color(0xFF4CAF50),
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.success,
           'title': 'Payment Successful!',
-          'message':
-              'Your order has been placed successfully.\nYou will receive a confirmation email shortly.',
+          'message': 'Your order has been placed successfully.\nYou will receive a confirmation email shortly.',
         };
       case 'failed':
         return {
           'icon': Icons.error_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.red.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.error,
           'title': 'Payment Failed',
-          'message':
-              'We couldn\'t process your payment.\nPlease try again or use a different payment method.',
+          'message': 'We couldn\'t process your payment.\nPlease try again or use a different payment method.',
         };
       case 'cancelled':
         return {
           'icon': Icons.cancel_outlined,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.orange.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.warning,
           'title': 'Payment Cancelled',
-          'message':
-              'You have cancelled the payment.\nYour order has been created but not confirmed.',
+          'message': 'You have cancelled the payment.\nYour order has been created but not confirmed.',
         };
       default:
         return {
           'icon': Icons.info_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.grey.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.gray500,
           'title': 'Payment Status Unknown',
           'message': 'Unable to determine payment status.',
         };
@@ -403,31 +568,16 @@ class PaymentStatusScreen extends StatelessWidget {
   }
 
   String _getPaymentMethod() {
-    final tags = order.tags?.split(',') ?? [];
+    final tags = widget.order.tags?.split(',') ?? [];
     final isPrePaid = tags.any(
-      (tag) =>
-          tag.trim().toLowerCase().contains('pre-paid') ||
-          tag.trim().toLowerCase().contains('prepaid'),
+      (tag) => tag.trim().toLowerCase().contains('pre-paid') || tag.trim().toLowerCase().contains('prepaid'),
     );
     return isPrePaid ? 'Pre-paid (Online)' : 'Cash on Delivery';
   }
 
   String _formatDateTime(DateTime dateTime) {
     try {
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
+      final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       final day = dateTime.day;
       final month = months[dateTime.month - 1];

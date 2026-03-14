@@ -89,15 +89,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
         const SizedBox(width: 4),
-        SmartImage(
-          source: ImageConstant.icNotifications,
-          width: 60,
-          height: 34,
-          onTap: () {
-            // Notifications tap action (currently no action)
-          },
-        ),
-        const SizedBox(width: 12),
+        // SmartImage(
+        //   source: ImageConstant.icNotifications,
+        //   width: 60,
+        //   height: 34,
+        //   onTap: () {
+        //     // Notifications tap action (currently no action)
+        //   },
+        // ),
+        // const SizedBox(width: 12),
         WishlistIconWithBadge(
           width: 60,
           height: 34,
