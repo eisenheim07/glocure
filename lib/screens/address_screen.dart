@@ -205,7 +205,7 @@ class _AddressScreenState extends State<AddressScreen> {
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
         child: Container(
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
@@ -220,7 +220,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.gray300,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -231,13 +231,13 @@ class _AddressScreenState extends State<AddressScreen> {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C9A).withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.location_on,
                   size: 32,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                 ),
               ),
 
@@ -250,7 +250,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.black,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -263,7 +263,7 @@ class _AddressScreenState extends State<AddressScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: Colors.grey.shade600,
+                  color: AppColors.gray300,
                   fontFamily: 'Inter',
                   height: 1.5,
                 ),
@@ -280,10 +280,10 @@ class _AddressScreenState extends State<AddressScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
+                          color: AppColors.gray300,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.grey.shade300,
+                            color: AppColors.gray300,
                             width: 1,
                           ),
                         ),
@@ -293,7 +293,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: AppColors.gray800,
                               fontFamily: 'Inter',
                             ),
                           ),
@@ -313,7 +313,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Center(
@@ -322,7 +322,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontFamily: 'Inter',
                             ),
                           ),
@@ -352,7 +352,7 @@ class _AddressScreenState extends State<AddressScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Please login first'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
             ),
           );
         }
@@ -439,7 +439,7 @@ class _AddressScreenState extends State<AddressScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(widget.existingAddress != null ? 'Address updated successfully' : 'Address added successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2),
           ),
@@ -472,7 +472,7 @@ class _AddressScreenState extends State<AddressScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to ${widget.existingAddress != null ? 'update' : 'add'} address: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
           ),
@@ -1007,7 +1007,7 @@ class _AddressScreenState extends State<AddressScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         appBar: CustomAppBar(
           type: AppBarType.simple,
           title: widget.existingAddress != null ? 'Update Address' : 'Add Address',
@@ -1158,22 +1158,22 @@ class _AddressScreenState extends State<AddressScreen> {
                                                 });
                                               },
                                         activeColor: _isDefaultAddressDisabled
-                                            ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
-                                            : const Color(0xFFFF5C9A), // Full pink for enabled
-                                        checkColor: Colors.white,
+                                            ? AppColors.primary.withValues(alpha: 0.4) // Faded pink for disabled
+                                            : AppColors.primary, // Full pink for enabled
+                                        checkColor: AppColors.white,
                                         fillColor: WidgetStateProperty.resolveWith<Color>((states) {
                                           if (states.contains(WidgetState.selected)) {
                                             return _isDefaultAddressDisabled
-                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
-                                                : const Color(0xFFFF5C9A); // Full pink for enabled
+                                                ? AppColors.primary.withValues(alpha: 0.4) // Faded pink for disabled
+                                                : AppColors.primary; // Full pink for enabled
                                           }
                                           return Colors.transparent;
                                         }),
                                         side: WidgetStateBorderSide.resolveWith((states) {
                                           return BorderSide(
                                             color: _isDefaultAddressDisabled
-                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
-                                                : const Color(0xFFFF5C9A), // Full pink border for enabled
+                                                ? AppColors.primary.withValues(alpha: 0.4) // Faded pink border for disabled
+                                                : AppColors.primary, // Full pink border for enabled
                                             width: 2.w,
                                           );
                                         }),
@@ -1189,8 +1189,8 @@ class _AddressScreenState extends State<AddressScreen> {
                                           fontSize: 12.fSize,
                                           fontWeight: FontWeight.w500,
                                           color: _isDefaultAddressDisabled 
-                                              ? Colors.black.withOpacity(0.5) // Faded text for disabled
-                                              : Colors.black, // Full black for enabled
+                                              ? AppColors.black.withValues(alpha: 0.5) // Faded text for disabled
+                                              : AppColors.black, // Full black for enabled
                                         ),
                                       ),
                                     ),
@@ -1215,12 +1215,15 @@ class _AddressScreenState extends State<AddressScreen> {
   }
 
   Widget _buildBottomButton() {
+    // Disable button during location fetching, saving, or if form is invalid
+    final isButtonDisabled = _isFetchingLocation || _isSavingAddress || !_isFormValid;
+    
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -1233,12 +1236,12 @@ class _AddressScreenState extends State<AddressScreen> {
           width: double.infinity,
           height: 48.h,
           child: ElevatedButton(
-            onPressed: _handleAddAddress,
+            onPressed: isButtonDisabled ? null : _handleAddAddress,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isFormValid ? Color(0xFFFF5C9A) : const Color(0xFFFF5C9A).withValues(alpha: 0.4),
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Color(0xFFFF5C9A).withValues(alpha: 0.4),
-              disabledForegroundColor: Colors.white.withValues(alpha: 0.6),
+              backgroundColor: isButtonDisabled ? AppColors.primary.withValues(alpha: 0.4) : AppColors.primary,
+              foregroundColor: AppColors.white,
+              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
+              disabledForegroundColor: AppColors.white.withValues(alpha: 0.6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),
               ),
@@ -1249,6 +1252,7 @@ class _AddressScreenState extends State<AddressScreen> {
               style: TextStyle(
                 fontSize: 14.fSize,
                 fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
               ),
             ),
           ),
@@ -1276,7 +1280,7 @@ class _AddressScreenState extends State<AddressScreen> {
           style: TextStyle(
             fontSize: 12.fSize,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: AppColors.black,
           ),
         ),
         SizedBox(height: 8),
@@ -1296,10 +1300,10 @@ class _AddressScreenState extends State<AddressScreen> {
             hintText: hint,
             hintStyle: TextStyle(
               fontSize: 12.fSize,
-              color: Colors.grey.shade400,
+              color: AppColors.gray500,
             ),
             filled: true,
-            fillColor: enabled ? Colors.grey.shade50 : Colors.grey.shade100,
+            fillColor: enabled ? AppColors.gray100 : AppColors.gray200,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
@@ -1307,28 +1311,28 @@ class _AddressScreenState extends State<AddressScreen> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : Colors.grey.shade300,
+                color: errorText != null ? AppColors.error : AppColors.gray300,
                 width: 1.w,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : Colors.grey.shade300,
+                color: errorText != null ? AppColors.error : AppColors.gray300,
                 width: 1.w,
               ),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
-                color: Colors.grey.shade300,
+                color: AppColors.gray300,
                 width: 1.w,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7.r),
               borderSide: BorderSide(
-                color: errorText != null ? Colors.red : Color(0xFFFF5C9A),
+                color: errorText != null ? AppColors.error : AppColors.primary,
                 width: 2.w,
               ),
             ),
@@ -1340,7 +1344,7 @@ class _AddressScreenState extends State<AddressScreen> {
             errorText,
             style: TextStyle(
               fontSize: 10.fSize,
-              color: Colors.red,
+              color: AppColors.error,
             ),
           ),
         ],
@@ -1355,10 +1359,10 @@ class _AddressScreenState extends State<AddressScreen> {
         width: double.infinity,
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: AppColors.gray100,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: AppColors.gray300,
             width: 1.w,
           ),
         ),
@@ -1371,12 +1375,12 @@ class _AddressScreenState extends State<AddressScreen> {
                   width: 41.w,
                   height: 41.h,
                   decoration: BoxDecoration(
-                    color: Color(0xFFFF5C9A).withValues(alpha: 0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.location_on,
-                    color: Color(0xFFFF5C9A),
+                    color: AppColors.primary,
                     size: 20.h,
                   ),
                 ),
@@ -1386,27 +1390,40 @@ class _AddressScreenState extends State<AddressScreen> {
                 // Location Details
                 Expanded(
                   child: _isFetchingLocation
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 102.w,
-                              height: 14.h,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(3.r),
+                      ? Shimmer.fromColors(
+                          baseColor: AppColors.shimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 120.w,
+                                height: 14.h,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(3.r),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              height: 12.h,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(3.r),
+                              SizedBox(height: 8),
+                              Container(
+                                width: double.infinity,
+                                height: 12.h,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(3.r),
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 4),
+                              Container(
+                                width: 180.w,
+                                height: 12.h,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(3.r),
+                                ),
+                              ),
+                            ],
+                          ),
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1416,15 +1433,16 @@ class _AddressScreenState extends State<AddressScreen> {
                               style: TextStyle(
                                 fontSize: 14.fSize,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                                color: AppColors.black,
+                                fontFamily: 'Inter',
                               ),
                             ),
-                            SizedBox(height: 4),
                             Text(
                               _currentLocationAddress.isNotEmpty ? _currentLocationAddress : 'Please wait...',
                               style: TextStyle(
                                 fontSize: 12.fSize,
-                                color: Colors.grey.shade600,
+                                color: AppColors.gray600,
+                                fontFamily: 'Inter',
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -1440,7 +1458,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   onPressed: _isFetchingLocation ? null : _fetchCurrentLocation,
                   icon: Icon(
                     Icons.refresh,
-                    color: _isFetchingLocation ? Colors.grey.shade400 : const Color(0xFFFF5C9A),
+                    color: _isFetchingLocation ? AppColors.gray500 : AppColors.primary,
                     size: 20.h,
                   ),
                   tooltip: 'Refresh location',
@@ -1451,7 +1469,6 @@ class _AddressScreenState extends State<AddressScreen> {
 
             // Use this location text
             if (_currentPlacemark != null && !_isFetchingLocation) ...[
-              SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
@@ -1464,7 +1481,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Address fields populated from current location'),
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppColors.success,
                         behavior: SnackBarBehavior.floating,
                         duration: Duration(seconds: 2),
                       ),
@@ -1475,9 +1492,9 @@ class _AddressScreenState extends State<AddressScreen> {
                     style: TextStyle(
                       fontSize: 11.fSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFFF5C9A),
+                      color: AppColors.primary,
                       decoration: TextDecoration.underline,
-                      decorationColor: const Color(0xFFFF5C9A),
+                      decorationColor: AppColors.primary,
                     ),
                   ),
                 ),
@@ -1499,13 +1516,13 @@ class _AddressScreenState extends State<AddressScreen> {
           Padding(
             padding: EdgeInsets.all(14.w),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Container(
                 width: double.infinity,
                 height: 68.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
@@ -1522,8 +1539,8 @@ class _AddressScreenState extends State<AddressScreen> {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 14.h),
                   child: Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
+                    baseColor: AppColors.shimmerBase,
+                    highlightColor: AppColors.shimmerHighlight,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1531,7 +1548,7 @@ class _AddressScreenState extends State<AddressScreen> {
                           width: 85.w,
                           height: 12.h,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(3.r),
                           ),
                         ),
@@ -1540,7 +1557,7 @@ class _AddressScreenState extends State<AddressScreen> {
                           width: double.infinity,
                           height: 41.h,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(7.r),
                           ),
                         ),
@@ -1556,15 +1573,15 @@ class _AddressScreenState extends State<AddressScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14.w),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Row(
                 children: [
                   Container(
                     width: 20.w,
                     height: 20.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
@@ -1573,7 +1590,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     width: 153.w,
                     height: 12.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
@@ -1588,13 +1605,13 @@ class _AddressScreenState extends State<AddressScreen> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14.w),
             child: Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Container(
                 width: double.infinity,
                 height: 48.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),

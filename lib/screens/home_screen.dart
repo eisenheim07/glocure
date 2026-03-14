@@ -37,6 +37,7 @@ import '../widgets/search_bar_widget.dart';
 import '../widgets/wishlist_icon_with_badge.dart';
 import 'cart_screen.dart';
 import 'wishlist_screen.dart';
+import '../utils/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -118,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         type: AppBarType.full,
         onWishlistReturn: _refreshWishlistStatus,
@@ -127,19 +128,19 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Action Buttons (Skin Analysis & Video Consult)
           Container(
-            color: Colors.white,
+            color: AppColors.white,
             padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 8.h),
             child: (_isInitialLoad || _isRefreshing)
                 ? Row(
                     children: [
                       Expanded(
                         child: Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
+                          baseColor: AppColors.shimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
                           child: Container(
                             height: 42.h,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
@@ -148,12 +149,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
+                          baseColor: AppColors.shimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
                           child: Container(
                             height: 42.h,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
@@ -186,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ImageConstant.icMedicalStaff,
                                   width: 12.w,
                                   height: 12.h,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                                 SizedBox(width: 5.w),
                                 Text(
@@ -194,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: TextStyle(
                                     fontSize: 12.fSize,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -238,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ImageConstant.icDashboard,
                                   width: 12.w,
                                   height: 12.h,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                                 SizedBox(width: 5.w),
                                 Text(
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: TextStyle(
                                     fontSize: 12.fSize,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                               ],
@@ -260,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Sticky Search Bar with shimmer during initial load and refresh
           Container(
-            color: Colors.white,
+            color: AppColors.white,
             padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
             child: (_isInitialLoad || _isRefreshing)
                 ? const SearchBarShimmer()
@@ -300,11 +301,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.all(16.w),
                           child: Column(
                             children: [
-                              Icon(Icons.error_outline, size: 48.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 48.h, color: AppColors.error),
                               SizedBox(height: 8.h),
                               Text(
                                 '${state.message}',
-                                style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'),
+                                style: TextStyle(fontSize: 14.fSize, color: AppColors.error, fontFamily: 'Inter'),
                                 textAlign: TextAlign.center,
                               ),
                               SizedBox(height: 8.h),
@@ -319,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: EdgeInsets.all(16.w),
                             child: Center(
-                              child: Text('No banners found', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
+                              child: Text('No banners found', style: TextStyle(fontSize: 14.fSize, color: AppColors.gray300, fontFamily: 'Inter')),
                             ),
                           );
                         }
@@ -334,13 +335,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: (_isInitialLoad || _isRefreshing)
                         ? Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
+                            baseColor: AppColors.shimmerBase,
+                            highlightColor: AppColors.shimmerHighlight,
                             child: Container(
                               width: 180.w,
                               height: 20.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 borderRadius: BorderRadius.circular(4.r),
                               ),
                             ),
@@ -350,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16.fSize),
+                                ?.copyWith(fontWeight: FontWeight.bold, color: AppColors.black, fontSize: 16.fSize),
                           ),
                   ),
                   SizedBox(height: 12.h),
@@ -362,11 +363,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 40.h, color: AppColors.error),
                               SizedBox(height: 8.h),
                               Text(
                                 state.message,
-                                style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'),
+                                style: TextStyle(fontSize: 14.fSize, color: AppColors.error, fontFamily: 'Inter'),
                                 textAlign: TextAlign.center,
                               ),
                               TextButton(onPressed: () => context.read<SkinGeniusCubit>().fetchAnalyzes(), child: const Text('Retry')),
@@ -379,7 +380,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (analyzes.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text('No Skin Genius analyzes yet', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
+                            child: Text('No Skin Genius analyzes yet',
+                                style: TextStyle(fontSize: 14.fSize, color: AppColors.gray300, fontFamily: 'Inter')),
                           );
                         }
                         return _SkinGeniusList(analyzes: analyzes);
@@ -395,26 +397,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         ? Row(
                             children: [
                               Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
+                                baseColor: AppColors.shimmerBase,
+                                highlightColor: AppColors.shimmerHighlight,
                                 child: Container(
                                   width: 160.w,
                                   height: 20.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
                               ),
                               const Spacer(),
                               Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
+                                baseColor: AppColors.shimmerBase,
+                                highlightColor: AppColors.shimmerHighlight,
                                 child: Container(
                                   width: 55.w,
                                   height: 18.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(4.r),
                                   ),
                                 ),
@@ -429,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 16.fSize),
+                                      ?.copyWith(fontWeight: FontWeight.bold, color: AppColors.black, fontSize: 16.fSize),
                                 ),
                               ),
                               TextButton(
@@ -458,26 +460,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             children: [
                               Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
+                                baseColor: AppColors.shimmerBase,
+                                highlightColor: AppColors.shimmerHighlight,
                                 child: Container(
                                   width: 100.w,
                                   height: 28.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(16.r),
                                   ),
                                 ),
                               ),
                               SizedBox(width: 6.w),
                               Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
+                                baseColor: AppColors.shimmerBase,
+                                highlightColor: AppColors.shimmerHighlight,
                                 child: Container(
                                   width: 100.w,
                                   height: 28.h,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     borderRadius: BorderRadius.circular(16.r),
                                   ),
                                 ),
@@ -537,10 +539,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 18.h, color: AppColors.error),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: AppColors.error, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -562,7 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
                             child: Text('No products found for this filter.',
-                                style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
+                                style: TextStyle(fontSize: 14.fSize, color: AppColors.gray300, fontFamily: 'Inter')),
                           );
                         }
 
@@ -595,12 +597,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 18.h, color: AppColors.error),
                               SizedBox(width: 6.w),
                               Expanded(
                                 child: Text(
                                   state.message,
-                                  style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter'),
+                                  style: TextStyle(fontSize: 13.fSize, color: AppColors.error, fontFamily: 'Inter'),
                                 ),
                               ),
                               TextButton(
@@ -617,7 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (categories.isEmpty) {
                           return Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text('No categories found.', style: TextStyle(fontSize: 14.fSize, color: Colors.grey, fontFamily: 'Inter')),
+                            child: Text('No categories found.', style: TextStyle(fontSize: 14.fSize, color: AppColors.gray300, fontFamily: 'Inter')),
                           );
                         }
                         return _BrowseCategoriesSection(categories: categories);
@@ -636,10 +638,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 40.h, color: AppColors.error),
                               SizedBox(height: 8.h),
                               Text(state.message,
-                                  style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'), textAlign: TextAlign.center),
+                                  style: TextStyle(fontSize: 14.fSize, color: AppColors.error, fontFamily: 'Inter'), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<MiddleBannerCubit>().fetchMiddleBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -665,10 +667,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 18.h, color: AppColors.error),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: AppColors.error, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () => context.read<DiscountedProductsCubit>().fetchDiscountedProducts(),
@@ -696,10 +698,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Row(
                             children: [
-                              Icon(Icons.error_outline, size: 18.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 18.h, color: AppColors.error),
                               SizedBox(width: 6.w),
                               Expanded(
-                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: Colors.red, fontFamily: 'Inter')),
+                                child: Text(state.message, style: TextStyle(fontSize: 13.fSize, color: AppColors.error, fontFamily: 'Inter')),
                               ),
                               TextButton(
                                 onPressed: () => context.read<BrandLogosCubit>().fetchBrandLogos(),
@@ -727,10 +729,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
                             children: [
-                              Icon(Icons.error_outline, size: 40.h, color: Colors.red),
+                              Icon(Icons.error_outline, size: 40.h, color: AppColors.error),
                               SizedBox(height: 8.h),
                               Text(state.message,
-                                  style: TextStyle(fontSize: 14.fSize, color: Colors.red, fontFamily: 'Inter'), textAlign: TextAlign.center),
+                                  style: TextStyle(fontSize: 14.fSize, color: AppColors.error, fontFamily: 'Inter'), textAlign: TextAlign.center),
                               TextButton(onPressed: () => context.read<BottomBannerCubit>().fetchBottomBanners(), child: const Text('Retry')),
                             ],
                           ),
@@ -810,7 +812,7 @@ class _BannerCard extends StatelessWidget {
           : Container(
               width: double.infinity,
               height: 175.h,
-              color: Colors.grey[300],
+              color: AppColors.gray300,
               child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
             ),
     );
@@ -844,11 +846,11 @@ class _BannerShimmerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.r),
-        child: Container(width: width, height: height, color: Colors.white),
+        child: Container(width: width, height: height, color: AppColors.white),
       ),
     );
   }
@@ -907,7 +909,7 @@ class _MiddleBannerCard extends StatelessWidget {
               width: double.infinity,
               height: 175.h,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.gray300,
                 borderRadius: BorderRadius.circular(radius.r),
               ),
               child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
@@ -922,13 +924,13 @@ class _MiddleBannerShimmer extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: AppColors.shimmerBase,
+        highlightColor: AppColors.shimmerHighlight,
         child: Container(
           width: double.infinity,
           height: 175.h,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(15.r),
           ),
         ),
@@ -990,7 +992,7 @@ class _BottomBannerCard extends StatelessWidget {
               width: double.infinity,
               height: 175.h,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.gray300,
                 borderRadius: BorderRadius.circular(radius.r),
               ),
               child: Center(child: Icon(Icons.image_not_supported, size: 48.h)),
@@ -1093,7 +1095,7 @@ class _SkinGeniusCard extends StatelessWidget {
             SizedBox(height: 4.h),
             Text(
               label,
-              style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
+              style: TextStyle(fontSize: 10.fSize, color: AppColors.black, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -1108,8 +1110,8 @@ class _SkinGeniusCard extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      color: Colors.grey[300],
-      child: const Icon(Icons.image_outlined, size: 32, color: Colors.grey),
+      color: AppColors.gray300,
+      child: const Icon(Icons.image_outlined, size: 32, color: AppColors.gray500),
     );
   }
 }
@@ -1130,18 +1132,18 @@ class _SkinGeniusShimmer extends StatelessWidget {
         separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
           return Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   width: cardWidth,
                   height: cardWidth,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10.r)),
+                  decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(10.r)),
                 ),
                 SizedBox(height: 4.h),
-                Container(width: 40.w, height: 8.h, color: Colors.white),
+                Container(width: 40.w, height: 8.h, color: AppColors.white),
               ],
             ),
           );
@@ -1265,7 +1267,6 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-
     _heartScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween<double>(begin: 1.0, end: 1.4).chain(CurveTween(curve: Curves.easeOut)),
@@ -1320,7 +1321,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Removed from wishlist'),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warning,
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -1335,7 +1336,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Product variant not available'),
-                backgroundColor: Colors.red,
+                backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
                 duration: Duration(seconds: 2),
               ),
@@ -1376,7 +1377,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Added to wishlist'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -1389,7 +1390,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2),
           ),
@@ -1424,10 +1425,10 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
       width: cardWidth,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 0.8,
         ),
       ),
@@ -1442,17 +1443,18 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(12.r), topRight: Radius.circular(12.r)),
                 child: Container(
                   width: cardWidth,
-                  color: Colors.grey[50],
+                  color: AppColors.gray50,
                   child: imageUrl != null && imageUrl.isNotEmpty
                       ? NetworkImageLoader(
                           imageUrl: imageUrl,
                           width: cardWidth,
+                          height: 180.h,
                           fit: BoxFit.contain,
                         )
                       : Container(
-                          height: 90.h,
-                          color: Colors.grey[200],
-                          child: Center(child: Icon(Icons.image_outlined, color: Colors.grey, size: 22.h)),
+                          height: 180.h,
+                          color: AppColors.gray200,
+                          child: Center(child: Icon(Icons.image_outlined, color: AppColors.gray300, size: 22.h)),
                         ),
                 ),
               ),
@@ -1462,7 +1464,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                 child: Container(
                   width: 24.w,
                   height: 24.h,
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: AppColors.white.withValues(alpha: 0.9), shape: BoxShape.circle),
                   child: IconButton(
                     onPressed: _toggleWishlist,
                     icon: ScaleTransition(
@@ -1483,7 +1485,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
           // Separator line between image and text
           Container(
             height: 1,
-            color: Colors.grey.shade200,
+            color: AppColors.gray300,
           ),
 
           // Product info section
@@ -1497,7 +1499,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                   widget.product.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10.fSize, fontWeight: FontWeight.w600, color: Colors.black, height: 1.2, fontFamily: 'Inter'),
+                  style: TextStyle(fontSize: 10.fSize, fontWeight: FontWeight.w600, color: AppColors.black, height: 1.2, fontFamily: 'Inter'),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -1509,7 +1511,7 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
                 SizedBox(height: 4.h),
                 Text(
                   price,
-                  style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.bold, color: Colors.black, fontFamily: 'Inter'),
+                  style: TextStyle(fontSize: 11.fSize, fontWeight: FontWeight.bold, color: AppColors.black, fontFamily: 'Inter'),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -1539,15 +1541,15 @@ class _TopProductsShimmer extends StatelessWidget {
             return Padding(
               padding: EdgeInsets.only(right: 8.w),
               child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
                 child: Container(
                   width: cardWidth,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: Colors.grey.shade200,
+                      color: AppColors.gray300,
                       width: 0.8,
                     ),
                   ),
@@ -1559,7 +1561,7 @@ class _TopProductsShimmer extends StatelessWidget {
                         width: cardWidth,
                         height: 180.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(12.r),
                             topRight: Radius.circular(12.r),
@@ -1570,7 +1572,7 @@ class _TopProductsShimmer extends StatelessWidget {
                       /// Divider
                       Container(
                         height: 1,
-                        color: Colors.grey.shade200,
+                        color: AppColors.gray300,
                       ),
 
                       Padding(
@@ -1582,7 +1584,7 @@ class _TopProductsShimmer extends StatelessWidget {
                             Container(
                               height: 10.h,
                               width: double.infinity,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
 
                             SizedBox(height: 6.h),
@@ -1591,7 +1593,7 @@ class _TopProductsShimmer extends StatelessWidget {
                             Container(
                               height: 8.h,
                               width: 100.w,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
 
                             SizedBox(height: 8.h),
@@ -1600,7 +1602,7 @@ class _TopProductsShimmer extends StatelessWidget {
                             Container(
                               height: 10.h,
                               width: 60.w,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ],
                         ),
@@ -1633,11 +1635,11 @@ class _TopProductsShimmer extends StatelessWidget {
 //         scrollDirection: Axis.horizontal,
 //         itemBuilder: (context, index) {
 //           return Shimmer.fromColors(
-//             baseColor: Colors.grey[300]!,
-//             highlightColor: Colors.grey[100]!,
+// baseColor: AppColors.shimmerBase,
+// highlightColor: AppColors.shimmerHighlight,
 //             child: Container(
 //               width: cardWidth,
-//               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r)),
+//               decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(12.r)),
 //             ),
 //           );
 //         },
@@ -1672,7 +1674,7 @@ class _BrowseCategoriesSection extends StatelessWidget {
               'Browse by categories',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: AppColors.black,
                     fontSize: 15.fSize,
                   ),
             ),
@@ -1719,9 +1721,9 @@ class _BrowseCategoryCard extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(bottom: 7.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(14.r),
-          border: isHighlighted ? Border.all(color: const Color(0xFF2F80ED), width: 2) : null,
+          border: isHighlighted ? Border.all(color: AppColors.info, width: 2) : null,
         ),
         child: Row(
           children: [
@@ -1741,9 +1743,9 @@ class _BrowseCategoryCard extends StatelessWidget {
                         fit: BoxFit.cover,
                       )
                     : Container(
-                        color: Colors.grey[200],
+                        color: AppColors.gray200,
                         child: Center(
-                          child: Icon(Icons.image_outlined, color: Colors.grey, size: 24.h),
+                          child: Icon(Icons.image_outlined, color: AppColors.gray300, size: 24.h),
                         ),
                       ),
               ),
@@ -1763,7 +1765,7 @@ class _BrowseCategoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -1773,7 +1775,7 @@ class _BrowseCategoryCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10.fSize,
-                        color: const Color(0xFF777777),
+                        color: AppColors.gray600,
                       ),
                     ),
                   ],
@@ -1796,11 +1798,11 @@ class _BrowseCategoriesShimmer extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: AppColors.shimmerBase,
+        highlightColor: AppColors.shimmerHighlight,
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFFFE5F0),
+            color: AppColors.secondary,
             borderRadius: BorderRadius.circular(24.r),
           ),
           padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
@@ -1811,7 +1813,7 @@ class _BrowseCategoriesShimmer extends StatelessWidget {
               Container(
                 width: 140.w,
                 height: 18.h,
-                color: Colors.white,
+                color: AppColors.white,
               ),
               SizedBox(height: 16.h),
               Column(
@@ -1820,7 +1822,7 @@ class _BrowseCategoriesShimmer extends StatelessWidget {
                     height: 92.h,
                     margin: EdgeInsets.only(bottom: 10.h),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(18.r),
                     ),
                   );
@@ -1854,7 +1856,7 @@ class _DiscountedProductsSection extends StatelessWidget {
                   'Discounted Products',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                 ),
               ),
@@ -1870,7 +1872,7 @@ class _DiscountedProductsSection extends StatelessWidget {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_forward),
                   iconSize: 22.h,
-                  color: Colors.black,
+                  color: AppColors.black,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -1945,10 +1947,10 @@ class _DiscountedProductCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: AppColors.gray300,
             width: 0.8,
           ),
         ),
@@ -1974,9 +1976,9 @@ class _DiscountedProductCard extends StatelessWidget {
                               fit: BoxFit.cover,
                             )
                           : Container(
-                              color: Colors.grey[200],
+                              color: AppColors.gray200,
                               child: Center(
-                                child: Icon(Icons.image_outlined, color: Colors.grey, size: 32.h),
+                                child: Icon(Icons.image_outlined, color: AppColors.gray300, size: 32.h),
                               ),
                             ),
                     ),
@@ -1988,13 +1990,13 @@ class _DiscountedProductCard extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.success,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
                           '-$discount%',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 11.fSize,
                             fontWeight: FontWeight.w600,
                           ),
@@ -2008,7 +2010,7 @@ class _DiscountedProductCard extends StatelessWidget {
             // Separator line between image and text
             Container(
               height: 1,
-              color: Colors.grey.shade200,
+              color: AppColors.gray300,
             ),
 
             // Product info
@@ -2020,12 +2022,12 @@ class _DiscountedProductCard extends StatelessWidget {
                 children: [
                   Text(
                     product.title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.black,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -2036,7 +2038,7 @@ class _DiscountedProductCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.fSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                       SizedBox(width: 4.w),
@@ -2046,9 +2048,9 @@ class _DiscountedProductCard extends StatelessWidget {
                             originalPrice,
                             style: TextStyle(
                               fontSize: 10.fSize,
-                              color: const Color(0xFF999999),
+                              color: AppColors.gray500,
                               decoration: TextDecoration.lineThrough,
-                              decorationColor: const Color(0xFF999999),
+                              decorationColor: AppColors.gray500,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -2094,7 +2096,7 @@ class _BrandsSection extends StatelessWidget {
                   'Brands',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                 ),
                 SizedBox(height: 16.h),
@@ -2141,7 +2143,7 @@ class _BrandLogoCard extends StatelessWidget {
       width: size,
       height: size,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         shape: BoxShape.circle,
       ),
       child: ClipOval(
@@ -2154,7 +2156,7 @@ class _BrandLogoCard extends StatelessWidget {
                   height: size - 24.w,
                   fit: BoxFit.contain,
                 )
-              : Icon(Icons.business, color: Colors.grey, size: 28.h),
+              : Icon(Icons.business, color: AppColors.gray300, size: 28.h),
         ),
       ),
     );
@@ -2168,11 +2170,11 @@ class _BrandsShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Container(
         height: 140.h,
-        color: Colors.white,
+        color: AppColors.white,
       ),
     );
   }
@@ -2191,9 +2193,9 @@ class _DiscountedProductsShimmer extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(width: 180.w, height: 22.h, color: Colors.white),
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Container(width: 180.w, height: 22.h, color: AppColors.white),
           ),
           SizedBox(height: 14.h),
           GridView.builder(
@@ -2208,11 +2210,11 @@ class _DiscountedProductsShimmer extends StatelessWidget {
             itemCount: 4,
             itemBuilder: (context, index) {
               return Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
+                baseColor: AppColors.shimmerBase,
+                highlightColor: AppColors.shimmerHighlight,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(18.r),
                   ),
                 ),
@@ -2221,6 +2223,79 @@ class _DiscountedProductsShimmer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Custom image widget that shows fixed height during loading, then wrap content after loaded
+class _ImageWithFixedLoadingHeight extends StatefulWidget {
+  final String imageUrl;
+  final double width;
+  final double fixedLoadingHeight;
+
+  const _ImageWithFixedLoadingHeight({
+    required this.imageUrl,
+    required this.width,
+    required this.fixedLoadingHeight,
+  });
+
+  @override
+  State<_ImageWithFixedLoadingHeight> createState() => _ImageWithFixedLoadingHeightState();
+}
+
+class _ImageWithFixedLoadingHeightState extends State<_ImageWithFixedLoadingHeight> {
+  bool _isImageLoaded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      widget.imageUrl,
+      width: widget.width,
+      height: _isImageLoaded ? null : widget.fixedLoadingHeight,
+      // Fixed height during loading, null after loaded
+      fit: BoxFit.contain,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          // Image is fully loaded
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && !_isImageLoaded) {
+              setState(() {
+                _isImageLoaded = true;
+              });
+            }
+          });
+          return child;
+        }
+
+        // Image is still loading - show shimmer with fixed height
+        return SizedBox(
+          width: widget.width,
+          height: widget.fixedLoadingHeight,
+          child: Shimmer.fromColors(
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Container(
+              width: widget.width,
+              height: widget.fixedLoadingHeight,
+              color: AppColors.white,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: widget.width,
+          height: widget.fixedLoadingHeight,
+          color: AppColors.gray200,
+          child: Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: AppColors.gray500,
+              size: 22.h,
+            ),
+          ),
+        );
+      },
     );
   }
 }

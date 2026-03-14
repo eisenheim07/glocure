@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import '../models/page_model.dart';
 import '../cubits/pages/pages_cubit.dart';
 import '../cubits/pages/pages_state.dart';
+import '../utils/app_colors.dart';
 
 class DisclaimerScreen extends StatefulWidget {
   const DisclaimerScreen({super.key});
@@ -36,18 +37,18 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
         final showTabs = state is PagesSuccess;
 
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           appBar: AppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.white,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: AppColors.black),
               onPressed: () => Navigator.pop(context),
             ),
             title: const Text(
               'GloCure Disclaimer',
               style: TextStyle(
-                color: Colors.black,
+                color: AppColors.black,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
@@ -56,9 +57,9 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             bottom: showTabs
                 ? TabBar(
                     controller: _tabController,
-                    labelColor: const Color(0xFFFF5C9A),
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: const Color(0xFFFF5C9A),
+                    labelColor: AppColors.primary,
+                    unselectedLabelColor: AppColors.gray500,
+                    indicatorColor: AppColors.primary,
                     labelStyle: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -92,8 +93,8 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
 
   Widget _buildLoadingState() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: List.generate(
@@ -107,7 +108,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
                   width: double.infinity,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -116,7 +117,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
                   width: double.infinity,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -125,7 +126,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
                   width: double.infinity,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -134,7 +135,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
                   width: MediaQuery.of(context).size.width * 0.7,
                   height: 16,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -156,7 +157,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             const Icon(
               Icons.error_outline,
               size: 64,
-              color: Colors.red,
+              color: AppColors.error,
             ),
             const SizedBox(height: 16),
             Text(
@@ -164,15 +165,15 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
-                color: Colors.red,
+                color: AppColors.error,
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.read<PagesCubit>().fetchPages(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -215,7 +216,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: 16),
@@ -224,8 +225,8 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
           Text(
             _stripHtmlTags(page.body),
             style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade800,
+              fontSize: 15,
+              color: AppColors.gray500,
               height: 1.6,
             ),
           ),

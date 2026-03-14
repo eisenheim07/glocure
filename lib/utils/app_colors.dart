@@ -34,12 +34,12 @@ class AppColors {
   static const Color gray600 = Color(0xFF666666); // Muted text
   
   /// Medium grays for borders and dividers
-  static const Color gray500 = Color(0xFF808080); // Disabled text
-  static const Color gray400 = Color(0xFF999999); // Placeholder text
-  static const Color gray300 = Color(0xFFCCCCCC); // Borders
-  static const Color gray200 = Color(0xFFE5E5E5); // Light borders
-  static const Color gray100 = Color(0xFFF5F5F5); // Background
-  static const Color gray50 = Color(0xFFFAFAFA);  // Light background
+  static const Color gray500 = Color(0xFF9CA3AF); // Disabled text
+  static const Color gray400 = Color(0xFFD1D5DB); // Placeholder text
+  static const Color gray300 = Color(0xFFE5E7EB); // Borders
+  static const Color gray200 = Color(0xFFF3F4F6); // Light borders
+  static const Color gray100 = Color(0xFFF9FAFB); // Background
+  static const Color gray50 = Color(0xFFFDFDFD);  // Light background
 
   // ============================================================================
   // SEMANTIC COLORS (Status & Feedback)
@@ -150,12 +150,12 @@ class AppColors {
   /// Border colors
   static const Color borderPrimary = gray300;
   static const Color borderSecondary = gray200;
-  static const Color borderLight = gray100;
+  static const Color borderLight = gray200;
   
   /// Shadow colors
-  static Color shadowLight = black.withValues(alpha: 0.1);
-  static Color shadowMedium = black.withValues(alpha: 0.15);
-  static Color shadowDark = black.withValues(alpha: 0.25);
+  static Color shadowLight = black.withValues(alpha: 0.05);
+  static Color shadowMedium = black.withValues(alpha: 0.1);
+  static Color shadowDark = black.withValues(alpha: 0.15);
   
   /// Overlay colors
   static Color overlayLight = black.withValues(alpha: 0.3);
@@ -179,11 +179,11 @@ class AppColors {
   
   /// Card colors
   static const Color cardBackground = white;
-  static const Color cardBorder = gray200;
+  static const Color cardBorder = gray300;
   
   /// Navigation colors
   static const Color navigationBackground = white;
-  static const Color navigationBorder = gray200;
+  static const Color navigationBorder = gray300;
   static const Color navigationSelected = primary;
   static const Color navigationUnselected = gray500;
   

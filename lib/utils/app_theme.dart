@@ -10,16 +10,16 @@ class AppTheme {
   // ============================================================================
   // LIGHT THEME
   // ============================================================================
-  
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: AppColors.lightColorScheme,
-      
+
       // Font family
       fontFamily: 'Inter',
-      
+
       // App Bar Theme
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.white,
@@ -39,10 +39,10 @@ class AppTheme {
           fontFamily: 'Inter',
         ),
       ),
-      
+
       // Scaffold Theme
       scaffoldBackgroundColor: AppColors.backgroundPrimary,
-      
+
       // Card Theme
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
@@ -56,7 +56,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Button Themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -74,7 +74,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -85,7 +85,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
@@ -103,7 +103,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -158,7 +158,7 @@ class AppTheme {
           fontFamily: 'Inter',
         ),
       ),
-      
+
       // Bottom Navigation Bar Theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.navigationBackground,
@@ -177,14 +177,14 @@ class AppTheme {
           fontFamily: 'Inter',
         ),
       ),
-      
+
       // Divider Theme
       dividerTheme: const DividerThemeData(
         color: AppColors.borderSecondary,
         thickness: 1,
         space: 1,
       ),
-      
+
       // Snackbar Theme
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.gray800,
@@ -198,7 +198,7 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      
+
       // Dialog Theme
       dialogTheme: const DialogThemeData(
         backgroundColor: AppColors.white,
@@ -218,7 +218,7 @@ class AppTheme {
           fontFamily: 'Inter',
         ),
       ),
-      
+
       // Bottom Sheet Theme
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.white,
@@ -229,7 +229,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Text Theme
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -329,7 +329,7 @@ class AppTheme {
   // ============================================================================
   // DARK THEME (Same as light for now, as requested)
   // ============================================================================
-  
+
   static ThemeData get darkTheme {
     return lightTheme.copyWith(
       brightness: Brightness.dark,

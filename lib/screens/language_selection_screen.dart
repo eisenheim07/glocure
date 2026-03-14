@@ -93,7 +93,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           width: 42.w,
                           height: 42.h,
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
@@ -112,7 +112,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         style: TextStyle(
                           fontSize: 24.fSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                       
@@ -122,7 +122,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         'Select your preferred language below',
                         style: TextStyle(
                           fontSize: 13.fSize,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ],
@@ -135,7 +135,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20.r),
                         topRight: Radius.circular(20.r),
@@ -227,7 +227,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       child: Container(
         height: 56,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderSecondary,
@@ -253,7 +253,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       child: Icon(
                         Icons.circle,
                         size: 10,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     )
                   : null,

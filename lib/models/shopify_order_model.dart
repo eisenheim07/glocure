@@ -112,6 +112,7 @@ class ShopifyLineItem {
   final String vendor;
   final String? productId;
   final String? variantId;
+  final String? imageUrl;
 
   ShopifyLineItem({
     required this.id,
@@ -124,9 +125,37 @@ class ShopifyLineItem {
     required this.vendor,
     this.productId,
     this.variantId,
+    this.imageUrl,
   });
 
   factory ShopifyLineItem.fromJson(Map<String, dynamic> json) {
+    // Extract image URL from properties or variant
+    String? imageUrl;
+    
+    // Try to get image from properties first
+    final properties = json['properties'] as List<dynamic>? ?? [];
+    for (final prop in properties) {
+      if (prop is Map<String, dynamic> && prop['name'] == 'image_url') {
+        imageUrl = prop['value']?.toString();
+        break;
+      }
+    }
+    
+    // If no image in properties, try variant image
+    if (imageUrl == null || imageUrl.isEmpty) {
+      final variant = json['variant'] as Map<String, dynamic>?;
+      imageUrl = variant?['image_url']?.toString();
+    }
+    
+    // If still no image, try product image
+    if (imageUrl == null || imageUrl.isEmpty) {
+      final product = json['product'] as Map<String, dynamic>?;
+      final images = product?['images'] as List<dynamic>?;
+      if (images != null && images.isNotEmpty) {
+        imageUrl = images.first['src']?.toString();
+      }
+    }
+    
     return ShopifyLineItem(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
@@ -138,6 +167,7 @@ class ShopifyLineItem {
       vendor: json['vendor']?.toString() ?? '',
       productId: json['product_id']?.toString(),
       variantId: json['variant_id']?.toString(),
+      imageUrl: imageUrl,
     );
   }
 

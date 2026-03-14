@@ -10,6 +10,7 @@ import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'main_navigation_screen.dart';
 import 'ordered_items_details.dart';
+import '../utils/app_colors.dart';
 
 class OrderScreen extends StatefulWidget {
   final bool isVisible;
@@ -108,7 +109,7 @@ class OrderScreenState extends State<OrderScreen> with SingleTickerProviderState
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         appBar: CustomAppBar(
           type: AppBarType.full,
           showBackButton: true,
@@ -127,12 +128,12 @@ class OrderScreenState extends State<OrderScreen> with SingleTickerProviderState
           children: [
             // Tab Bar
             Container(
-              color: Colors.white,
+              color: AppColors.white,
               child: TabBar(
                 controller: _tabController,
-                labelColor: const Color(0xFFFF5C9A),
-                unselectedLabelColor: const Color(0xFF777777),
-                indicatorColor: const Color(0xFFFF5C9A),
+                labelColor: AppColors.primary,
+                unselectedLabelColor: AppColors.gray600,
+                indicatorColor: AppColors.primary,
                 indicatorWeight: 2.h,
                 indicatorSize: TabBarIndicatorSize.tab,
                 labelStyle: TextStyle(
@@ -199,7 +200,7 @@ class _OrdersTabContent extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () => context.read<OrdersCubit>().refreshOrders(),
-            color: const Color(0xFFFF5C9A),
+            color: AppColors.primary,
             child: ListView.builder(
               padding: EdgeInsets.all(14.w),
               itemCount: state.orders.length,
@@ -221,14 +222,14 @@ class _OrdersTabContent extends StatelessWidget {
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
           period: const Duration(milliseconds: 1200),
           child: Container(
             margin: EdgeInsets.only(bottom: 10.h),
             height: 150.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(10.r),
             ),
           ),
@@ -244,14 +245,14 @@ class _OrdersTabContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 56.h, color: const Color(0xFFE0E0E0)),
+            Icon(Icons.error_outline, size: 56.h, color: AppColors.gray200),
             SizedBox(height: 14.h),
             Text(
               'Error loading orders',
               style: TextStyle(
                 fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A),
+                color: AppColors.gray900,
                 fontFamily: 'Inter',
               ),
             ),
@@ -260,7 +261,7 @@ class _OrdersTabContent extends StatelessWidget {
               message,
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: const Color(0xFF777777),
+                color: AppColors.gray600,
                 fontFamily: 'Inter',
               ),
               textAlign: TextAlign.center,
@@ -269,8 +270,8 @@ class _OrdersTabContent extends StatelessWidget {
             ElevatedButton(
               onPressed: () => context.read<OrdersCubit>().refreshOrders(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
@@ -292,14 +293,14 @@ class _OrdersTabContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shopping_bag_outlined, size: 56.h, color: const Color(0xFFE0E0E0)),
+            Icon(Icons.shopping_bag_outlined, size: 56.h, color: AppColors.gray200),
             SizedBox(height: 14.h),
             Text(
               'No orders available',
               style: TextStyle(
                 fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A),
+                color: AppColors.gray900,
                 fontFamily: 'Inter',
               ),
             ),
@@ -308,7 +309,7 @@ class _OrdersTabContent extends StatelessWidget {
               'Start shopping to see your orders here',
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: const Color(0xFF777777),
+                color: AppColors.gray600,
                 fontFamily: 'Inter',
               ),
               textAlign: TextAlign.center,
@@ -319,8 +320,8 @@ class _OrdersTabContent extends StatelessWidget {
                 MainNavigationScreen.navigateToHome(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
@@ -342,14 +343,14 @@ class _OrdersTabContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shopping_bag_outlined, size: 56.h, color: const Color(0xFFE0E0E0)),
+            Icon(Icons.shopping_bag_outlined, size: 56.h, color: AppColors.gray200),
             SizedBox(height: 14.h),
             Text(
               'No ${currentTab.toLowerCase()} orders',
               style: TextStyle(
                 fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A),
+                color: AppColors.gray900,
                 fontFamily: 'Inter',
               ),
             ),
@@ -358,7 +359,7 @@ class _OrdersTabContent extends StatelessWidget {
               'Your ${currentTab.toLowerCase()} orders will appear here',
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: const Color(0xFF777777),
+                color: AppColors.gray600,
                 fontFamily: 'Inter',
               ),
               textAlign: TextAlign.center,
@@ -391,10 +392,10 @@ class _OrderCardState extends State<_OrderCard> {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1,
         ),
       ),
@@ -409,7 +410,7 @@ class _OrderCardState extends State<_OrderCard> {
                 style: TextStyle(
                   fontSize: 16.fSize,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1A1A1A),
+                  color: AppColors.gray900,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -417,10 +418,10 @@ class _OrderCardState extends State<_OrderCard> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
+                  color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
-                    color: const Color(0xFFFFE0B2),
+                    color: AppColors.warning.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -429,7 +430,7 @@ class _OrderCardState extends State<_OrderCard> {
                   style: TextStyle(
                     fontSize: 11.fSize,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFFFF9800),
+                    color: AppColors.warning,
                     fontFamily: 'Inter',
                   ),
                 ),
@@ -438,7 +439,7 @@ class _OrderCardState extends State<_OrderCard> {
                 padding: EdgeInsets.zero,
                 icon: Icon(
                   Icons.more_vert,
-                  color: const Color(0xFF666666),
+                  color: AppColors.gray600,
                   size: 18.h,
                 ),
                 offset: Offset(0, 36.h),
@@ -454,14 +455,15 @@ class _OrderCardState extends State<_OrderCard> {
                     _onDeleteOrder(context, widget.order);
                   }
                 },
-                itemBuilder: (BuildContext context) => [
+                itemBuilder: (BuildContext context) =>
+                [
                   PopupMenuItem<String>(
                     value: 'view_details',
                     child: Row(
                       children: [
                         Icon(
                           Icons.visibility_outlined,
-                          color: const Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           size: 18.h,
                         ),
                         SizedBox(width: 10.w),
@@ -470,7 +472,7 @@ class _OrderCardState extends State<_OrderCard> {
                           style: TextStyle(
                             fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: const Color(0xFF333333),
+                            color: AppColors.gray800,
                           ),
                         ),
                       ],
@@ -482,7 +484,7 @@ class _OrderCardState extends State<_OrderCard> {
                       children: [
                         Icon(
                           Icons.local_shipping_outlined,
-                          color: const Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           size: 18.h,
                         ),
                         SizedBox(width: 10.w),
@@ -491,7 +493,7 @@ class _OrderCardState extends State<_OrderCard> {
                           style: TextStyle(
                             fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: const Color(0xFF333333),
+                            color: AppColors.gray800,
                           ),
                         ),
                       ],
@@ -503,7 +505,7 @@ class _OrderCardState extends State<_OrderCard> {
                       children: [
                         Icon(
                           Icons.delete_outline,
-                          color: const Color(0xFFF44336),
+                          color: AppColors.error,
                           size: 18.h,
                         ),
                         SizedBox(width: 10.w),
@@ -512,7 +514,7 @@ class _OrderCardState extends State<_OrderCard> {
                           style: TextStyle(
                             fontSize: 13.fSize,
                             fontFamily: 'Inter',
-                            color: const Color(0xFF333333),
+                            color: AppColors.gray800,
                           ),
                         ),
                       ],
@@ -528,7 +530,7 @@ class _OrderCardState extends State<_OrderCard> {
             'Placed on ${_formatDate(widget.order.createdAt)}',
             style: TextStyle(
               fontSize: 11.fSize,
-              color: const Color(0xFF777777),
+              color: AppColors.gray600,
               fontFamily: 'Inter',
             ),
           ),
@@ -537,7 +539,7 @@ class _OrderCardState extends State<_OrderCard> {
 
           // Divider before amount section
           Divider(
-            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            color: AppColors.gray200.withValues(alpha: 0.5),
             thickness: 1,
             height: 1,
           ),
@@ -554,7 +556,7 @@ class _OrderCardState extends State<_OrderCard> {
                     'Total Amount',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: const Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -564,7 +566,7 @@ class _OrderCardState extends State<_OrderCard> {
                     style: TextStyle(
                       fontSize: 18.fSize,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -578,7 +580,7 @@ class _OrderCardState extends State<_OrderCard> {
                     'Items',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: const Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -588,7 +590,7 @@ class _OrderCardState extends State<_OrderCard> {
                     style: TextStyle(
                       fontSize: 14.fSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -601,7 +603,7 @@ class _OrderCardState extends State<_OrderCard> {
 
           // Divider before items list
           Divider(
-            color: const Color(0xFFE5E5E5).withOpacity(0.5),
+            color: AppColors.gray200.withValues(alpha: 0.5),
             thickness: 1,
             height: 1,
           ),
@@ -609,7 +611,8 @@ class _OrderCardState extends State<_OrderCard> {
           SizedBox(height: 8.h),
 
           // Product items list
-          ...itemsToShow.map((item) => Padding(
+          ...itemsToShow.map((item) =>
+              Padding(
                 padding: EdgeInsets.only(bottom: 5.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -619,7 +622,7 @@ class _OrderCardState extends State<_OrderCard> {
                       width: 3.5.w,
                       height: 3.5.h,
                       decoration: const BoxDecoration(
-                        color: Color(0xFF333333),
+                        color: AppColors.gray800,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -629,7 +632,7 @@ class _OrderCardState extends State<_OrderCard> {
                         item.title,
                         style: TextStyle(
                           fontSize: 12.fSize,
-                          color: const Color(0xFF333333),
+                          color: AppColors.gray800,
                           fontFamily: 'Inter',
                         ),
                         maxLines: 1,
@@ -641,7 +644,7 @@ class _OrderCardState extends State<_OrderCard> {
                       '... Qty: ${item.quantity}',
                       style: TextStyle(
                         fontSize: 12.fSize,
-                        color: const Color(0xFF333333),
+                        color: AppColors.gray800,
                         fontFamily: 'Inter',
                       ),
                     ),
@@ -667,7 +670,7 @@ class _OrderCardState extends State<_OrderCard> {
                         _showAllItems ? 'View Less' : 'View More',
                         style: TextStyle(
                           fontSize: 12.fSize,
-                          color: const Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inter',
                         ),
@@ -675,7 +678,7 @@ class _OrderCardState extends State<_OrderCard> {
                       SizedBox(width: 3.w),
                       Icon(
                         _showAllItems ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: const Color(0xFFFF5C9A),
+                        color: AppColors.primary,
                         size: 16.h,
                       ),
                     ],
@@ -705,7 +708,7 @@ class _OrderCardState extends State<_OrderCard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Track order ${order.name}'),
-        backgroundColor: const Color(0xFFFF5C9A),
+        backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
@@ -721,7 +724,7 @@ class _OrderCardState extends State<_OrderCard> {
       icon: Icon(
         Icons.delete_outline,
         size: 44.h,
-        color: const Color(0xFFFF5C9A),
+        color: AppColors.primary,
       ),
       isIconEnabled: false,
       primaryButtonText: 'Delete',
@@ -738,7 +741,7 @@ class _OrderCardState extends State<_OrderCard> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Order ${order.name} deleted successfully'),
-                backgroundColor: const Color(0xFF4CAF50),
+                backgroundColor: AppColors.success,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
@@ -750,7 +753,7 @@ class _OrderCardState extends State<_OrderCard> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Failed to delete order: ${e.toString()}'),
-                backgroundColor: const Color(0xFFF44336),
+                backgroundColor: AppColors.error,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
               ),
@@ -767,13 +770,13 @@ class _OrderCardState extends State<_OrderCard> {
     final fulfillment = order.fulfillmentStatus.toLowerCase();
 
     if (financial == 'paid' && fulfillment == 'fulfilled') {
-      return const Color(0xFF4CAF50);
+      return AppColors.success;
     } else if (financial == 'pending' || fulfillment == 'unfulfilled') {
-      return const Color(0xFFFF9800);
+      return AppColors.warning;
     } else if (financial == 'refunded' || fulfillment == 'cancelled') {
-      return const Color(0xFFF44336);
+      return AppColors.error;
     } else {
-      return const Color(0xFF2196F3);
+      return AppColors.info;
     }
   }
 

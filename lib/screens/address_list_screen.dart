@@ -9,6 +9,7 @@ import '../widgets/custom_app_bar.dart';
 import '../cubits/customer/customer_cubit.dart';
 import '../cubits/customer/customer_state.dart';
 import 'address_screen.dart';
+import '../utils/app_colors.dart';
 
 class AddressListScreen extends StatefulWidget {
   final Customer? customer;
@@ -47,7 +48,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   /// Example: gid://shopify/MailingAddress/10194549440690?model_name=... -> 10194549440690
   String? _extractBaseAddressId(String? fullAddressId) {
     if (fullAddressId == null || fullAddressId.isEmpty) return null;
-    
+
     try {
       // Extract the numeric ID from the Shopify GID
       final regex = RegExp(r'MailingAddress/(\d+)');
@@ -61,7 +62,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   /// Find address by base ID and update selected address ID to current full ID
   void _updateSelectedAddressAfterRefresh(List<CustomerAddress> addresses) {
     if (_selectedBaseAddressId == null) return;
-    
+
     // Find address with matching base ID
     for (final address in addresses) {
       final baseId = _extractBaseAddressId(address.id);
@@ -71,7 +72,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         return;
       }
     }
-    
+
     // If no matching address found, clear selection
     _selectedAddressId = null;
     _selectedBaseAddressId = null;
@@ -89,7 +90,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Invalid address ID'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           duration: Duration(seconds: 2),
         ),
       );
@@ -99,7 +100,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
     // Show confirmation bottom sheet
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -108,7 +109,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         child: Container(
           padding: EdgeInsets.all(20.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -119,7 +120,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 width: 34.w,
                 height: 3.h,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.gray300,
                   borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
@@ -131,7 +132,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 style: TextStyle(
                   fontSize: 17.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
               ),
               const SizedBox(height: 8),
@@ -142,7 +143,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12.fSize,
-                  color: Colors.grey.shade600,
+                  color: AppColors.gray300,
                   height: 1.4,
                 ),
               ),
@@ -150,64 +151,64 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
               // Buttons
               Row(
-              children: [
-                // Cancel button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, false),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 1.w,
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, false),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          border: Border.all(
+                            color: AppColors.gray300,
+                            width: 1.w,
+                          ),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14.fSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.gray300,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                // Delete button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, true),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(
-                            fontSize: 14.fSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                  // Delete button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, true),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom),
-          ],
-        ),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
         ),
       ),
     );
@@ -236,7 +237,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Address deleted successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
             duration: Duration(seconds: 2),
           ),
         );
@@ -250,7 +251,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to delete address: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -267,7 +268,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'My Addresses',
@@ -308,16 +309,16 @@ class _AddressListScreenState extends State<AddressListScreen> {
           child: ListView(
             padding: EdgeInsets.all(14.w),
             children: List.generate(
-              3,
+              20,
               (index) => Padding(
                 padding: EdgeInsets.only(bottom: 14.h),
                 child: Shimmer.fromColors(
-                  baseColor: Colors.grey.shade300,
-                  highlightColor: Colors.grey.shade100,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
-                    height: 102.h,
+                    height: 80.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -330,10 +331,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
         Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
@@ -341,13 +342,13 @@ class _AddressListScreenState extends State<AddressListScreen> {
           ),
           child: SafeArea(
             child: Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
-              highlightColor: Colors.grey.shade100,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
               child: Container(
                 width: double.infinity,
                 height: 48.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
@@ -369,7 +370,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
             Icon(
               Icons.error_outline,
               size: 54.h,
-              color: Colors.red,
+              color: AppColors.error,
             ),
             const SizedBox(height: 16),
             Text(
@@ -377,15 +378,15 @@ class _AddressListScreenState extends State<AddressListScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.fSize,
-                color: Colors.red,
+                color: AppColors.error,
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.read<CustomerCubit>().fetchCustomer(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
@@ -412,7 +413,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
       children: [
         Expanded(
           child: RefreshIndicator(
-            color: const Color(0xFFFF5C9A),
+            color: AppColors.primary,
             onRefresh: _refreshCustomerData,
             child: ListView.builder(
               padding: EdgeInsets.all(14.w),
@@ -445,10 +446,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
         Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
@@ -481,9 +482,9 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 14.h),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               border: Border.all(
-                                color: const Color(0xFFFF5C9A),
+                                color: AppColors.primary,
                                 width: 2.w,
                               ),
                               borderRadius: BorderRadius.circular(10.r),
@@ -494,7 +495,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                 children: [
                                   Icon(
                                     Icons.add,
-                                    color: Color(0xFFFF5C9A),
+                                    color: AppColors.primary,
                                     size: 17.h,
                                   ),
                                   SizedBox(width: 8),
@@ -503,7 +504,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                     style: TextStyle(
                                       fontSize: 14.fSize,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFFFF5C9A),
+                                      color: AppColors.primary,
                                     ),
                                   ),
                                 ],
@@ -523,7 +524,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 14.h),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF5C9A),
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Center(
@@ -532,7 +533,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                                 style: TextStyle(
                                   fontSize: 14.fSize,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -563,7 +564,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFF5C9A),
+                        color: AppColors.primary,
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Center(
@@ -572,7 +573,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           children: [
                             Icon(
                               Icons.add,
-                              color: Colors.white,
+                              color: AppColors.white,
                               size: 17.h,
                             ),
                             SizedBox(width: 8),
@@ -581,7 +582,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                               style: TextStyle(
                                 fontSize: 14.fSize,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ],
@@ -636,7 +637,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
       children: [
         Expanded(
           child: RefreshIndicator(
-            color: const Color(0xFFFF5C9A),
+            color: AppColors.primary,
             onRefresh: _refreshCustomerData,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -651,7 +652,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                         Icon(
                           Icons.location_off_outlined,
                           size: 54.h,
-                          color: Colors.grey.shade400,
+                          color: AppColors.gray300,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -659,7 +660,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           style: TextStyle(
                             fontSize: 15.fSize,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColors.gray800,
                           ),
                         ),
                         SizedBox(height: 8.h),
@@ -668,7 +669,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 12.fSize,
-                            color: Colors.grey.shade600,
+                            color: AppColors.gray300,
                           ),
                         ),
                       ],
@@ -683,10 +684,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
         Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppColors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
@@ -715,7 +716,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 14.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Center(
@@ -724,7 +725,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     children: [
                       Icon(
                         Icons.add,
-                        color: Colors.white,
+                        color: AppColors.white,
                         size: 17.h,
                       ),
                       SizedBox(width: 8),
@@ -733,7 +734,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                         style: TextStyle(
                           fontSize: 14.fSize,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ],
@@ -784,17 +785,17 @@ class _AddressListScreenState extends State<AddressListScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(14.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade300,
+            color: isSelected ? AppColors.primary : AppColors.gray300,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -808,12 +809,12 @@ class _AddressListScreenState extends State<AddressListScreen> {
               width: 34.w,
               height: 34.h,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.secondary,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.location_on_outlined,
-                color: Colors.grey.shade600,
+                color: AppColors.primary,
                 size: 20.h,
               ),
             ),
@@ -832,23 +833,27 @@ class _AddressListScreenState extends State<AddressListScreen> {
                         style: TextStyle(
                           fontSize: 14.fSize,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                       const SizedBox(width: 8),
                       if (isDefault)
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(3.r),
+                            color: AppColors.gray100,
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(
+                              color: AppColors.gray200,
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             'Default',
                             style: TextStyle(
                               fontSize: 10.fSize,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey,
+                              color: AppColors.gray800,
                             ),
                           ),
                         ),
@@ -862,7 +867,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     style: TextStyle(
                       fontSize: 12.fSize,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey.shade600,
+                      color: AppColors.gray600,
                       height: 1.4,
                     ),
                     maxLines: 2,
@@ -903,7 +908,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       child: Icon(
                         Icons.edit_outlined,
                         size: 20.h,
-                        color: isSelected ? Colors.red : Colors.red.withOpacity(0.3),
+                        color: isSelected ? AppColors.error : AppColors.error.withValues(alpha: 0.3),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -912,7 +917,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     Container(
                       width: 1.w,
                       height: 17.h,
-                      color: Colors.grey.shade300,
+                      color: AppColors.gray300,
                     ),
                     const SizedBox(width: 8),
 
@@ -922,7 +927,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       child: Icon(
                         Icons.delete_outline,
                         size: 20.h,
-                        color: isSelected ? Colors.red : Colors.red.withOpacity(0.3),
+                        color: isSelected ? AppColors.error : AppColors.error.withValues(alpha: 0.3),
                       ),
                     ),
                   ],
@@ -936,10 +941,10 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? const Color(0xFFFF5C9A) : Colors.grey.shade400,
+                      color: isSelected ? AppColors.primary : AppColors.gray500,
                       width: 2.w,
                     ),
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                   child: isSelected
                       ? Center(
@@ -948,7 +953,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                             height: 10.h,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFFFF5C9A),
+                              color: AppColors.primary,
                             ),
                           ),
                         )

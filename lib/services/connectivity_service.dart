@@ -7,7 +7,9 @@ import '../utils/app_colors.dart';
 /// Service to handle internet connectivity checking for the entire app
 class ConnectivityService {
   static final ConnectivityService _instance = ConnectivityService._internal();
+
   factory ConnectivityService() => _instance;
+
   ConnectivityService._internal();
 
   final Connectivity _connectivity = Connectivity();
@@ -19,14 +21,14 @@ class ConnectivityService {
   /// Initialize connectivity monitoring
   void initialize(GlobalKey<NavigatorState> navigatorKey) {
     _navigatorKey = navigatorKey;
-    
+
     // Listen to connectivity changes
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (List<ConnectivityResult> results) {
         _handleConnectivityChange(results);
       },
     );
-    
+
     // Check initial connectivity
     _checkInitialConnectivity();
   }
@@ -45,7 +47,7 @@ class ConnectivityService {
   /// Handle connectivity changes
   void _handleConnectivityChange(List<ConnectivityResult> results) async {
     final hasConnection = await _hasInternetConnection(results);
-    
+
     if (!hasConnection && _isConnected) {
       // Lost connection - start aggressive monitoring
       _isConnected = false;
@@ -71,7 +73,7 @@ class ConnectivityService {
       try {
         final results = await _connectivity.checkConnectivity();
         final hasConnection = await _hasInternetConnection(results);
-        
+
         if (!hasConnection && _isConnected) {
           // Lost connection
           _isConnected = false;
@@ -107,8 +109,7 @@ class ConnectivityService {
     }
 
     // If connected to wifi or mobile, verify actual internet access
-    if (results.contains(ConnectivityResult.wifi) || 
-        results.contains(ConnectivityResult.mobile)) {
+    if (results.contains(ConnectivityResult.wifi) || results.contains(ConnectivityResult.mobile)) {
       return await _verifyInternetAccess();
     }
 
@@ -123,9 +124,9 @@ class ConnectivityService {
         InternetAddress.lookup('google.com').timeout(const Duration(seconds: 3)),
         InternetAddress.lookup('cloudflare.com').timeout(const Duration(seconds: 3)),
       ];
-      
+
       final results = await Future.wait(futures, eagerError: false);
-      
+
       // If any lookup succeeds, we have internet
       for (final result in results) {
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -144,7 +145,7 @@ class ConnectivityService {
     if (context == null || _isBottomSheetShowing) return;
 
     _isBottomSheetShowing = true;
-    
+
     showModalBottomSheet(
       context: context,
       isDismissible: false,
@@ -158,7 +159,7 @@ class ConnectivityService {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -172,31 +173,31 @@ class ConnectivityService {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.wifi_off_rounded,
                     size: 40,
-                    color: Colors.red.shade600,
+                    color: AppColors.error,
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Title
                 const Text(
                   'No Internet Connection',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 12),
-                
+
                 // Description
                 Text(
                   'Please check your internet connection and try again.',
@@ -207,17 +208,17 @@ class ConnectivityService {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Try Again Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _retryConnection,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5C9A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -233,7 +234,7 @@ class ConnectivityService {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
               ],
             ),
@@ -246,7 +247,7 @@ class ConnectivityService {
   /// Hide no internet bottom sheet
   void _hideNoInternetBottomSheet() {
     if (!_isBottomSheetShowing) return;
-    
+
     _isBottomSheetShowing = false;
     final context = _navigatorKey?.currentContext;
     if (context != null) {
@@ -260,7 +261,7 @@ class ConnectivityService {
       // Show loading state on button (optional enhancement)
       final results = await _connectivity.checkConnectivity();
       final hasConnection = await _hasInternetConnection(results);
-      
+
       if (hasConnection) {
         _isConnected = true;
         _hideNoInternetBottomSheet();

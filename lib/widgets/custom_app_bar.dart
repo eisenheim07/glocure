@@ -5,6 +5,7 @@ import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
 import '../widgets/wishlist_icon_with_badge.dart';
 import '../screens/cart_screen.dart';
+import '../utils/app_colors.dart';
 
 /// Custom App Bar with two predefined types:
 /// Type 1 (Full): Logo + Elite Glow GIF + Notifications + Wishlist + Cart
@@ -18,7 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.onBackPressed,
     this.showBackButton = false, // Show back arrow in full type
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = AppColors.white,
     this.toolbarHeight,
     this.onWishlistReturn, // Callback when returning from wishlist
   });
@@ -61,7 +62,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: showBackButton ? 0 : 0,
       leading: showBackButton
           ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: AppColors.black),
               onPressed: onBackPressed ?? () => Navigator.pop(context),
             )
           : Container(
@@ -88,15 +89,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             // Elite Glow GIF tap action (currently no action)
           },
         ),
-        const SizedBox(width: 4),
-        SmartImage(
-          source: ImageConstant.icNotifications,
-          width: 60,
-          height: 34,
-          onTap: () {
-            // Notifications tap action (currently no action)
-          },
-        ),
+        // const SizedBox(width: 4),
+        // SmartImage(
+        //   source: ImageConstant.icNotifications,
+        //   width: 60,
+        //   height: 34,
+        //   onTap: () {
+        //     // Notifications tap action (currently no action)
+        //   },
+        // ),
         const SizedBox(width: 12),
         WishlistIconWithBadge(
           width: 60,
@@ -131,13 +132,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0.0,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        icon: const Icon(Icons.arrow_back, color: AppColors.black),
         onPressed: onBackPressed ?? () => Navigator.pop(context),
       ),
       title: Text(
         title ?? '',
         style: const TextStyle(
-          color: Colors.black,
+          color: AppColors.black,
           fontSize: 20,
           fontWeight: FontWeight.w700,
         ),

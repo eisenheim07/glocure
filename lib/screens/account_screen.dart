@@ -9,6 +9,7 @@ import 'disclaimer_screen.dart';
 import 'login_screen.dart';
 import 'main_navigation_screen.dart';
 import 'profile_screen.dart';
+import '../utils/app_colors.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -47,7 +48,7 @@ class _AccountScreenState extends State<AccountScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Logout failed: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -74,7 +75,7 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         type: AppBarType.full,
         showBackButton: true,
@@ -85,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
       body: _isLoggingOut
           ? const Center(
               child: CircularProgressIndicator(
-                color: Color(0xFFFF5C9A),
+                color: AppColors.primary,
               ),
             )
           : ListView(
@@ -207,14 +208,14 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Row(
                       children: [
                         const Icon(
                           Icons.power_settings_new,
-                          color: Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                           size: 22,
                         ),
                         SizedBox(width: 12.w),
@@ -223,7 +224,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           style: TextStyle(
                             fontSize: 14.fSize,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFFFF5C9A),
+                            color: AppColors.primary,
                           ),
                         ),
                       ],
@@ -255,10 +256,10 @@ class _AccountMenuItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: AppColors.gray300,
             width: 1,
           ),
         ),
@@ -266,7 +267,7 @@ class _AccountMenuItem extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.black87,
+              color: AppColors.gray800,
               size: 22,
             ),
             SizedBox(width: 12.w),
@@ -276,13 +277,13 @@ class _AccountMenuItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.fSize,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  color: AppColors.gray800,
                 ),
               ),
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.grey.shade400,
+              color: AppColors.gray300,
               size: 22,
             ),
           ],

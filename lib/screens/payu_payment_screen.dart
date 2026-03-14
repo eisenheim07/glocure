@@ -5,6 +5,7 @@ import '../services/payu_service.dart';
 import '../models/order_model.dart';
 import '../models/customer_model.dart';
 import '../config/api_config.dart';
+import '../utils/app_colors.dart';
 
 /// PayU Payment Screen
 /// WebView screen for PayU payment gateway
@@ -60,13 +61,13 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
     final productInfo = 'Order #${widget.order.orderNumber} - ${widget.order.lineItems.length} items';
     final firstName = widget.customer.firstName ?? 'Customer';
     final lastName = widget.customer.lastName ?? '';
-    
+
     // Ensure email is valid, use default if not provided
     String email = widget.customer.email ?? '';
     if (email.isEmpty || !email.contains('@')) {
       email = 'test@glocure.com';
     }
-    
+
     // Ensure phone is valid, use default if not provided
     String phone = widget.customer.phone ?? widget.customer.defaultAddress?.phone ?? '';
     if (phone.isEmpty) {
@@ -145,7 +146,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       await _controller.goBack();
       return false; // Don't pop the screen
     }
-    
+
     // If can't go back, show confirmation dialog
     debugPrint('⚠️ No WebView history, showing cancel confirmation');
     final shouldPop = await showDialog<bool>(
@@ -165,11 +166,11 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
         ],
       ),
     );
-    
+
     if (shouldPop == true) {
       _handlePaymentCancelled();
     }
-    
+
     return false; // We handle the pop manually
   }
 
@@ -178,44 +179,44 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
     // Check for success URL patterns (case-insensitive)
     final lowerUrl = url.toLowerCase();
-    
+
     // Check if URL contains success indicators
     if (lowerUrl.contains('success') && !lowerUrl.contains('failure')) {
       debugPrint('✅ Payment Success detected from URL');
       _handlePaymentSuccess();
       return;
     }
-    
+
     // Check for failure URL patterns
     if (lowerUrl.contains('failure') || lowerUrl.contains('failed')) {
       debugPrint('❌ Payment Failure detected from URL');
       _handlePaymentFailure();
       return;
     }
-    
+
     // Check for cancel patterns
     if (lowerUrl.contains('cancel')) {
       debugPrint('⚠️ Payment Cancelled detected from URL');
       _handlePaymentCancelled();
       return;
     }
-    
+
     // Check for PayU test response page with status parameter
     if (lowerUrl.contains('testpg_response.php')) {
       debugPrint('📋 PayU test response page detected, checking for status...');
-      
+
       // Try to extract status from URL parameters
       final uri = Uri.parse(url);
       final status = uri.queryParameters['status'];
-      
+
       debugPrint('Status parameter: $status');
-      
+
       // PayU status codes:
       // 000 = Success
       // 001 = Failure
       // 002 = Pending
       // 003 = Cancelled
-      
+
       if (status == '000') {
         debugPrint('✅ Payment Success detected (status: $status)');
         _showPaymentResultOverlay('success');
@@ -234,17 +235,17 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _showPaymentResultOverlay(String status) {
     if (_showingResult) return; // Prevent multiple overlays
-    
+
     setState(() {
       _showingResult = true;
       _paymentStatus = status;
     });
-    
+
     // Auto-redirect after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _showingResult) {
         debugPrint('🔄 Auto-redirecting to payment status screen');
-        
+
         if (status == 'success') {
           _handlePaymentSuccess();
         } else if (status == 'failed') {
@@ -258,7 +259,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _handlePaymentSuccess() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -266,7 +267,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
     Navigator.pop(context, {
       'status': 'success',
       'orderId': widget.order.id,
@@ -276,7 +277,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _handlePaymentFailure() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -284,7 +285,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
     Navigator.pop(context, {
       'status': 'failed',
       'orderId': widget.order.id,
@@ -294,7 +295,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _handlePaymentCancelled() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -302,7 +303,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
     Navigator.pop(context, {
       'status': 'cancelled',
       'orderId': widget.order.id,
@@ -312,15 +313,15 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   Widget _buildPaymentResultOverlay() {
     final config = _getResultConfig(_paymentStatus!);
-    
+
     return Container(
-      color: Colors.black.withValues(alpha: 0.85),
+      color: AppColors.black.withValues(alpha: 0.85),
       child: Center(
         child: Container(
           margin: const EdgeInsets.all(32),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -337,55 +338,55 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                 child: Icon(
                   config['icon'],
                   size: 40,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Status title
               Text(
                 config['title'],
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Status message
               Text(
                 config['message'],
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: AppColors.gray200,
                   height: 1.5,
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Loading indicator
               const SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               Text(
                 'Redirecting...',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade500,
+                  color: AppColors.gray600,
                 ),
               ),
             ],
@@ -400,28 +401,28 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       case 'success':
         return {
           'icon': Icons.check_circle,
-          'backgroundColor': const Color(0xFF4CAF50),
+          'backgroundColor': AppColors.success,
           'title': 'Payment Successful!',
           'message': 'Your payment has been processed successfully.',
         };
       case 'failed':
         return {
           'icon': Icons.error,
-          'backgroundColor': Colors.red.shade400,
+          'backgroundColor': AppColors.error,
           'title': 'Payment Failed',
           'message': 'We couldn\'t process your payment. Please try again.',
         };
       case 'cancelled':
         return {
           'icon': Icons.cancel,
-          'backgroundColor': Colors.orange.shade400,
+          'backgroundColor': AppColors.warning,
           'title': 'Payment Cancelled',
           'message': 'You have cancelled the payment.',
         };
       default:
         return {
           'icon': Icons.info,
-          'backgroundColor': Colors.grey.shade400,
+          'backgroundColor': AppColors.gray500,
           'title': 'Payment Status',
           'message': 'Processing your payment...',
         };
@@ -440,8 +441,8 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Payment'),
-          backgroundColor: const Color(0xFFFF5C9A),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: _onWillPop,
@@ -468,7 +469,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                     ],
                   ),
                 );
-                
+
                 if (shouldCancel == true) {
                   _handlePaymentCancelled();
                 }
@@ -478,84 +479,83 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
         ),
         body: Stack(
           children: [
-          Column(
-            children: [
-              // Test mode banner
-              if (!ApiConfig.payuIsProduction)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: Colors.orange.shade100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.info_outline, color: Colors.orange.shade900, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'TEST MODE',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade900,
-                              fontSize: 14,
+            Column(
+              children: [
+                // Test mode banner
+                if (!ApiConfig.payuIsProduction)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    color: AppColors.warning,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: AppColors.warning, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'TEST MODE',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.warning,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Use test card: 5123456789012346, CVV: 123',
-                        style: TextStyle(
-                          color: Colors.orange.shade900,
-                          fontSize: 12,
+                          ],
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Use test card: 5123456789012346, CVV: 123',
+                          style: TextStyle(
+                            color: AppColors.warning,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          '⚠️ UPI may show validation errors in test mode',
+                          style: TextStyle(
+                            color: AppColors.warning,
+                            fontSize: 11,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // WebView
+                Expanded(
+                  child: WebViewWidget(controller: _controller),
+                ),
+              ],
+            ),
+
+            // Loading overlay
+            if (_isLoading)
+              Container(
+                color: AppColors.white,
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                       ),
+                      SizedBox(height: 16),
                       Text(
-                        '⚠️ UPI may show validation errors in test mode',
+                        'Loading payment gateway...',
                         style: TextStyle(
-                          color: Colors.orange.shade900,
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
+                          fontSize: 16,
+                          color: AppColors.gray200,
                         ),
                       ),
                     ],
                   ),
                 ),
-              // WebView
-              Expanded(
-                child: WebViewWidget(controller: _controller),
               ),
-            ],
-          ),
-          
-          // Loading overlay
-          if (_isLoading)
-            Container(
-              color: Colors.white,
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Loading payment gateway...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          
-          // Payment result overlay
-          if (_showingResult && _paymentStatus != null)
-            _buildPaymentResultOverlay(),
+
+            // Payment result overlay
+            if (_showingResult && _paymentStatus != null) _buildPaymentResultOverlay(),
           ],
         ),
       ),

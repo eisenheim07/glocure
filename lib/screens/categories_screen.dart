@@ -219,7 +219,7 @@ class _SkinTypeGrid extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.r),
             gradient: const LinearGradient(
-              colors: [Color(0xFFFCE4EC), Color(0xFFF8BBD0)],
+              colors: [AppColors.secondary, AppColors.secondaryLight],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -287,7 +287,7 @@ class _CircularCategoryItem extends StatelessWidget {
             height: imageSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFE8C9A0), width: 2),
+              border: Border.all(color: AppColors.warning.withValues(alpha: 0.3), width: 2),
             ),
             child: ClipOval(
               child: imageUrl != null && imageUrl!.isNotEmpty
@@ -298,8 +298,8 @@ class _CircularCategoryItem extends StatelessWidget {
                       fit: BoxFit.cover,
                     )
                   : Container(
-                      color: const Color(0xFFF5E6EC),
-                      child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 26),
+                      color: AppColors.secondary,
+                      child: const Icon(Icons.spa_outlined, color: AppColors.primary, size: 26),
                     ),
             ),
           ),
@@ -359,8 +359,8 @@ class _SkinConcernGrid extends StatelessWidget {
                     fit: BoxFit.cover,
                   )
                 : Container(
-                    color: const Color(0xFFF0E0E8),
-                    child: const Icon(Icons.spa_outlined, color: Color(0xFFCC8899), size: 26),
+                    color: AppColors.secondary,
+                    child: const Icon(Icons.spa_outlined, color: AppColors.primary, size: 26),
                   ),
           ),
         );
@@ -371,13 +371,13 @@ class _SkinConcernGrid extends StatelessWidget {
 
 // ─── Tab 2: Shop Categories — 2-col cards with pastel bg + title + image ────
 
-const List<Color> _pastelColors = [
-  Color(0xFFFCE4EC), // pink
-  Color(0xFFFFF9C4), // yellow
-  Color(0xFFE8F5E9), // green
-  Color(0xFFE3F2FD), // blue
-  Color(0xFFF3E5F5), // purple
-  Color(0xFFFFF3E0), // orange
+final List<Color> _pastelColors = [
+  AppColors.secondary, // pink
+  AppColors.warning.withValues(alpha: 0.2), // yellow
+  AppColors.success.withValues(alpha: 0.2), // green
+  AppColors.info.withValues(alpha: 0.2), // blue
+  AppColors.primary.withValues(alpha: 0.2), // purple
+  AppColors.warning.withValues(alpha: 0.1), // orange
 ];
 
 class _ShopCategoriesGrid extends StatelessWidget {
@@ -451,7 +451,7 @@ class _ShopCategoryCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.fSize,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: AppColors.gray800,
                 ),
               ),
             ),
@@ -476,7 +476,7 @@ class _ShopCategoryCard extends StatelessWidget {
               const Expanded(
                 flex: 3,
                 child: Center(
-                  child: Icon(Icons.shopping_bag_outlined, size: 34, color: Colors.black26),
+                  child: Icon(Icons.shopping_bag_outlined, size: 34, color: AppColors.gray300),
                 ),
               ),
           ],
@@ -495,7 +495,7 @@ class _BrandsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppColors.white,
       child: GridView.builder(
         padding: EdgeInsets.all(10.w),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -544,7 +544,7 @@ class _BrandLogoItem extends StatelessWidget {
               height: double.infinity,
               fit: BoxFit.contain,
             )
-          : const Icon(Icons.business, color: Colors.grey, size: 24),
+          : const Icon(Icons.business, color: AppColors.gray300, size: 24),
     );
   }
 }
@@ -559,11 +559,11 @@ class _CategoriesShimmer extends StatelessWidget {
     return Row(
       children: [
         Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(width: 70.w, color: Colors.white),
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
+          child: Container(width: 70.w, color: AppColors.white),
         ),
-        Container(width: 1, color: const Color(0xFFEEEEEE)),
+        Container(width: 1, color: AppColors.gray200),
         Expanded(
           child: Padding(
             padding: EdgeInsets.all(12.w),
@@ -571,12 +571,12 @@ class _CategoriesShimmer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     height: 120.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
@@ -593,20 +593,20 @@ class _CategoriesShimmer extends StatelessWidget {
                     itemCount: 6,
                     itemBuilder: (context, index) {
                       return Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Column(
                           children: [
                             Container(
                               width: 64,
                               height: 64,
                               decoration: const BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             SizedBox(height: 6.h),
-                            Container(width: 45, height: 10, color: Colors.white),
+                            Container(width: 45, height: 10, color: AppColors.white),
                           ],
                         ),
                       );

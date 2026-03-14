@@ -49,7 +49,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'Reviews',
@@ -76,7 +76,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     style: TextStyle(
                       fontSize: 18.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.black,
                     ),
                   ),
                   SizedBox(height: 8.h),
@@ -94,8 +94,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       context.read<ReviewsCubit>().refreshReviews();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5C9A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: 24.h,
                         vertical: 12.h,
@@ -120,7 +120,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     Icon(
                       Icons.rate_review_outlined,
                       size: 54.h,
-                      color: Colors.grey.shade400,
+                      color: AppColors.gray300,
                     ),
                     SizedBox(height: 16.h),
                     Text(
@@ -128,7 +128,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       style: TextStyle(
                         fontSize: 18.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -136,7 +136,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       'Be the first to review this product',
                       style: TextStyle(
                         fontSize: 14.fSize,
-                        color: Colors.grey.shade600,
+                        color: AppColors.black,
                       ),
                     ),
                   ],
@@ -146,7 +146,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
             return RefreshIndicator(
               onRefresh: () => context.read<ReviewsCubit>().refreshReviews(),
-              color: const Color(0xFFFF5C9A),
+              color: AppColors.primary,
               child: ListView.builder(
                 controller: _scrollController,
                 padding: EdgeInsets.all(16.h),
@@ -158,7 +158,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       padding: EdgeInsets.all(16.h),
                       child: const Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFFFF5C9A),
+                          color: AppColors.primary,
                         ),
                       ),
                     );
@@ -194,15 +194,15 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       margin: EdgeInsets.only(bottom: 14.h.h),
       padding: EdgeInsets.all(16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -222,7 +222,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   width: 40.h,
                   height: 40.h,
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -236,26 +236,26 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
                       child: Container(
                         width: 120.h,
                         height: 14.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
                     ),
                     SizedBox(height: 4.h),
                     Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
+                      baseColor: AppColors.shimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
                       child: Container(
                         width: 80.h,
                         height: 12.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(3.r),
                         ),
                       ),
@@ -275,7 +275,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       height: 16.h,
                       margin: EdgeInsets.only(right: 2.w.h),
                       decoration: const BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -295,7 +295,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               width: double.infinity,
               height: 16.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(3.r),
               ),
             ),
@@ -309,13 +309,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               return Container(
                 margin: EdgeInsets.only(bottom: 3.h.h),
                 child: Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: index == 2 ? 200.h : double.infinity, // Last line shorter
                     height: 14.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
@@ -332,13 +332,13 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
               return Container(
                 margin: EdgeInsets.only(right: 7.w.h),
                 child: Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: 60.h,
                     height: 60.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(7.r),
                     ),
                   ),
@@ -355,7 +355,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 class _ReviewCard extends StatelessWidget {
   final JudgemeReview review;
 
-  _ReviewCard({required this.review});
+  const _ReviewCard({required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -363,15 +363,15 @@ class _ReviewCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 14.h.h),
       padding: EdgeInsets.all(16.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -388,7 +388,7 @@ class _ReviewCard extends StatelessWidget {
                 width: 40.h,
                 height: 40.h,
                 decoration: BoxDecoration(
-                  color: Color(0xFFFF5C9A).withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -397,7 +397,7 @@ class _ReviewCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.fSize,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFFFF5C9A),
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
@@ -415,7 +415,7 @@ class _ReviewCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -423,7 +423,7 @@ class _ReviewCard extends StatelessWidget {
                       review.formattedDate,
                       style: TextStyle(
                         fontSize: 12.fSize,
-                        color: Colors.grey.shade600,
+                        color: AppColors.gray600,
                       ),
                     ),
                   ],
@@ -436,7 +436,7 @@ class _ReviewCard extends StatelessWidget {
                   return Icon(
                     index < review.rating ? Icons.star : Icons.star_border,
                     size: 16.h,
-                    color: const Color(0xFFFFA500),
+                    color: AppColors.warning,
                   );
                 }),
               ),
@@ -452,7 +452,7 @@ class _ReviewCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14.fSize,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.black,
               ),
             ),
             SizedBox(height: 8.h),
@@ -464,7 +464,7 @@ class _ReviewCard extends StatelessWidget {
               review.body,
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: Colors.grey.shade700,
+                color: AppColors.gray600,
                 height: 1.4,
               ),
             ),
@@ -487,7 +487,7 @@ class _ReviewCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(7.r),
                       border: Border.all(
-                        color: Colors.grey.shade200,
+                        color: AppColors.gray300,
                         width: 1.w,
                       ),
                     ),
@@ -501,13 +501,13 @@ class _ReviewCard extends StatelessWidget {
                             return child;
                           }
                           return Container(
-                            color: Colors.grey.shade50,
+                            color: AppColors.gray300,
                             child: Center(
                               child: SizedBox(
                                 width: 20.h,
                                 height: 20.h,
                                 child: CircularProgressIndicator(
-                                  color: const Color(0xFFFF5C9A),
+                                  color: AppColors.primary,
                                   strokeWidth: 2,
                                   value: loadingProgress.expectedTotalBytes != null
                                       ? loadingProgress.cumulativeBytesLoaded /
@@ -520,10 +520,10 @@ class _ReviewCard extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Colors.grey.shade100,
+                            color: AppColors.gray300,
                             child: Icon(
                               Icons.image_not_supported,
-                              color: Colors.grey.shade400,
+                              color: AppColors.gray300,
                               size: 24.h,
                             ),
                           );
@@ -545,10 +545,10 @@ class _ReviewCard extends StatelessWidget {
                 vertical: 4.h,
               ),
               decoration: BoxDecoration(
-                color: Colors.green.shade50,
+                color: AppColors.success,
                 borderRadius: BorderRadius.circular(3.r),
                 border: Border.all(
-                  color: Colors.green.shade200,
+                  color: AppColors.success,
                   width: 1.w,
                 ),
               ),
@@ -557,7 +557,7 @@ class _ReviewCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10.fSize,
                   fontWeight: FontWeight.w500,
-                  color: Colors.green.shade700,
+                  color: AppColors.success,
                 ),
               ),
             ),

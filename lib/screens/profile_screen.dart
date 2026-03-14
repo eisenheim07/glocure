@@ -63,82 +63,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 128.w,
                 height: 17.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
               SizedBox(height: 16),
-              
+
               // Field shimmers (3 fields for personal info)
-              ...List.generate(3, (index) => Padding(
-                padding: EdgeInsets.only(bottom: 14.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Label shimmer
-                    Container(
-                      width: 68.w,
-                      height: 12.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(3.r),
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    // Field shimmer
-                    Container(
-                      width: double.infinity,
-                      height: 41.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(7.r),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-              
+              ...List.generate(
+                  3,
+                  (index) => Padding(
+                        padding: EdgeInsets.only(bottom: 14.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Label shimmer
+                            Container(
+                              width: 68.w,
+                              height: 12.h,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            // Field shimmer
+                            Container(
+                              width: double.infinity,
+                              height: 41.h,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(7.r),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+
               SizedBox(height: 8),
-              
+
               // Address Section title shimmer
               Container(
                 width: 153.w,
                 height: 17.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(3.r),
                 ),
               ),
               SizedBox(height: 16),
-              
+
               // Field shimmers (8 fields for address info)
-              ...List.generate(8, (index) => Padding(
-                padding: EdgeInsets.only(bottom: 14.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Label shimmer
-                    Container(
-                      width: 85.w,
-                      height: 12.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(3.r),
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    // Field shimmer
-                    Container(
-                      width: double.infinity,
-                      height: 41.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(7.r),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
+              ...List.generate(
+                  8,
+                  (index) => Padding(
+                        padding: EdgeInsets.only(bottom: 14.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Label shimmer
+                            Container(
+                              width: 85.w,
+                              height: 12.h,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            // Field shimmer
+                            Container(
+                              width: double.infinity,
+                              height: 41.h,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(7.r),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
             ],
           ),
         ),
@@ -157,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Icon(
               Icons.error_outline,
               size: 54.h,
-              color: Colors.red,
+              color: AppColors.error,
             ),
             SizedBox(height: 16),
             Text(
@@ -288,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       style: TextStyle(
         fontSize: 18.fSize,
         fontWeight: FontWeight.w700,
-        color: Colors.black,
+        color: AppColors.black,
       ),
     );
   }

@@ -4,6 +4,7 @@ import '../models/order_model.dart';
 import '../utils/format_utils.dart';
 import '../widgets/custom_app_bar.dart';
 import 'main_navigation_screen.dart';
+import '../utils/app_colors.dart';
 
 /// Payment Status Screen
 /// Shows payment result (success, failed, cancelled) with order details
@@ -27,7 +28,7 @@ class PaymentStatusScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         appBar: CustomAppBar(
           type: AppBarType.simple,
           title: 'Payment Status',
@@ -95,7 +96,7 @@ class PaymentStatusScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 20.fSize,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: AppColors.black,
           ),
           textAlign: TextAlign.center,
         ),
@@ -107,7 +108,7 @@ class PaymentStatusScreen extends StatelessWidget {
           statusConfig['message'],
           style: TextStyle(
             fontSize: 13.fSize,
-            color: Colors.grey.shade600,
+            color: AppColors.gray500,
             height: 1.5,
           ),
           textAlign: TextAlign.center,
@@ -128,10 +129,10 @@ class PaymentStatusScreen extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray100,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
       ),
@@ -144,7 +145,7 @@ class PaymentStatusScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 15.fSize,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.black,
             ),
           ),
 
@@ -184,7 +185,7 @@ class PaymentStatusScreen extends StatelessWidget {
 
           // Divider
           Divider(
-            color: Colors.grey.shade300,
+            color: AppColors.gray300,
             thickness: 1,
           ),
 
@@ -199,7 +200,7 @@ class PaymentStatusScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14.fSize,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
               ),
               Text(
@@ -207,7 +208,7 @@ class PaymentStatusScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 17.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                 ),
               ),
             ],
@@ -226,7 +227,7 @@ class PaymentStatusScreen extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12.fSize,
-            color: Colors.grey.shade600,
+            color: AppColors.gray800,
           ),
         ),
         SizedBox(width: 16),
@@ -236,7 +237,7 @@ class PaymentStatusScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.fSize,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: AppColors.gray500,
             ),
             textAlign: TextAlign.right,
           ),
@@ -249,10 +250,10 @@ class PaymentStatusScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(17.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -313,8 +314,8 @@ class PaymentStatusScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFF5C9A),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
           ),
@@ -342,9 +343,9 @@ class PaymentStatusScreen extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFFFF5C9A),
+          foregroundColor: AppColors.primary,
           side: const BorderSide(
-            color: Color(0xFFFF5C9A),
+            color: AppColors.primary,
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
@@ -367,8 +368,8 @@ class PaymentStatusScreen extends StatelessWidget {
       case 'success':
         return {
           'icon': Icons.check_circle_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': const Color(0xFF4CAF50),
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.success,
           'title': 'Payment Successful!',
           'message':
               'Your order has been placed successfully.\nYou will receive a confirmation email shortly.',
@@ -376,8 +377,8 @@ class PaymentStatusScreen extends StatelessWidget {
       case 'failed':
         return {
           'icon': Icons.error_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.red.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.error,
           'title': 'Payment Failed',
           'message':
               'We couldn\'t process your payment.\nPlease try again or use a different payment method.',
@@ -385,8 +386,8 @@ class PaymentStatusScreen extends StatelessWidget {
       case 'cancelled':
         return {
           'icon': Icons.cancel_outlined,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.orange.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.warning,
           'title': 'Payment Cancelled',
           'message':
               'You have cancelled the payment.\nYour order has been created but not confirmed.',
@@ -394,8 +395,8 @@ class PaymentStatusScreen extends StatelessWidget {
       default:
         return {
           'icon': Icons.info_outline,
-          'iconColor': Colors.white,
-          'backgroundColor': Colors.grey.shade400,
+          'iconColor': AppColors.white,
+          'backgroundColor': AppColors.gray500,
           'title': 'Payment Status Unknown',
           'message': 'Unable to determine payment status.',
         };

@@ -51,7 +51,7 @@ class ProductReviewsSummary extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.fSize,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     if (hasMoreReviews)
@@ -139,7 +139,7 @@ class _ReviewSummaryCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(12.h),
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: AppColors.gray600,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: AppColors.gray200,
@@ -184,7 +184,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     Text(
@@ -220,7 +220,7 @@ class _ReviewSummaryCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.fSize,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: AppColors.black,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -251,10 +251,10 @@ class _ReviewSummaryCard extends StatelessWidget {
                 vertical: 2.h,
               ),
               decoration: BoxDecoration(
-                color: Colors.green.shade50,
+                color: AppColors.success,
                 borderRadius: BorderRadius.circular(3),
                 border: Border.all(
-                  color: Colors.green.shade200,
+                  color: AppColors.success,
                   width: 1,
                 ),
               ),
@@ -263,7 +263,7 @@ class _ReviewSummaryCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 8.fSize,
                   fontWeight: FontWeight.w500,
-                  color: Colors.green.shade700,
+                  color: AppColors.success,
                 ),
               ),
             ),

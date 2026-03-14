@@ -52,7 +52,7 @@ void _showSessionExpiredDialog() {
             children: [
               Icon(
                 Icons.warning_amber_rounded,
-                color: Colors.orange.shade700,
+                color: AppColors.warning,
                 size: 28,
               ),
               const SizedBox(width: 12),
@@ -61,7 +61,7 @@ void _showSessionExpiredDialog() {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
               ),
             ],
@@ -70,7 +70,7 @@ void _showSessionExpiredDialog() {
             'Your session has expired. Please login again to continue.',
             style: TextStyle(
               fontSize: 15,
-              color: Colors.black87,
+              color: AppColors.gray800,
               height: 1.4,
             ),
           ),
@@ -89,8 +89,8 @@ void _showSessionExpiredDialog() {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5C9A),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

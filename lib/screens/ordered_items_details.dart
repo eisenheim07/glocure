@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../utils/size_utils.dart';
 import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/utils/format_utils.dart';
+import '../utils/app_colors.dart';
+import '../widgets/network_image_loader.dart';
 
 class OrderedItemsDetails extends StatelessWidget {
   final ShopifyOrder order;
@@ -15,7 +19,7 @@ class OrderedItemsDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.full,
         showBackButton: true,
@@ -27,14 +31,14 @@ class OrderedItemsDetails extends StatelessWidget {
           children: [
             // Order Header Card
             _buildOrderHeaderCard(),
-            
+
             SizedBox(height: 16),
-            
+
             // Order Details Card
             _buildOrderDetailsCard(),
-            
+
             SizedBox(height: 16),
-            
+
             // Ordered Items Section
             _buildOrderedItemsSection(),
           ],
@@ -48,10 +52,10 @@ class OrderedItemsDetails extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
       ),
@@ -66,7 +70,7 @@ class OrderedItemsDetails extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
+                  color: AppColors.gray900,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -75,7 +79,7 @@ class OrderedItemsDetails extends StatelessWidget {
                 'Placed on ${_formatDate(order.createdAt)}',
                 style: TextStyle(
                   fontSize: 11.fSize,
-                  color: Color(0xFF777777),
+                  color: AppColors.gray600,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -84,10 +88,10 @@ class OrderedItemsDetails extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF3E0),
+              color: AppColors.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(5.r),
               border: Border.all(
-                color: const Color(0xFFFFE0B2),
+                color: AppColors.warning.withValues(alpha: 0.3),
                 width: 1.w,
               ),
             ),
@@ -96,7 +100,7 @@ class OrderedItemsDetails extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.fSize,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFFF9800),
+                color: AppColors.warning,
                 fontFamily: 'Inter',
               ),
             ),
@@ -111,10 +115,10 @@ class OrderedItemsDetails extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
       ),
@@ -131,7 +135,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     'Total Amount',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -141,7 +145,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20.fSize,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -154,7 +158,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     'Items',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -164,7 +168,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -172,17 +176,13 @@ class OrderedItemsDetails extends StatelessWidget {
               ),
             ],
           ),
-          
           SizedBox(height: 16),
-          
           Divider(
-            color: Color(0xFFE5E5E5).withOpacity(0.5),
+            color: AppColors.gray200.withValues(alpha: 0.5),
             thickness: 1,
             height: 1.h,
           ),
-          
           SizedBox(height: 16),
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -193,7 +193,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     'Financial Status',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -203,7 +203,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -216,7 +216,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     'Fulfillment',
                     style: TextStyle(
                       fontSize: 11.fSize,
-                      color: Color(0xFF777777),
+                      color: AppColors.gray600,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -226,7 +226,7 @@ class OrderedItemsDetails extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
+                      color: AppColors.gray900,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -248,13 +248,13 @@ class OrderedItemsDetails extends StatelessWidget {
           style: TextStyle(
             fontSize: 15.fSize,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1A1A1A),
+            color: AppColors.gray900,
             fontFamily: 'Inter',
           ),
         ),
-        
+
         SizedBox(height: 12),
-        
+
         // Items List
         ...order.lineItems.map((item) => _buildItemCard(item)).toList(),
       ],
@@ -266,33 +266,52 @@ class OrderedItemsDetails extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.gray50,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1.w,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product Image Placeholder
-          Container(
-            width: 48.w,
-            height: 48.h,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(7.r),
-            ),
-            child: Icon(
-              Icons.shopping_bag_outlined,
-              color: Color(0xFFCCCCCC),
-              size: 24.h,
+          // Product Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(7.r),
+            child: Container(
+              width: 48.w,
+              height: 48.h,
+              decoration: BoxDecoration(
+                color: AppColors.gray100,
+                borderRadius: BorderRadius.circular(7.r),
+              ),
+              child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                  ? NetworkImageLoader(
+                      imageUrl: item.imageUrl!,
+                      width: 48.w,
+                      height: 48.h,
+                      fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(7.r),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.gray100,
+                        borderRadius: BorderRadius.circular(7.r),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.shopping_bag_outlined,
+                          color: AppColors.gray400,
+                          size: 24.h,
+                        ),
+                      ),
+                    ),
             ),
           ),
-          
+
           SizedBox(width: 12),
-          
+
           // Product Details
           Expanded(
             child: Column(
@@ -303,20 +322,20 @@ class OrderedItemsDetails extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.fSize,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
+                    color: AppColors.gray900,
                     fontFamily: 'Inter',
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
+
                 SizedBox(height: 8),
-                
+
                 // Quantity Badge
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFF0F5),
+                    color: AppColors.secondary,
                     borderRadius: BorderRadius.circular(3.r),
                   ),
                   child: Text(
@@ -324,28 +343,28 @@ class OrderedItemsDetails extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFFFF5C9A),
+                      color: AppColors.primary,
                       fontFamily: 'Inter',
                     ),
                   ),
                 ),
-                
+
                 SizedBox(height: 8),
-                
+
                 // Sold by text
                 Row(
                   children: [
                     Icon(
                       Icons.store_outlined,
                       size: 12.h,
-                      color: Colors.grey[600],
+                      color: AppColors.gray600,
                     ),
                     SizedBox(width: 4),
                     Text(
                       'Sold by Glo Cure',
                       style: TextStyle(
                         fontSize: 10.fSize,
-                        color: Colors.grey[600],
+                        color: AppColors.gray600,
                         fontFamily: 'Inter',
                       ),
                     ),
@@ -354,9 +373,9 @@ class OrderedItemsDetails extends StatelessWidget {
               ],
             ),
           ),
-          
+
           SizedBox(width: 12),
-          
+
           // Unit Price
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -365,7 +384,7 @@ class OrderedItemsDetails extends StatelessWidget {
                 'Unit Price',
                 style: TextStyle(
                   fontSize: 9.fSize,
-                  color: Color(0xFF777777),
+                  color: AppColors.gray600,
                   fontFamily: 'Inter',
                 ),
               ),
@@ -375,7 +394,7 @@ class OrderedItemsDetails extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
+                  color: AppColors.gray900,
                   fontFamily: 'Inter',
                 ),
               ),

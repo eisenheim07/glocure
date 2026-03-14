@@ -216,18 +216,18 @@ class _FilterValuePanel extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(vertical: 8.h),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7.r),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                borderSide: const BorderSide(color: AppColors.gray200),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7.r),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                borderSide: const BorderSide(color: AppColors.gray200),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(7.r),
-                borderSide: const BorderSide(color: Color(0xFFFF5C9A)),
+                borderSide: const BorderSide(color: AppColors.primary),
               ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.white,
             ),
             style: TextStyle(fontSize: 11.fSize, fontFamily: 'Inter'),
           ),
@@ -239,7 +239,7 @@ class _FilterValuePanel extends StatelessWidget {
               ? Center(
                   child: Text(
                     'No results found',
-                    style: TextStyle(fontSize: 11.fSize, color: Color(0xFF999999), fontFamily: 'Inter'),
+                    style: TextStyle(fontSize: 11.fSize, color: AppColors.gray400, fontFamily: 'Inter'),
                   ),
                 )
               : ListView.builder(
@@ -286,7 +286,7 @@ class _FilterValueRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        color: isSelected ? const Color(0xFFFFE9F0) : Colors.transparent,
+        color: isSelected ? AppColors.secondary : Colors.transparent,
         padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 12.h),
         child: Row(
           children: [
@@ -296,7 +296,7 @@ class _FilterValueRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.fSize,
                   fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                  color: Colors.black87,
+                  color: AppColors.gray800,
                 ),
               ),
             ),
@@ -323,15 +323,15 @@ class _FilterCheckbox extends StatelessWidget {
       width: 19.h,
       height: 19.h,
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFFF5C9A) : Colors.transparent,
+        color: isSelected ? AppColors.primary : Colors.transparent,
         borderRadius: BorderRadius.circular(3.r),
         border: Border.all(
-          color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFD0D0D0),
+          color: isSelected ? AppColors.primary : AppColors.gray300,
           width: 1.5,
         ),
       ),
       child: isSelected
-          ? Icon(Icons.check, size: 13.h, color: Colors.white)
+          ? Icon(Icons.check, size: 13.h, color: AppColors.white)
           : null,
     );
   }
@@ -352,10 +352,10 @@ class _ApplyButton extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(13.w, 10.h, 13.w, 10.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: AppColors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -374,8 +374,8 @@ class _ApplyButton extends StatelessWidget {
               Navigator.pop(context, filters);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5C9A),
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.r),

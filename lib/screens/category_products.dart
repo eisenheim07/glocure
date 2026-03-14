@@ -296,7 +296,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                         style: TextStyle(
                           fontSize: 19.fSize,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                     ),
@@ -311,7 +311,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                           style: TextStyle(
                             fontSize: 14.fSize,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF777777),
+                            color: AppColors.gray600,
                           ),
                         ),
                         SizedBox(height: 8),
@@ -319,7 +319,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                           'Pull down to refresh',
                           style: TextStyle(
                             fontSize: 11.fSize,
-                            color: Color(0xFF999999),
+                            color: AppColors.gray400,
                           ),
                         ),
                       ],
@@ -351,7 +351,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                 style: TextStyle(
                                   fontSize: 19.fSize,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                               SizedBox(height: 4),
@@ -359,7 +359,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                 '${products.length} Products',
                                 style: TextStyle(
                                   fontSize: 12.fSize,
-                                  color: Color(0xFF777777),
+                                  color: AppColors.gray600,
                                 ),
                               ),
                             ],
@@ -492,7 +492,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                                 height: 20.h,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Color(0xFFFF5C9A),
+                                  color: AppColors.primary,
                                 ),
                               ),
                             ),
@@ -569,7 +569,7 @@ class _SortBottomSheet extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15.fSize,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: AppColors.black,
               ),
             ),
           ),
@@ -598,7 +598,7 @@ class _SortBottomSheet extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 13.fSize,
                                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                      color: Colors.black,
+                                      color: AppColors.black,
                                     ),
                                   ),
                                 ),
@@ -639,7 +639,7 @@ class _RadioCircle extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected ? const Color(0xFFFF5C9A) : const Color(0xFFD0D0D0),
+          color: isSelected ? AppColors.primary : AppColors.gray300,
           width: 2.w,
         ),
       ),
@@ -650,7 +650,7 @@ class _RadioCircle extends StatelessWidget {
                 height: 10.h,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                 ),
               ),
             )
@@ -684,10 +684,10 @@ class _BottomSortBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: AppColors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -719,7 +719,7 @@ class _BottomSortBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11.fSize,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                               SizedBox(width: 4),
@@ -737,7 +737,7 @@ class _BottomSortBar extends StatelessWidget {
                             sortLabel,
                             style: TextStyle(
                               fontSize: 9.fSize,
-                              color: Color(0xFF777777),
+                              color: AppColors.gray600,
                             ),
                           ),
                         ],
@@ -760,7 +760,7 @@ class _BottomSortBar extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.tune, size: 17.h, color: Colors.black),
+                      Icon(Icons.tune, size: 17.h, color: AppColors.black),
                       SizedBox(width: 8),
                       Column(
                         mainAxisSize: MainAxisSize.min,
@@ -773,7 +773,7 @@ class _BottomSortBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 11.fSize,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                               SizedBox(width: 4),
@@ -781,7 +781,7 @@ class _BottomSortBar extends StatelessWidget {
                                 width: 5.w,
                                 height: 5.h,
                                 decoration: BoxDecoration(
-                                  color: isFilterApplied ? const Color(0xFFFF5C9A) : Colors.grey[400],
+                                  color: isFilterApplied ? AppColors.primary : AppColors.gray400,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -791,7 +791,7 @@ class _BottomSortBar extends StatelessWidget {
                             filterLabel,
                             style: TextStyle(
                               fontSize: 9.fSize,
-                              color: Color(0xFF777777),
+                              color: AppColors.gray600,
                             ),
                           ),
                         ],
@@ -861,10 +861,10 @@ class _ProductCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(15.r),
           border: Border.all(
-            color: Colors.grey.shade200,
+            color: AppColors.gray300,
             width: 0.8,
           ),
         ),
@@ -893,9 +893,9 @@ class _ProductCard extends StatelessWidget {
                               fit: BoxFit.cover,
                             )
                           : Container(
-                              color: Colors.grey[200],
+                              color: AppColors.gray200,
                               child: const Center(
-                                child: Icon(Icons.image_outlined, color: Colors.grey),
+                                child: Icon(Icons.image_outlined, color: AppColors.gray500),
                               ),
                             ),
                     ),
@@ -907,13 +907,13 @@ class _ProductCard extends StatelessWidget {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.success,
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Text(
                           '-$discount%',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 9.fSize,
                             fontWeight: FontWeight.w600,
                           ),
@@ -927,7 +927,7 @@ class _ProductCard extends StatelessWidget {
             // Divider between image and text
             Container(
               height: 1,
-              color: Colors.grey.shade200,
+              color: AppColors.gray300,
             ),
 
             // Product info
@@ -944,7 +944,7 @@ class _ProductCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.black,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -954,7 +954,7 @@ class _ProductCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 9.fSize,
-                      color: Color(0xFF777777),
+                      color: AppColors.gray500,
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -966,7 +966,7 @@ class _ProductCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12.fSize,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.black,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -978,9 +978,9 @@ class _ProductCard extends StatelessWidget {
                             originalPrice,
                             style: TextStyle(
                               fontSize: 9.fSize,
-                              color: Color(0xFF999999),
+                              color: AppColors.gray500,
                               decoration: TextDecoration.lineThrough,
-                              decorationColor: Color(0xFF999999),
+                              decorationColor: AppColors.gray500,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -991,13 +991,13 @@ class _ProductCard extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50),
+                            color: AppColors.success,
                             borderRadius: BorderRadius.circular(5.r),
                           ),
                           child: Text(
                             '-$discount%',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 8.fSize,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1026,8 +1026,8 @@ class _FullPageShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Padding(
         padding: EdgeInsets.all(14.w),
         child: Column(
@@ -1037,7 +1037,7 @@ class _FullPageShimmer extends StatelessWidget {
               width: 153.w,
               height: 20.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(3.r),
               ),
             ),
@@ -1046,7 +1046,7 @@ class _FullPageShimmer extends StatelessWidget {
               width: 85.w,
               height: 12.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(3.r),
               ),
             ),
@@ -1062,7 +1062,7 @@ class _FullPageShimmer extends StatelessWidget {
                       width: 94.w,
                       height: 32.h,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(17.r),
                       ),
                     ),
@@ -1084,7 +1084,7 @@ class _FullPageShimmer extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(15.r),
                     ),
                   );

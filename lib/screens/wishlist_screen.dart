@@ -87,7 +87,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2),
           ),
@@ -115,7 +115,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Cart not initialized. Please try again.'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -133,7 +133,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Product variant not available'),
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
@@ -240,7 +240,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to move to cart: ${e.toString().replaceAll('Exception: ', '')}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
           ),
@@ -348,7 +348,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
                 color: AppColors.borderSecondary,
@@ -356,7 +356,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: AppColors.black.withValues(alpha: 0.04),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -413,7 +413,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       style: TextStyle(
                         fontSize: 13.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                         height: 1.3,
                       ),
                     ),
@@ -437,9 +437,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             originalPrice,
                             style: TextStyle(
                               fontSize: 12.fSize,
-                              color: AppColors.gray500,
+                              color: AppColors.gray300,
                               decoration: TextDecoration.lineThrough,
-                              decorationColor: AppColors.gray500,
+                              decorationColor: AppColors.gray300,
                             ),
                           ),
                         ],
@@ -460,7 +460,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                               vertical: 5.h,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(5.r),
                               border: Border.all(
                                 color: AppColors.borderPrimary,
@@ -524,7 +524,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   width: 28.w,
                   height: 28.h,
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -545,14 +545,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.r),
-                  color: Colors.white.withOpacity(0.7),
+                  color: AppColors.white.withValues(alpha: 0.7),
                 ),
                 child: Shimmer.fromColors(
                   baseColor: AppColors.shimmerBase,
                   highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -589,7 +589,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
             'Add products you love to your wishlist',
             style: TextStyle(
               fontSize: 13.fSize,
-              color: AppColors.gray500,
+              color: AppColors.textMuted,
             ),
           ),
           SizedBox(height: 20.h),
@@ -633,7 +633,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           child: Container(
             height: 95.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.circular(10.r),
             ),
           ),

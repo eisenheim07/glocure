@@ -7,6 +7,7 @@ import 'package:glocure/screens/custom_webview_screen.dart';
 import 'package:glocure/screens/order_screen.dart';
 import '../config/api_config.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../utils/app_colors.dart';
 
 /// Main Navigation Screen
 /// Manages bottom navigation and screen switching
@@ -91,7 +92,7 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
+        statusBarColor: AppColors.white,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light,
       ),

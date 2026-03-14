@@ -213,16 +213,16 @@ class _CartScreenState extends State<CartScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AppColors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
         ],
       ),
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(8.w),
       child: SafeArea(
         top: false,
         child: Column(
@@ -231,8 +231,8 @@ class _CartScreenState extends State<CartScreen> {
             // Total row with shimmer when not ready or updating
             showShimmer
                 ? Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -240,7 +240,7 @@ class _CartScreenState extends State<CartScreen> {
                           width: 55.w,
                           height: 22.h,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -248,7 +248,7 @@ class _CartScreenState extends State<CartScreen> {
                           width: 90.w,
                           height: 22.h,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                         ),
@@ -263,7 +263,7 @@ class _CartScreenState extends State<CartScreen> {
                         style: TextStyle(
                           fontSize: 18.fSize,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                       Text(
@@ -271,24 +271,24 @@ class _CartScreenState extends State<CartScreen> {
                         style: TextStyle(
                           fontSize: 18.fSize,
                           fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
                       ),
                     ],
                   ),
 
-            SizedBox(height: 14.h),
+            SizedBox(height: 2.h),
 
             // Button with shimmer until text is ready or while updating
             showShimmer
                 ? Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
                     child: Container(
                       width: double.infinity,
                       height: 50.h,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                     ),
@@ -353,7 +353,7 @@ class _CartScreenState extends State<CartScreen> {
       onRefresh: () async {
         await context.read<CartCubit>().refreshCart();
       },
-      color: const Color(0xFFFF5C9A),
+      color: AppColors.primary,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
@@ -366,7 +366,7 @@ class _CartScreenState extends State<CartScreen> {
                   Icon(
                     Icons.shopping_cart_outlined,
                     size: 70.h,
-                    color: Colors.grey.shade300,
+                    color: AppColors.gray300,
                   ),
                   SizedBox(height: 14.h),
                   Text(
@@ -427,7 +427,7 @@ class _CartScreenState extends State<CartScreen> {
             Icon(
               Icons.error_outline,
               size: 70.h,
-              color: Colors.red.shade300,
+              color: AppColors.error,
             ),
             SizedBox(height: 14.h),
             Text(
@@ -435,7 +435,7 @@ class _CartScreenState extends State<CartScreen> {
               style: TextStyle(
                 fontSize: 16.fSize,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade700,
+                color: AppColors.gray300,
               ),
             ),
             SizedBox(height: 7.h),
@@ -444,7 +444,7 @@ class _CartScreenState extends State<CartScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.fSize,
-                color: Colors.grey.shade500,
+                color: AppColors.gray600,
               ),
             ),
             SizedBox(height: 20.h),
@@ -453,8 +453,8 @@ class _CartScreenState extends State<CartScreen> {
                 context.read<CartCubit>().fetchCart();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -486,10 +486,10 @@ class _CartScreenState extends State<CartScreen> {
         // Bottom section shimmer
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: AppColors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -2),
               ),
@@ -503,8 +503,8 @@ class _CartScreenState extends State<CartScreen> {
               children: [
                 // Total row shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -512,7 +512,7 @@ class _CartScreenState extends State<CartScreen> {
                         width: 55.w,
                         height: 22.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
@@ -520,7 +520,7 @@ class _CartScreenState extends State<CartScreen> {
                         width: 90.w,
                         height: 22.h,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
@@ -532,13 +532,13 @@ class _CartScreenState extends State<CartScreen> {
 
                 // Button shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 50.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -585,7 +585,7 @@ class _CartItemCard extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Only $availableQty items available in stock'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 2),
         ),
@@ -598,7 +598,7 @@ class _CartItemCard extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Quantity cannot be less than 1'),
-          backgroundColor: Colors.orange,
+          backgroundColor: AppColors.warning,
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 2),
         ),
@@ -620,7 +620,7 @@ class _CartItemCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Item removed from cart'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -632,7 +632,7 @@ class _CartItemCard extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to remove item: ${e.toString().replaceAll('Exception: ', '')}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 3),
           ),
@@ -653,10 +653,10 @@ class _CartItemCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.gray300,
           width: 1,
         ),
       ),
@@ -670,7 +670,7 @@ class _CartItemCard extends StatelessWidget {
             child: Container(
               width: 85.w,
               height: 85.h,
-              color: Colors.grey.shade50,
+              color: AppColors.gray300,
               child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                   ? NetworkImageLoader(
                       imageUrl: product.imageUrl!,
@@ -679,9 +679,9 @@ class _CartItemCard extends StatelessWidget {
                       fit: BoxFit.cover,
                     )
                   : Container(
-                      color: Colors.grey.shade200,
+                      color: AppColors.gray300,
                       child: const Center(
-                        child: Icon(Icons.image_outlined, color: Colors.grey),
+                        child: Icon(Icons.image_outlined, color: AppColors.gray500),
                       ),
                     ),
             ),
@@ -702,7 +702,7 @@ class _CartItemCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.fSize,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.black,
                     height: 1.3,
                   ),
                 ),
@@ -717,7 +717,7 @@ class _CartItemCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.fSize,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     if (originalPrice.isNotEmpty) ...[
@@ -726,9 +726,9 @@ class _CartItemCard extends StatelessWidget {
                         originalPrice,
                         style: TextStyle(
                           fontSize: 12.fSize,
-                          color: Colors.grey.shade400,
+                          color: AppColors.gray300,
                           decoration: TextDecoration.lineThrough,
-                          decorationColor: Colors.grey.shade400,
+                          decorationColor: AppColors.gray300,
                         ),
                       ),
                     ],
@@ -737,7 +737,7 @@ class _CartItemCard extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.success,
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Text(
@@ -745,7 +745,7 @@ class _CartItemCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11.fSize,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -762,12 +762,12 @@ class _CartItemCard extends StatelessWidget {
                       'Quantity: ',
                       style: TextStyle(
                         fontSize: 12.fSize,
-                        color: Colors.grey.shade600,
+                        color: AppColors.gray500,
                       ),
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
+                        border: Border.all(color: AppColors.gray300),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Row(
@@ -788,8 +788,8 @@ class _CartItemCard extends StatelessWidget {
                               cartLine.quantity == 1 ? Icons.delete_outline : Icons.remove,
                               size: 14.h,
                               color: isAnyOperationInProgress
-                                  ? Colors.grey.shade300
-                                  : (cartLine.quantity == 1 ? Colors.red : Colors.grey.shade700),
+                                  ? AppColors.gray500
+                                  : (cartLine.quantity == 1 ? AppColors.error : AppColors.gray500),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: BoxConstraints(
@@ -801,7 +801,7 @@ class _CartItemCard extends StatelessWidget {
                           Container(
                             width: 1,
                             height: 18.h,
-                            color: Colors.grey.shade300,
+                            color: AppColors.gray300,
                           ),
                           // Quantity display with loading indicator
                           Padding(
@@ -813,7 +813,7 @@ class _CartItemCard extends StatelessWidget {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.grey.shade600,
+                                        AppColors.gray500,
                                       ),
                                     ),
                                   )
@@ -822,14 +822,14 @@ class _CartItemCard extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 13.fSize,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+                                      color: AppColors.black,
                                     ),
                                   ),
                           ),
                           Container(
                             width: 1,
                             height: 18.h,
-                            color: Colors.grey.shade300,
+                            color: AppColors.gray300,
                           ),
                           // Increase button
                           IconButton(
@@ -839,7 +839,7 @@ class _CartItemCard extends StatelessWidget {
                             icon: Icon(
                               Icons.add,
                               size: 14.h,
-                              color: isAnyOperationInProgress ? Colors.grey.shade300 : Colors.grey.shade700,
+                              color: isAnyOperationInProgress ? AppColors.gray500 : AppColors.gray500,
                             ),
                             padding: EdgeInsets.zero,
                             constraints: BoxConstraints(
@@ -858,7 +858,7 @@ class _CartItemCard extends StatelessWidget {
                           '| ${merchandise.title}',
                           style: TextStyle(
                             fontSize: 12.fSize,
-                            color: Colors.grey.shade600,
+                            color: AppColors.gray300,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -876,7 +876,7 @@ class _CartItemCard extends StatelessWidget {
             onPressed: isAnyOperationInProgress ? null : () => _removeItem(context),
             icon: Icon(
               Icons.delete_outline,
-              color: isAnyOperationInProgress ? Colors.grey.shade300 : Colors.grey.shade400,
+              color: isAnyOperationInProgress ? AppColors.gray500 : AppColors.gray500,
               size: 20.h,
             ),
             padding: EdgeInsets.zero,
@@ -895,11 +895,11 @@ class _CartItemShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(10.r),
         ),
         padding: EdgeInsets.all(10.w),
@@ -910,7 +910,7 @@ class _CartItemShimmer extends StatelessWidget {
               width: 85.w,
               height: 85.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(8.r),
               ),
             ),
@@ -922,19 +922,19 @@ class _CartItemShimmer extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     height: 14.h,
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                   SizedBox(height: 7.h),
                   Container(
                     width: 130.w,
                     height: 14.h,
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                   SizedBox(height: 10.h),
                   Container(
                     width: 90.w,
                     height: 18.h,
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                 ],
               ),

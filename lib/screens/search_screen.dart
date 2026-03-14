@@ -178,7 +178,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                 textAlignVertical: TextAlignVertical.center,
                 style: TextStyle(
                   fontSize: 13.fSize,
-                  color: Colors.black,
+                  color: AppColors.black,
                   fontWeight: FontWeight.w400,
                 ),
                 decoration: InputDecoration(
@@ -291,7 +291,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppColors.black,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -317,7 +317,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     TextButton(
@@ -382,7 +382,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             highlightColor: AppColors.shimmerHighlight,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(15.r),
               ),
               child: Column(
@@ -463,14 +463,14 @@ class _SearchChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          color: AppColors.gray100,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           label,
           style: const TextStyle(
             fontSize: 14,
-            color: Color(0xFF666666),
+            color: AppColors.gray600,
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -525,7 +525,7 @@ class _SearchResultsGrid extends StatelessWidget {
                 height: 20.h,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Color(0xFFFF5C9A),
+                  color: AppColors.primary,
                 ),
               ),
             ),
@@ -651,7 +651,7 @@ class _ProductCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.borderSecondary,
@@ -659,7 +659,7 @@ class _ProductCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: AppColors.black.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -700,7 +700,7 @@ class _ProductCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF00C853),
+                      color: AppColors.success,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -708,7 +708,7 @@ class _ProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -717,7 +717,7 @@ class _ProductCard extends StatelessWidget {
           ),
           Container(
             height: 1,
-            color: const Color(0xFFF0F0F0),
+            color: AppColors.gray300,
           ),
           Padding(
             padding: const EdgeInsets.all(8),
@@ -732,7 +732,7 @@ class _ProductCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -755,7 +755,7 @@ class _ProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                     if (compareAtPrice != null) ...[
@@ -767,9 +767,9 @@ class _ProductCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.gray500,
+                            color: AppColors.gray300,
                             decoration: TextDecoration.lineThrough,
-                            decorationColor: AppColors.gray500,
+                            decorationColor: AppColors.gray300,
                           ),
                         ),
                       ),
