@@ -2138,24 +2138,34 @@ class _BrandLogoCard extends StatelessWidget {
     final imageUrl = _imageUrl();
     final size = 72.0.w;
 
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-      ),
-      child: ClipOval(
-        child: Padding(
-          padding: EdgeInsets.all(12.w),
-          child: imageUrl != null && imageUrl.isNotEmpty
-              ? NetworkImageLoader(
-                  imageUrl: imageUrl,
-                  width: size - 24.w,
-                  height: size - 24.w,
-                  fit: BoxFit.contain,
-                )
-              : Icon(Icons.business, color: Colors.grey, size: 28.h),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CategoryProducts(handle: brand.fields[1].value),
+          ),
+        );
+      },
+      child: Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
+        child: ClipOval(
+          child: Padding(
+            padding: EdgeInsets.all(12.w),
+            child: imageUrl != null && imageUrl.isNotEmpty
+                ? NetworkImageLoader(
+                    imageUrl: imageUrl,
+                    width: size - 24.w,
+                    height: size - 24.w,
+                    fit: BoxFit.contain,
+                  )
+                : Icon(Icons.business, color: Colors.grey, size: 28.h),
+          ),
         ),
       ),
     );

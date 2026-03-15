@@ -531,20 +531,30 @@ class _BrandLogoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = _imageUrl();
 
-    return Container(
-      padding: EdgeInsets.all(6.w),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundTertiary,
-        borderRadius: BorderRadius.circular(8.r),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CategoryProducts(handle: brand.fields[1].value),
+          ),
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(6.w),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundTertiary,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: imageUrl != null && imageUrl.isNotEmpty
+            ? NetworkImageLoader(
+                imageUrl: imageUrl,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.contain,
+              )
+            : const Icon(Icons.business, color: Colors.grey, size: 24),
       ),
-      child: imageUrl != null && imageUrl.isNotEmpty
-          ? NetworkImageLoader(
-              imageUrl: imageUrl,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.contain,
-            )
-          : const Icon(Icons.business, color: Colors.grey, size: 24),
     );
   }
 }
