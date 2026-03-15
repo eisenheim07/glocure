@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +19,6 @@ import '../cubits/reviews/reviews_cubit.dart';
 import '../models/judgeme_reviews_model.dart';
 import '../models/judgeme_product_model.dart';
 import '../widgets/product_rating_widget.dart';
-import '../widgets/product_reviews_summary.dart';
 import '../screens/reviews_screen.dart';
 import 'category_products.dart';
 
@@ -1840,7 +1838,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     final totalPrice = needsShipping ? itemPrice + shippingCharges : itemPrice;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
