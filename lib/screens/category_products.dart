@@ -313,7 +313,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  if (title.isNotEmpty)
+                  if (title.isNotEmpty && products.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                       child: Text(
