@@ -222,7 +222,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
       child: SafeArea(
         top: false,
         child: Column(
@@ -277,7 +277,7 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
 
-            SizedBox(height: 2.h),
+            SizedBox(height: 4.h),
 
             // Button with shimmer until text is ready or while updating
             showShimmer
@@ -286,7 +286,7 @@ class _CartScreenState extends State<CartScreen> {
                     highlightColor: Colors.grey[100]!,
                     child: Container(
                       width: double.infinity,
-                      height: 50.h,
+                      height: 40.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10.r),
@@ -495,7 +495,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ],
           ),
-          padding: EdgeInsets.all(14.w),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
           child: SafeArea(
             top: false,
             child: Column(
@@ -528,7 +528,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ),
 
-                SizedBox(height: 14.h),
+                SizedBox(height: 4.h),
 
                 // Button shimmer
                 Shimmer.fromColors(
@@ -536,7 +536,7 @@ class _CartScreenState extends State<CartScreen> {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: double.infinity,
-                    height: 50.h,
+                    height: 40.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.r),

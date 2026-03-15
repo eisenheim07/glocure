@@ -18,6 +18,8 @@ import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
 import '../cubits/customer/customer_cubit.dart';
 import '../cubits/customer/customer_state.dart';
+import '../cubits/order_summary/order_summary_cubit.dart';
+import '../cubits/order_summary/order_summary_state.dart';
 import '../screens/payu_payment_screen.dart';
 import '../screens/payment_status_screen.dart';
 import '../models/order_model.dart';
@@ -36,23 +38,15 @@ class OrderSummaryScreen extends StatefulWidget {
 }
 
 class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
-  bool _isLoading = true;
-  bool _isRefreshing = false; // Track refresh state
-  bool _showAllProducts = false; // Track if user wants to see all products
-
-  // Related products state
-  bool _isLoadingRelatedProducts = false;
-  List<Map<String, dynamic>> _relatedProducts = [];
-
   @override
   void initState() {
     super.initState();
+    // Initialize the OrderSummaryCubit
+    context.read<OrderSummaryCubit>().initialize();
     _initializeScreen();
   }
 
   Future<void> _initializeScreen() async {
-    setState(() => _isLoading = true);
-
     try {
       // Fetch cart data
       context.read<CartCubit>().fetchCart();
@@ -66,34 +60,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       }
     } catch (e) {
       debugPrint('Error initializing screen: $e');
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _fetchRelatedProducts(String productId) async {
-    if (_isLoadingRelatedProducts) return;
-
-    setState(() => _isLoadingRelatedProducts = true);
-
-    try {
-      final products = await ApiService().getRelatedProducts(
-        productId: productId,
-        limit: 4,
-      );
-
-      setState(() {
-        _relatedProducts = products;
-        _isLoadingRelatedProducts = false;
-      });
-    } catch (e) {
-      debugPrint('Error fetching related products: $e');
-      setState(() => _isLoadingRelatedProducts = false);
     }
   }
 
   Future<void> _handleRefresh() async {
-    setState(() => _isRefreshing = true);
+    final orderSummaryCubit = context.read<OrderSummaryCubit>();
+    orderSummaryCubit.startRefresh();
 
     try {
       // Refresh cart data
@@ -107,13 +79,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       if (cartState is CartSuccess && cartState.cart.lines.isNotEmpty) {
         final firstProduct = cartState.cart.lines.first.merchandise?.product;
         if (firstProduct != null) {
-          await _fetchRelatedProducts(firstProduct.id);
+          await orderSummaryCubit.fetchRelatedProducts(firstProduct.id);
         }
       }
     } catch (e) {
       debugPrint('Error refreshing order summary: $e');
     } finally {
-      setState(() => _isRefreshing = false);
+      orderSummaryCubit.endRefresh();
     }
   }
 
@@ -149,8 +121,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       customer: customer,
       onPaymentSelected: (paymentMethod) async {
         debugPrint('Payment method selected: $paymentMethod');
-        // Show loading state on order summary screen
-        setState(() => _isLoading = true);
+        // Show loading state
+        context.read<OrderSummaryCubit>().initialize(); // This will show loading
 
         try {
           // Create order
@@ -162,11 +134,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           );
 
           debugPrint('✅ Order created: ${order.id}');
-
-          // Hide loading
-          if (mounted) {
-            setState(() => _isLoading = false);
-          }
 
           // Handle based on payment method
           if (paymentMethod == 'Pre-paid') {
@@ -201,7 +168,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         } catch (e) {
           debugPrint('❌ Order creation error: $e');
           if (mounted) {
-            setState(() => _isLoading = false);
+            // Reset to loaded state
+            context.read<OrderSummaryCubit>().reset();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Failed to create order: $e'),
@@ -220,8 +188,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     final status = result['status']?.toString().toLowerCase() ?? 'cancelled';
 
-    // Show shimmer loading on order summary screen
-    setState(() => _isLoading = true);
+    // Show loading
+    context.read<OrderSummaryCubit>().initialize();
 
     if (status == 'success') {
       // Payment successful - update order status
@@ -242,7 +210,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     // Wait for 2 seconds with shimmer showing
     await Future.delayed(const Duration(seconds: 2));
 
-    // Navigate to payment status screen (shimmer will close in background)
+    // Navigate to payment status screen
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -252,12 +220,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             order: order,
           ),
         ),
-      ).then((_) {
-        // Close shimmer in background after navigation
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
-      });
+      );
     }
   }
 
@@ -458,32 +421,39 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       ),
       body: BlocBuilder<CustomerCubit, CustomerState>(
         builder: (context, customerState) {
-          if (_isLoading || _isRefreshing || customerState is CustomerLoading) {
-            return _buildLoadingShimmer();
-          }
+          return BlocBuilder<OrderSummaryCubit, OrderSummaryState>(
+            builder: (context, orderSummaryState) {
+              // Show loading if any state is loading
+              if (orderSummaryState is OrderSummaryLoading ||
+                  customerState is CustomerLoading ||
+                  (orderSummaryState is OrderSummaryLoaded && orderSummaryState.isRefreshing)) {
+                return _buildLoadingShimmer();
+              }
 
-          if (customerState is CustomerError) {
-            return _buildErrorState();
-          }
+              if (customerState is CustomerError) {
+                return _buildErrorState();
+              }
 
-          if (customerState is! CustomerSuccess) {
-            return _buildLoadingShimmer();
-          }
+              if (customerState is! CustomerSuccess) {
+                return _buildLoadingShimmer();
+              }
 
-          final customer = customerState.customer;
+              final customer = customerState.customer;
 
-          return BlocBuilder<CartCubit, CartState>(
-            builder: (context, cartState) {
-              return Column(
-                children: [
-                  // Scrollable content
-                  Expanded(
-                    child: _buildContent(customer),
-                  ),
+              return BlocBuilder<CartCubit, CartState>(
+                builder: (context, cartState) {
+                  return Column(
+                    children: [
+                      // Scrollable content
+                      Expanded(
+                        child: _buildContent(customer, orderSummaryState),
+                      ),
 
-                  // Fixed bottom section with total and button
-                  if (cartState is CartSuccess) _buildBottomSection(cartState.cart, customer),
-                ],
+                      // Fixed bottom section with total and button
+                      if (cartState is CartSuccess) _buildBottomSection(cartState.cart, customer),
+                    ],
+                  );
+                },
               );
             },
           );
@@ -492,16 +462,20 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildContent(Customer customer) {
+  Widget _buildContent(Customer customer, OrderSummaryState orderSummaryState) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, cartState) {
         // Fetch related products when cart is loaded
-        if (cartState is CartSuccess && !_isLoadingRelatedProducts && _relatedProducts.isEmpty && cartState.cart.lines.isNotEmpty) {
+        if (cartState is CartSuccess &&
+            orderSummaryState is OrderSummaryLoaded &&
+            !orderSummaryState.isLoadingRelatedProducts &&
+            orderSummaryState.relatedProducts.isEmpty &&
+            cartState.cart.lines.isNotEmpty) {
           // Get first product ID from cart
           final firstProduct = cartState.cart.lines.first.merchandise?.product;
           if (firstProduct != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _fetchRelatedProducts(firstProduct.id);
+              context.read<OrderSummaryCubit>().fetchRelatedProducts(firstProduct.id);
             });
           }
         }
@@ -526,14 +500,19 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 SizedBox(height: 16),
 
                 // Cart Products Card
-                if (cartState is CartSuccess) _buildCartProductsCard(cartState.cart),
+                if (cartState is CartSuccess) _buildCartProductsCard(cartState.cart, orderSummaryState),
 
                 if (cartState is CartLoading) _buildCartProductsShimmer(),
 
                 SizedBox(height: 16),
 
                 // Related Products Section
-                if (_isLoadingRelatedProducts) _buildRelatedProductsShimmer() else if (_relatedProducts.isNotEmpty) _buildRelatedProductsSection(),
+                if (orderSummaryState is OrderSummaryLoaded) ...[
+                  if (orderSummaryState.isLoadingRelatedProducts)
+                    _buildRelatedProductsShimmer()
+                  else if (orderSummaryState.relatedProducts.isNotEmpty)
+                    _buildRelatedProductsSection(orderSummaryState.relatedProducts),
+                ],
 
                 SizedBox(height: 16),
               ],
@@ -568,112 +547,129 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 4.h),
+      padding: EdgeInsets.fromLTRB(8.h, 8.h, 8.h, 2.h),
       child: SafeArea(
         top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Subtotal row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Subtotal',
-                  style: TextStyle(
-                    fontSize: 14.fSize,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
-                    fontFamily: 'Inter',
-                  ),
+            // Price breakdown card
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: Colors.grey.shade200,
+                  width: 1,
                 ),
-                Text(
-                  formattedSubtotal,
-                  style: TextStyle(
-                    fontSize: 14.fSize,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
-
-            // Shipping charges row (always show)
-            SizedBox(height: 2.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Shipping Charges',
-                  style: TextStyle(
-                    fontSize: 14.fSize,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                Text(
-                  needsShipping ? formatIndianCurrency(shippingCharges.toString()) : 'FREE',
-                  style: TextStyle(
-                    fontSize: 14.fSize,
-                    fontWeight: FontWeight.w600,
-                    color: needsShipping ? Colors.black : const Color(0xFF4CAF50),
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 2.h),
-
-            // Divider
-            Divider(
-              color: Colors.grey.shade300,
-              thickness: 1,
-            ),
-
-            SizedBox(height: 2.h),
-
-            // Grand Total row with info icon
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Grand Total',
-                      style: TextStyle(
-                        fontSize: 17.fSize,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
-                        fontFamily: 'Inter',
+              ),
+              child: Column(
+                children: [
+                  // Subtotal row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Subtotal',
+                        style: TextStyle(
+                          fontSize: 13.fSize,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textMuted,
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () => _showGrandTotalInfoBottomSheet(context),
-                      child: Icon(
-                        Icons.info_outline,
-                        size: 18.h,
-                        color: Colors.grey.shade600,
+                      Text(
+                        formattedSubtotal,
+                        style: TextStyle(
+                          fontSize: 14.fSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Text(
-                  formattedTotal,
-                  style: TextStyle(
-                    fontSize: 17.fSize,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                    fontFamily: 'Inter',
+                    ],
                   ),
-                ),
-              ],
+
+                  SizedBox(height: 4.h),
+
+                  // Shipping charges row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Shipping Charges',
+                            style: TextStyle(
+                              fontSize: 13.fSize,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textMuted,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          GestureDetector(
+                            onTap: () => _showGrandTotalInfoBottomSheet(context),
+                            child: Icon(
+                              Icons.info_outline,
+                              size: 14.h,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        needsShipping ? formattedShipping : 'FREE',
+                        style: TextStyle(
+                          fontSize: 14.fSize,
+                          fontWeight: FontWeight.w600,
+                          color: needsShipping ? AppColors.textPrimary : AppColors.success,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 4.h),
+
+                  // Divider
+                  Divider(
+                    color: AppColors.borderSecondary,
+                    thickness: 1,
+                  ),
+
+                  SizedBox(height: 4.h),
+
+                  // Grand Total row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Grand Total',
+                        style: TextStyle(
+                          fontSize: 15.fSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      Text(
+                        formattedTotal,
+                        style: TextStyle(
+                          fontSize: 16.fSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
-            SizedBox(height: 2.h),
+            SizedBox(height: 8.h),
 
             // Proceed to Pay button
             SizedBox(
@@ -685,7 +681,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   elevation: 0,
                 ),
@@ -695,12 +691,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     Text(
                       'Proceed to Pay',
                       style: TextStyle(
-                        fontSize: 14.fSize,
+                        fontSize: 16.fSize,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Inter',
                       ),
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Icon(Icons.arrow_forward, size: 20.h),
                   ],
                 ),
@@ -928,9 +924,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildCartProductsCard(Cart cart) {
+  Widget _buildCartProductsCard(Cart cart, OrderSummaryState orderSummaryState) {
     final totalItems = cart.lines.length;
-    final displayedItems = _showAllProducts ? cart.lines : cart.lines.take(2).toList();
+    final showAllProducts = orderSummaryState is OrderSummaryLoaded ? orderSummaryState.showAllProducts : false;
+    final displayedItems = showAllProducts ? cart.lines : cart.lines.take(2).toList();
 
     return Container(
       width: double.infinity,
@@ -966,9 +963,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
                 child: TextButton(
                   onPressed: () {
-                    setState(() {
-                      _showAllProducts = !_showAllProducts;
-                    });
+                    context.read<OrderSummaryCubit>().toggleShowAllProducts();
                   },
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFFFF5C9A),
@@ -978,7 +973,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _showAllProducts ? 'View Less' : 'View More',
+                        showAllProducts ? 'View Less' : 'View More',
                         style: TextStyle(
                           fontSize: 12.fSize,
                           fontWeight: FontWeight.w600,
@@ -986,7 +981,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       ),
                       SizedBox(width: 4),
                       Icon(
-                        _showAllProducts ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        showAllProducts ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                         size: 17.h,
                       ),
                     ],
@@ -1155,7 +1150,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     );
   }
 
-  Widget _buildRelatedProductsSection() {
+  Widget _buildRelatedProductsSection(List<Map<String, dynamic>> relatedProducts) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1176,7 +1171,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _relatedProducts.map((product) {
+            children: relatedProducts.map((product) {
               return _buildRelatedProductCard(product);
             }).toList(),
           ),
@@ -1599,50 +1594,132 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
         // Bottom section shimmer
         Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
+                color: Colors.black.withOpacity(0.06),
+                blurRadius: 8,
                 offset: const Offset(0, -2),
               ),
             ],
           ),
-          padding: EdgeInsets.all(14.w),
           child: SafeArea(
             top: false,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Total row shimmer
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // Price breakdown card
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
                     children: [
-                      Container(
-                        width: 51.w,
-                        height: 20.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(3.r),
+                      // Subtotal row shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 70.w,
+                              height: 14.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                            Container(
+                              width: 120.w,
+                              height: 14.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Container(
-                        width: 85.w,
-                        height: 20.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(3.r),
+
+                      SizedBox(height: 4.h),
+
+                      // Shipping charges row shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 110.w,
+                              height: 14.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                            Container(
+                              width: 50.w,
+                              height: 14.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      // Divider
+                      Divider(
+                        color: AppColors.borderSecondary,
+                        thickness: 1,
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      // Grand Total row shimmer
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: 80.w,
+                              height: 16.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                            Container(
+                              width: 90.w,
+                              height: 16.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 8.h),
 
                 // Button shimmer
                 Shimmer.fromColors(
@@ -1653,7 +1730,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     height: 48.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                 ),
