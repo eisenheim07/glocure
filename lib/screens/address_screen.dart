@@ -454,6 +454,9 @@ class _AddressScreenState extends State<AddressScreen> {
         } else if (widget.sourceScreen == 'product_details') {
           // Coming from product details screen - go back to product details
           Navigator.pop(context, updatedCustomer); // Return updated customer
+        } else if (widget.sourceScreen == 'order_summary') {
+          // Coming from order summary screen - go back to order summary
+          Navigator.pop(context, updatedCustomer); // Return updated customer
         } else {
           // Coming from cart screen - navigate to order summary
           Navigator.pushAndRemoveUntil(

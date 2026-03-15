@@ -814,7 +814,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               ),
               child: Icon(
                 Icons.location_on_outlined,
-                color: Colors.grey.shade600,
+                color: AppColors.primary,
                 size: 20.h,
               ),
             ),

@@ -24,6 +24,7 @@ import '../screens/payu_payment_screen.dart';
 import '../screens/payment_status_screen.dart';
 import '../models/order_model.dart';
 import 'address_list_screen.dart';
+import 'address_screen.dart';
 
 class OrderSummaryScreen extends StatefulWidget {
   final Customer? customer;
@@ -222,6 +223,40 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         ),
       );
     }
+  }
+
+  /// Handle Add Address button press
+  void _handleAddAddress(BuildContext context, Customer customer) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddressScreen(
+          customer: customer,
+          sourceScreen: 'order_summary', // Indicate source screen
+        ),
+      ),
+    ).then((result) async {
+      // Handle returned data from address screen
+      if (mounted) {
+        // If we got updated customer data, update the cubit
+        if (result is Customer) {
+          context.read<CustomerCubit>().updateCustomer(result);
+        } else {
+          // Refresh customer data from API
+          context.read<CustomerCubit>().refreshCustomer();
+        }
+        
+        // Show success message
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text('Address information updated'),
+        //     backgroundColor: AppColors.success,
+        //     duration: Duration(seconds: 2),
+        //     behavior: SnackBarBehavior.floating,
+        //   ),
+        // );
+      }
+    });
   }
 
   void _showGrandTotalInfoBottomSheet(BuildContext context) {
@@ -671,12 +706,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
             SizedBox(height: 8.h),
 
-            // Proceed to Pay button
+            // Dynamic button based on address availability
             SizedBox(
               width: double.infinity,
               height: 40.h,
               child: ElevatedButton(
-                onPressed: () => _handleProceedToPay(context, cart, customer),
+                onPressed: () => customer.hasCompleteAddress() 
+                    ? _handleProceedToPay(context, cart, customer)
+                    : _handleAddAddress(context, customer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,
@@ -689,7 +726,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Proceed to Pay',
+                      customer.hasCompleteAddress() ? 'Proceed to Pay' : 'Add Address',
                       style: TextStyle(
                         fontSize: 16.fSize,
                         fontWeight: FontWeight.w700,

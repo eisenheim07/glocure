@@ -263,14 +263,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           });
           
           // Show success message if address was updated
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Address information refreshed'),
-              backgroundColor: AppColors.success,
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('Address information refreshed'),
+          //     backgroundColor: AppColors.success,
+          //     duration: Duration(seconds: 2),
+          //     behavior: SnackBarBehavior.floating,
+          //   ),
+          // );
         }
       });
     }
