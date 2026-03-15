@@ -737,7 +737,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(10.r),
@@ -761,38 +761,30 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 ),
               ),
               // Edit button
-              Container(
-                width: 34.w,
-                height: 34.h,
-                decoration: BoxDecoration(
-                  color: Color(0xFFFF5C9A),
-                  shape: BoxShape.circle,
+              IconButton(
+                icon: Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primary,
+                  size: 17.h,
                 ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.edit_outlined,
-                    color: Colors.white,
-                    size: 17.h,
-                  ),
-                  onPressed: () async {
-                    // Navigate to address list screen
-                    final updatedCustomer = await Navigator.push<Customer>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AddressListScreen(
-                          customer: customer,
-                          returnSelectedAddress: true,
-                        ),
+                onPressed: () async {
+                  // Navigate to address list screen
+                  final updatedCustomer = await Navigator.push<Customer>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AddressListScreen(
+                        customer: customer,
+                        returnSelectedAddress: true,
                       ),
-                    );
+                    ),
+                  );
 
-                    // If customer was updated, refresh the cubit
-                    if (updatedCustomer != null && mounted) {
-                      context.read<CustomerCubit>().updateCustomer(updatedCustomer);
-                    }
-                  },
-                  padding: EdgeInsets.zero,
-                ),
+                  // If customer was updated, refresh the cubit
+                  if (updatedCustomer != null && mounted) {
+                    context.read<CustomerCubit>().updateCustomer(updatedCustomer);
+                  }
+                },
+                padding: EdgeInsets.zero,
               ),
             ],
           ),
@@ -818,7 +810,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(10.r),

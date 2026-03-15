@@ -17,12 +17,14 @@ class AddressScreen extends StatefulWidget {
   final Customer? customer;
   final bool isAddingNew;
   final CustomerAddress? existingAddress;
+  final String? sourceScreen; // New parameter to track source screen
 
   const AddressScreen({
     super.key,
     this.customer,
     this.isAddingNew = false,
     this.existingAddress,
+    this.sourceScreen, // 'product_details', 'cart', or null for default behavior
   });
 
   @override
@@ -449,6 +451,9 @@ class _AddressScreenState extends State<AddressScreen> {
         if (widget.isAddingNew || widget.existingAddress != null) {
           // Coming from address list screen - go back to address list
           Navigator.pop(context, true); // Return true to indicate success
+        } else if (widget.sourceScreen == 'product_details') {
+          // Coming from product details screen - go back to product details
+          Navigator.pop(context, updatedCustomer); // Return updated customer
         } else {
           // Coming from cart screen - navigate to order summary
           Navigator.pushAndRemoveUntil(

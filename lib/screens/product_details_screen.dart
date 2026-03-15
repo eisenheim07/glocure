@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/top_products_model.dart';
+import '../models/customer_model.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
 import '../utils/app_colors.dart';
@@ -15,12 +16,16 @@ import '../cubits/top_products/top_products_cubit.dart';
 import '../cubits/top_products/top_products_state.dart';
 import '../cubits/product_details/product_details_cubit.dart';
 import '../cubits/product_details/product_details_state.dart';
+import '../cubits/customer/customer_cubit.dart';
+import '../cubits/customer/customer_state.dart';
 import '../cubits/reviews/reviews_cubit.dart';
 import '../models/judgeme_reviews_model.dart';
 import '../models/judgeme_product_model.dart';
 import '../widgets/product_rating_widget.dart';
 import '../screens/reviews_screen.dart';
 import 'category_products.dart';
+import 'address_screen.dart';
+import 'address_list_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final TopProduct? product;
@@ -41,6 +46,13 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> with TickerProviderStateMixin {
   late String discoverHandle;
   final PageController _pageController = PageController();
+
+  // Address checking variables
+  bool _hasCompleteAddress = false;
+  bool _hasCheckedAddress = false;
+  bool _buttonTextReady = false;
+  bool _isRefreshingAddress = false; // New flag for refresh shimmer
+  Customer? _customer;
 
   // Animation controller for heart icon
   late AnimationController _heartAnimationController;
@@ -107,6 +119,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     discoverHandle = widget.handle ?? 'top-products';
     AppLogger.navigation('ProductDetailsScreen', 'Handle received: $discoverHandle');
     context.read<TopProductsCubit>().fetchProductsForHandle(discoverHandle);
+
+    // Check customer address for button text
+    _checkCustomerAddress();
   }
 
   /// Toggle wishlist status
@@ -128,6 +143,136 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           duration: const Duration(seconds: 2),
         ),
       );
+    }
+  }
+
+  /// Check customer address and set button text accordingly
+  Future<void> _checkCustomerAddress() async {
+    if (_hasCheckedAddress) return; // Prevent multiple calls
+    _hasCheckedAddress = true;
+
+    try {
+      final token = await AuthStorage.getToken();
+      if (token == null || token.isEmpty) {
+        setState(() {
+          _hasCompleteAddress = false;
+          _buttonTextReady = true;
+        });
+        return;
+      }
+
+      // Fetch customer to get default address
+      final customer = await ApiService().getCustomer(token);
+      _customer = customer;
+
+      if (customer == null) {
+        setState(() {
+          _hasCompleteAddress = false;
+          _buttonTextReady = true;
+        });
+        return;
+      }
+
+      // Use the model's validation method
+      final hasCompleteAddress = customer.hasCompleteAddress();
+
+      if (!hasCompleteAddress) {
+        // If defaultAddress exists but is incomplete, delete it
+        final defaultAddr = customer.defaultAddress;
+        if (defaultAddr != null && defaultAddr.id != null) {
+          try {
+            await ApiService().customerAddressDelete(
+              customerAccessToken: token,
+              addressId: defaultAddr.id!,
+            );
+            AppLogger.info('Default address deleted successfully');
+          } catch (e) {
+            AppLogger.error('Error deleting default address: $e');
+          }
+        }
+
+        setState(() {
+          _hasCompleteAddress = false;
+          _buttonTextReady = true;
+        });
+      } else {
+        AppLogger.info('Address is complete, no deletion needed');
+        setState(() {
+          _hasCompleteAddress = true;
+          _buttonTextReady = true;
+        });
+      }
+    } catch (e) {
+      AppLogger.error('Error in address check flow: $e');
+      setState(() {
+        _hasCompleteAddress = false;
+        _buttonTextReady = true;
+      });
+    }
+  }
+
+  /// Handle Buy Now button press
+  void _handleBuyNow() {
+    if (_hasCompleteAddress) {
+      // TODO: Implement Buy Now functionality
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Buy Now functionality will be implemented'),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Navigate to address screen with source parameter
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddressScreen(
+            customer: _customer,
+            sourceScreen: 'product_details', // Indicate source screen
+          ),
+        ),
+      ).then((result) async {
+        // Handle returned data from address screen
+        if (mounted) {
+          // Show shimmer during refresh
+          setState(() {
+            _isRefreshingAddress = true;
+            _hasCheckedAddress = false;
+            _buttonTextReady = false;
+          });
+          
+          // If we got updated customer data, use it
+          if (result is Customer) {
+            setState(() {
+              _customer = result;
+            });
+            // Update the customer cubit as well
+            context.read<CustomerCubit>().updateCustomer(result);
+          } else {
+            // Refresh customer data from API
+            context.read<CustomerCubit>().refreshCustomer();
+          }
+          
+          // Re-check customer address to update button text and card visibility
+          await _checkCustomerAddress();
+          
+          // Hide shimmer after refresh
+          setState(() {
+            _isRefreshingAddress = false;
+          });
+          
+          // Show success message if address was updated
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Address information refreshed'),
+              backgroundColor: AppColors.success,
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      });
     }
   }
 
@@ -596,6 +741,221 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     );
   }
 
+  /// Build shipping address card
+  Widget _buildShippingAddressCard(Customer customer) {
+    final defaultAddr = customer.defaultAddress;
+
+    if (defaultAddr == null) {
+      return _buildEmptyCard('Shipping Address', 'No address available');
+    }
+
+    // Build full address string
+    final addressParts = <String>[];
+    if (defaultAddr.address1 != null && defaultAddr.address1!.isNotEmpty) {
+      addressParts.add(defaultAddr.address1!);
+    }
+    if (defaultAddr.address2 != null && defaultAddr.address2!.isNotEmpty) {
+      addressParts.add(defaultAddr.address2!);
+    }
+    if (defaultAddr.city != null && defaultAddr.city!.isNotEmpty) {
+      addressParts.add(defaultAddr.city!);
+    }
+    if (defaultAddr.province != null && defaultAddr.province!.isNotEmpty) {
+      addressParts.add(defaultAddr.province!);
+    }
+    if (defaultAddr.zip != null && defaultAddr.zip!.isNotEmpty) {
+      addressParts.add(defaultAddr.zip!);
+    }
+
+    final fullAddress = addressParts.join(', ');
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(8.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1.w,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Shipping Address',
+                style: TextStyle(
+                  fontSize: 14.fSize,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+              // Edit button
+              IconButton(
+                icon: Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primary,
+                  size: 16.h,
+                ),
+                onPressed: () async {
+                  // Navigate to address list screen
+                  final updatedCustomer = await Navigator.push<Customer>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AddressListScreen(
+                        customer: customer,
+                        returnSelectedAddress: true,
+                      ),
+                    ),
+                  );
+
+                  // Always refresh when returning from address screen
+                  if (mounted) {
+                    // Show shimmer during refresh
+                    setState(() {
+                      _isRefreshingAddress = true;
+                      _hasCheckedAddress = false;
+                      _buttonTextReady = false;
+                    });
+                    
+                    // Update customer state if we got updated customer data
+                    if (updatedCustomer != null) {
+                      setState(() {
+                        _customer = updatedCustomer;
+                      });
+                      // Update the customer cubit as well
+                      context.read<CustomerCubit>().updateCustomer(updatedCustomer);
+                    } else {
+                      // Even if no customer returned, refresh customer data from API
+                      context.read<CustomerCubit>().refreshCustomer();
+                    }
+                    
+                    // Re-check customer address to update button text and card visibility
+                    await _checkCustomerAddress();
+                    
+                    // Hide shimmer after refresh
+                    setState(() {
+                      _isRefreshingAddress = false;
+                    });
+                  }
+                },
+                padding: EdgeInsets.zero,
+              ),
+            ],
+          ),
+          Text(
+            fullAddress.isNotEmpty ? fullAddress : 'Address not available',
+            style: TextStyle(
+              fontSize: 12.fSize,
+              color: Colors.grey.shade700,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build contact information card
+  Widget _buildContactInformationCard(Customer customer) {
+    final firstName = customer.firstName ?? '';
+    final lastName = customer.lastName ?? '';
+    final fullName = '$firstName $lastName'.trim();
+    final email = customer.email ?? '';
+    final phone = customer.defaultAddress?.phone ?? customer.phone ?? '';
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(8.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1.w,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Contact Information',
+                style: TextStyle(
+                  fontSize: 14.fSize,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          if (phone.isNotEmpty) ...[
+            Text(
+              phone,
+              style: TextStyle(
+                fontSize: 12.fSize,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
+          ],
+          if (email.isNotEmpty)
+            Text(
+              email,
+              style: TextStyle(
+                fontSize: 12.fSize,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Build empty card for missing information
+  Widget _buildEmptyCard(String title, String message) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1.w,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14.fSize,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            style: TextStyle(
+              fontSize: 12.fSize,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -612,7 +972,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           }
         },
         builder: (context, state) {
-          if (state is ProductDetailsLoading) {
+          // Show shimmer when refreshing address or loading product details
+          if (state is ProductDetailsLoading || _isRefreshingAddress) {
             return Column(
               children: [
                 const SizedBox(height: 10),
@@ -724,6 +1085,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                     ],
                   ),
                 ),
+
+                // Address Cards (if customer has complete address)
+                if (_hasCompleteAddress && _customer != null) ...[
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.h),
+                    child: Column(
+                      children: [
+                        _buildShippingAddressCard(_customer!),
+                        const SizedBox(height: 4),
+                        _buildContactInformationCard(_customer!),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ],
 
                 // Discover Products Section
                 _buildDiscoverSection(),
@@ -2071,34 +2447,44 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 Expanded(
                   child: SizedBox(
                     height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Implement Buy Now functionality
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF5C9A),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Buy Now',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Inter',
+                    child: !_buttonTextReady
+                        ? Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          )
+                        : ElevatedButton(
+                            onPressed: _handleBuyNow,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFF5C9A),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _hasCompleteAddress ? 'Buy Now' : 'Add Address',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(Icons.arrow_forward, size: 20.h),
+                              ],
                             ),
                           ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward, size: 20.h),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ],

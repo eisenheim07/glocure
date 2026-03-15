@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
 import '../utils/size_utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -308,14 +309,14 @@ class _AddressListScreenState extends State<AddressListScreen> {
           child: ListView(
             padding: EdgeInsets.all(14.w),
             children: List.generate(
-              3,
+              20,
               (index) => Padding(
                 padding: EdgeInsets.only(bottom: 14.h),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey.shade300,
                   highlightColor: Colors.grey.shade100,
                   child: Container(
-                    height: 102.h,
+                    height: 80.h,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.r),
@@ -345,7 +346,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               highlightColor: Colors.grey.shade100,
               child: Container(
                 width: double.infinity,
-                height: 48.h,
+                height: 40.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.r),
@@ -784,7 +785,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(14.w),
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.r),
@@ -838,10 +839,14 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       const SizedBox(width: 8),
                       if (isDefault)
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(3.r),
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(
+                              color: AppColors.gray200,
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             'Default',
