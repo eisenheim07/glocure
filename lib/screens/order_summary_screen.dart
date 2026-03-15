@@ -321,11 +321,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     ),
                   ),
 
-                  // SizedBox(height: 16.h),
+                  SizedBox(height: 16.h),
 
                   // Content
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -568,7 +568,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(10.w),
+      padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 4.h),
       child: SafeArea(
         top: false,
         child: Column(
@@ -600,7 +600,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             ),
 
             // Shipping charges row (always show)
-            SizedBox(height: 8),
+            SizedBox(height: 2.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -625,7 +625,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ],
             ),
 
-            SizedBox(height: 12),
+            SizedBox(height: 2.h),
 
             // Divider
             Divider(
@@ -633,7 +633,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               thickness: 1,
             ),
 
-            SizedBox(height: 8),
+            SizedBox(height: 2.h),
 
             // Grand Total row with info icon
             Row(
@@ -673,12 +673,12 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               ],
             ),
 
-            SizedBox(height: 16),
+            SizedBox(height: 2.h),
 
             // Proceed to Pay button
             SizedBox(
               width: double.infinity,
-              height: 48.h,
+              height: 40.h,
               child: ElevatedButton(
                 onPressed: () => _handleProceedToPay(context, cart, customer),
                 style: ElevatedButton.styleFrom(

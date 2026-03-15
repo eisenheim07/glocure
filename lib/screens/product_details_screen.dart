@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -407,6 +408,194 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       }
       AppLogger.error('Add to cart error: $e');
     }
+  }
+
+  /// Show shipping charges info dialog
+  void _showGrandTotalInfoBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+            width: double.infinity,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drag handle
+                  Container(
+                    margin: EdgeInsets.only(top: 8.h, bottom: 16.h),
+                    width: 32.w,
+                    height: 3.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.borderPrimary,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+
+                  // Icon and Title
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Container(
+                        //   width: 36.w,
+                        //   height: 36.h,
+                        //   decoration: BoxDecoration(
+                        //     color: AppColors.primary.withValues(alpha: 0.1),
+                        //     shape: BoxShape.circle,
+                        //   ),
+                        //   child: Icon(
+                        //     Icons.info_outline,
+                        //     size: 20.h,
+                        //     color: AppColors.primary,
+                        //   ),
+                        // ),
+                        // SizedBox(width: 12.w),
+                        Text(
+                          'Grand Total Breakdown',
+                          style: TextStyle(
+                            fontSize: 17.fSize,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 16.h),
+
+                  // Content
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Item price
+                        _buildInfoRow(
+                          '• Item Price',
+                          'Cost of all products in your cart',
+                        ),
+
+                        SizedBox(height: 12.h),
+
+                        // Delivery charges
+                        _buildInfoRow(
+                          '• Delivery Charges',
+                          '₹99 for orders below ₹1000\nFREE for orders ₹1000 & above',
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Highlight box
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.local_shipping_outlined,
+                                size: 16.h,
+                                color: AppColors.success,
+                              ),
+                              SizedBox(width: 8.w),
+                              Expanded(
+                                child: Text(
+                                  'Enjoy FREE delivery on orders ₹1000+',
+                                  style: TextStyle(
+                                    fontSize: 12.fSize,
+                                    color: AppColors.success,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 16.h),
+
+                  // Close button
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 40.h,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Got it',
+                          style: TextStyle(
+                            fontSize: 14.fSize,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // SizedBox(height: 16.h),
+                ],
+              ),
+            ));
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String title, String description) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 13.fSize,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontFamily: 'Inter',
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: 12.fSize,
+            color: AppColors.textMuted,
+            fontFamily: 'Inter',
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -1565,6 +1754,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     final originalPrice = selectedVariant.compareAtPriceV2 != null ? formatIndianCurrency(selectedVariant.compareAtPriceV2!.amount) : '';
     final discount = _calculateDiscountPercent(selectedVariant);
 
+    // Calculate shipping charges
+    final itemPrice = double.tryParse(selectedVariant.priceV2.amount) ?? 0;
+    const shippingCharges = 99.0;
+    final needsShipping = itemPrice < 1000;
+    final totalPrice = needsShipping ? itemPrice + shippingCharges : itemPrice;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
@@ -1579,153 +1774,257 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       ),
       child: SafeArea(
         top: false,
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Price section
-            Expanded(
+            // Price breakdown section
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: Colors.grey.shade200,
+                  width: 1,
+                ),
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Item price row
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        currentPrice,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black,
+                        'Item Price',
+                        style: TextStyle(
+                          fontSize: 13.fSize,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textMuted,
+                          fontFamily: 'Inter',
                         ),
                       ),
-                      if (originalPrice.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        Text(
-                          originalPrice,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                            decoration: TextDecoration.lineThrough,
-                            decorationColor: Colors.grey.shade500,
+                      Row(
+                        children: [
+                          Text(
+                            currentPrice,
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                              fontFamily: 'Inter',
+                            ),
                           ),
-                        ),
-                      ],
+                          if (originalPrice.isNotEmpty) ...[
+                            SizedBox(width: 6.w),
+                            Text(
+                              originalPrice,
+                              style: TextStyle(
+                                fontSize: 11.fSize,
+                                color: AppColors.textMuted,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: AppColors.textMuted,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                          ],
+                          if (discount > 0) ...[
+                            SizedBox(width: 6.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                              decoration: BoxDecoration(
+                                color: AppColors.success,
+                                borderRadius: BorderRadius.circular(3.r),
+                              ),
+                              child: Text(
+                                '-$discount%',
+                                style: TextStyle(
+                                  fontSize: 9.fSize,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ],
                   ),
-                  if (discount > 0) ...[
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+
+                  // SizedBox(height: 4.h),
+
+                  // Shipping charges row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Shipping Charges',
+                            style: TextStyle(
+                              fontSize: 13.fSize,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textMuted,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          GestureDetector(
+                            onTap: () => _showGrandTotalInfoBottomSheet(context),
+                            child: Icon(
+                              Icons.info_outline,
+                              size: 14.h,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF00C853),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '$discount% off',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                      Text(
+                        needsShipping ? formatIndianCurrency(shippingCharges.toString()) : 'FREE',
+                        style: TextStyle(
+                          fontSize: 14.fSize,
+                          fontWeight: FontWeight.w600,
+                          color: needsShipping ? AppColors.textPrimary : AppColors.success,
+                          fontFamily: 'Inter',
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+
+                  SizedBox(height: 4.h),
+
+                  // Divider
+                  Divider(
+                    color: AppColors.borderSecondary,
+                    thickness: 1,
+                  ),
+
+                  SizedBox(height: 4.h),
+
+                  // Total price row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Price',
+                        style: TextStyle(
+                          fontSize: 15.fSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      Text(
+                        formatIndianCurrency(totalPrice.toString()),
+                        style: TextStyle(
+                          fontSize: 16.fSize,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(width: 12),
+            SizedBox(height: 8.h),
 
-            // Wishlist button
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              ),
-              child: IconButton(
-                onPressed: _toggleWishlist,
-                icon: ScaleTransition(
-                  scale: _heartScaleAnimation,
-                  child: Icon(
-                    state.isInWishlist ? Icons.favorite : Icons.favorite_border,
-                    color: const Color(0xFFFF5C9A),
-                    size: 22,
-                  ),
-                ),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-
-            const SizedBox(width: 8),
-
-            // Cart button
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
-                  width: 1,
-                ),
-              ),
-              child: ScaleTransition(
-                scale: _cartScaleAnimation,
-                child: IconButton(
-                  onPressed: _addToCart,
-                  icon: const Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Color(0xFFFF5C9A),
-                    size: 22,
-                  ),
-                  padding: EdgeInsets.zero,
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 8),
-
-            // Buy Now button
-            Expanded(
-              child: SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Buy now action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5C9A),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+            // Action buttons row
+            Row(
+              children: [
+                // Wishlist button
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                      width: 1,
                     ),
-                    elevation: 0,
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Buy now',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
+                  child: IconButton(
+                    onPressed: _toggleWishlist,
+                    icon: ScaleTransition(
+                      scale: _heartScaleAnimation,
+                      child: Icon(
+                        state.isInWishlist ? Icons.favorite : Icons.favorite_border,
+                        color: const Color(0xFFFF5C9A),
+                        size: 22,
                       ),
-                      SizedBox(width: 6),
-                      Icon(Icons.arrow_forward, size: 18),
-                    ],
+                    ),
+                    padding: EdgeInsets.zero,
                   ),
                 ),
-              ),
+
+                const SizedBox(width: 8),
+
+                // Cart button
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    ),
+                  ),
+                  child: ScaleTransition(
+                    scale: _cartScaleAnimation,
+                    child: IconButton(
+                      onPressed: _addToCart,
+                      icon: const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Color(0xFFFF5C9A),
+                        size: 22,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Buy Now button
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // TODO: Implement Buy Now functionality
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF5C9A),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Buy Now',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward, size: 20.h),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -51,10 +51,10 @@ class _CartScreenState extends State<CartScreen> {
 
       // First, fetch customer to get default address
       final customer = await ApiService().getCustomer(token);
-      
+
       // Store customer object
       _customer = customer;
-      
+
       if (customer == null) {
         setState(() {
           _hasCompleteAddress = false;
@@ -65,7 +65,7 @@ class _CartScreenState extends State<CartScreen> {
 
       // Use the model's validation method
       final hasCompleteAddress = customer.hasCompleteAddress();
-      
+
       if (!hasCompleteAddress) {
         // If defaultAddress exists but is incomplete, delete it
         final defaultAddr = customer.defaultAddress;
@@ -83,7 +83,7 @@ class _CartScreenState extends State<CartScreen> {
           // No address to delete, just log
           debugPrint('ℹ️ No default address to delete');
         }
-        
+
         // After deletion (or if address was null), button shows "Add Address"
         setState(() {
           _hasCompleteAddress = false;
@@ -202,7 +202,7 @@ class _CartScreenState extends State<CartScreen> {
   Widget _buildBottomSection(Cart cart) {
     final totalAmount = cart.cost?.totalAmount.amount ?? '0';
     final formattedTotal = formatIndianCurrency(totalAmount);
-    
+
     // Check if any item is being updated
     final isAnyItemUpdating = cart.lines.any(
       (line) => context.watch<CartCubit>().isLineUpdating(line.id),
@@ -222,7 +222,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(12.w),
       child: SafeArea(
         top: false,
         child: Column(
@@ -277,7 +277,7 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
 
-            SizedBox(height: 14.h),
+            SizedBox(height: 2.h),
 
             // Button with shimmer until text is ready or while updating
             showShimmer
@@ -295,7 +295,7 @@ class _CartScreenState extends State<CartScreen> {
                   )
                 : SizedBox(
                     width: double.infinity,
-                    height: 50.h,
+                    height: 40.h,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_hasCompleteAddress) {
@@ -787,9 +787,7 @@ class _CartItemCard extends StatelessWidget {
                             icon: Icon(
                               cartLine.quantity == 1 ? Icons.delete_outline : Icons.remove,
                               size: 14.h,
-                              color: isAnyOperationInProgress
-                                  ? Colors.grey.shade300
-                                  : (cartLine.quantity == 1 ? Colors.red : Colors.grey.shade700),
+                              color: isAnyOperationInProgress ? Colors.grey.shade300 : (cartLine.quantity == 1 ? Colors.red : Colors.grey.shade700),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: BoxConstraints(
@@ -833,9 +831,7 @@ class _CartItemCard extends StatelessWidget {
                           ),
                           // Increase button
                           IconButton(
-                            onPressed: isAnyOperationInProgress
-                                ? null
-                                : () => _updateQuantity(context, cartLine.quantity + 1),
+                            onPressed: isAnyOperationInProgress ? null : () => _updateQuantity(context, cartLine.quantity + 1),
                             icon: Icon(
                               Icons.add,
                               size: 14.h,
