@@ -11,11 +11,13 @@ import '../config/api_config.dart';
 class PayUPaymentScreen extends StatefulWidget {
   final OrderModel order;
   final Customer customer;
+  final double? totalAmountWithShipping; // Optional parameter for total amount including shipping
 
   const PayUPaymentScreen({
     super.key,
     required this.order,
     required this.customer,
+    this.totalAmountWithShipping, // Add optional parameter
   });
 
   @override
@@ -56,7 +58,11 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _initializeWebView() {
     // Prepare payment parameters
-    final amount = widget.order.totalPrice?.replaceAll(RegExp(r'[^0-9.]'), '') ?? '0';
+    // Use the total amount with shipping if provided, otherwise use order's total price
+    final amount = widget.totalAmountWithShipping != null 
+        ? widget.totalAmountWithShipping!.toStringAsFixed(2)
+        : (widget.order.totalPrice?.replaceAll(RegExp(r'[^0-9.]'), '') ?? '0');
+    
     final productInfo = 'Order #${widget.order.orderNumber} - ${widget.order.lineItems.length} items';
     final firstName = widget.customer.firstName ?? 'Customer';
     final lastName = widget.customer.lastName ?? '';
@@ -81,7 +87,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
     debugPrint('═══════════════════════════════════════════════════════');
     debugPrint('🔧 PAYU PAYMENT INITIALIZATION');
     debugPrint('═══════════════════════════════════════════════════════');
-    debugPrint('Amount: $amount');
+    debugPrint('Amount: $amount ${widget.totalAmountWithShipping != null ? "(including shipping)" : "(from order)"}');
     debugPrint('Email: $email');
     debugPrint('Phone: $phone');
     debugPrint('First Name: $firstName');

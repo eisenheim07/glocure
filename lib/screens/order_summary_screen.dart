@@ -10,10 +10,12 @@ import '../services/api_service.dart';
 import '../services/order_service.dart';
 import '../utils/format_utils.dart';
 import '../utils/app_colors.dart';
+import '../utils/app_logger.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/payment_selection_bottom_sheet.dart';
 import '../widgets/common_bottom_sheet.dart';
+import '../widgets/common_payment_flow.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
 import '../cubits/customer/customer_cubit.dart';
@@ -39,6 +41,8 @@ class OrderSummaryScreen extends StatefulWidget {
 }
 
 class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
+  bool _isPaymentLoading = false; // Payment loading state
+  
   @override
   void initState() {
     super.initState();
@@ -91,138 +95,31 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   }
 
   void _handleProceedToPay(BuildContext context, Cart cart, Customer customer) {
-    // Validate customer and address
-    final defaultAddress = customer.defaultAddress;
-    if (defaultAddress == null || defaultAddress.zip == null || defaultAddress.zip!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add a delivery address with pincode'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Validate cart
-    if (cart.lines.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Your cart is empty'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Show payment selection bottom sheet
-    PaymentSelectionBottomSheet.show(
-      context,
-      pincode: defaultAddress.zip!,
-      cart: cart,
+    // Use the common payment flow
+    CommonPaymentFlow.startPaymentFlow(
+      context: context,
       customer: customer,
-      onPaymentSelected: (paymentMethod) async {
-        debugPrint('Payment method selected: $paymentMethod');
-        // Show loading state
-        context.read<OrderSummaryCubit>().initialize(); // This will show loading
-
-        try {
-          // Create order
-          debugPrint('📦 Creating $paymentMethod order...');
-          final order = await OrderService().createOrder(
-            cart: cart,
-            customer: customer,
-            paymentMethod: paymentMethod,
-          );
-
-          debugPrint('✅ Order created: ${order.id}');
-
-          // Handle based on payment method
-          if (paymentMethod == 'Pre-paid') {
-            // Navigate to PayU
-            if (mounted) {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PayUPaymentScreen(
-                    order: order,
-                    customer: customer,
-                  ),
-                ),
-              );
-
-              _handlePaymentResult(result, order);
-            }
-          } else {
-            // COD success - navigate to payment status screen
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PaymentStatusScreen(
-                    status: 'success',
-                    order: order,
-                  ),
-                ),
-              );
-            }
-          }
-        } catch (e) {
-          debugPrint('❌ Order creation error: $e');
-          if (mounted) {
-            // Reset to loaded state
-            context.read<OrderSummaryCubit>().reset();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to create order: $e'),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 4),
-              ),
-            );
-          }
-        }
+      cart: cart,
+      onLoadingStart: () {
+        setState(() {
+          _isPaymentLoading = true;
+        });
+      },
+      onLoadingEnd: () {
+        setState(() {
+          _isPaymentLoading = false;
+        });
+      },
+      onSuccess: () {
+        // Payment successful - could refresh data or show success message
+        AppLogger.success('Order payment completed successfully');
+      },
+      onError: () {
+        // Payment failed - reset to loaded state
+        context.read<OrderSummaryCubit>().reset();
+        AppLogger.error('Order payment failed');
       },
     );
-  }
-
-  void _handlePaymentResult(dynamic result, OrderModel order) async {
-    if (result == null || !mounted) return;
-
-    final status = result['status']?.toString().toLowerCase() ?? 'cancelled';
-
-    // Show loading
-    context.read<OrderSummaryCubit>().initialize();
-
-    if (status == 'success') {
-      // Payment successful - update order status
-      debugPrint('✅ Payment successful!');
-
-      OrderService()
-          .updateOrderStatus(
-        orderId: order.id!,
-        financialStatus: 'paid',
-      )
-          .then((_) {
-        debugPrint('✅ Order status updated to paid');
-      }).catchError((e) {
-        debugPrint('⚠️ Failed to update order status: $e');
-      });
-    }
-
-    // Wait for 2 seconds with shimmer showing
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Navigate to payment status screen
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PaymentStatusScreen(
-            status: status,
-            order: order,
-          ),
-        ),
-      );
-    }
   }
 
   /// Handle Add Address button press
@@ -458,9 +355,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         builder: (context, customerState) {
           return BlocBuilder<OrderSummaryCubit, OrderSummaryState>(
             builder: (context, orderSummaryState) {
-              // Show loading if any state is loading
+              // Show loading if any state is loading or payment is processing
               if (orderSummaryState is OrderSummaryLoading ||
                   customerState is CustomerLoading ||
+                  _isPaymentLoading ||
                   (orderSummaryState is OrderSummaryLoaded && orderSummaryState.isRefreshing)) {
                 return _buildLoadingShimmer();
               }

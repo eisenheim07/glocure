@@ -503,7 +503,7 @@ class _OrderCardState extends State<_OrderCard> {
                       children: [
                         Icon(
                           Icons.delete_outline,
-                          color: const Color(0xFFF44336),
+                          color: const Color(0xFFFF5C9A),
                           size: 18.h,
                         ),
                         SizedBox(width: 10.w),

@@ -12,6 +12,7 @@ import '../utils/app_logger.dart';
 import '../services/api_service.dart';
 import '../widgets/network_image_loader.dart';
 import '../widgets/custom_app_bar.dart';
+import '../widgets/common_payment_flow.dart';
 import '../cubits/top_products/top_products_cubit.dart';
 import '../cubits/top_products/top_products_state.dart';
 import '../cubits/product_details/product_details_cubit.dart';
@@ -52,6 +53,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   bool _hasCheckedAddress = false;
   bool _buttonTextReady = false;
   bool _isRefreshingAddress = false; // New flag for refresh shimmer
+  bool _isPaymentLoading = false; // New flag for payment loading shimmer
   Customer? _customer;
 
   // Animation controller for heart icon
@@ -213,14 +215,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Handle Buy Now button press
   void _handleBuyNow() {
-    if (_hasCompleteAddress) {
-      // TODO: Implement Buy Now functionality
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Buy Now functionality will be implemented'),
-          backgroundColor: AppColors.primary,
-          duration: Duration(seconds: 2),
-        ),
+    if (_hasCompleteAddress && _customer != null) {
+      final currentState = context.read<ProductDetailsCubit>().state;
+      if (currentState is! ProductDetailsLoaded) return;
+
+      final selectedVariant = _getSelectedVariant(currentState);
+
+      // Start the common payment flow
+      CommonPaymentFlow.startPaymentFlow(
+        context: context,
+        customer: _customer!,
+        product: currentState.product,
+        selectedVariant: selectedVariant,
+        quantity: 1,
+        onLoadingStart: () {
+          setState(() {
+            _isPaymentLoading = true;
+          });
+        },
+        onLoadingEnd: () {
+          setState(() {
+            _isPaymentLoading = false;
+          });
+        },
+        onSuccess: () {
+          // Payment successful - could refresh data or show success message
+          AppLogger.success('Buy Now payment completed successfully');
+        },
+        onError: () {
+          // Payment failed - could show error message or retry option
+          AppLogger.error('Buy Now payment failed');
+        },
       );
     } else {
       // Navigate to address screen with source parameter
@@ -241,7 +266,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             _hasCheckedAddress = false;
             _buttonTextReady = false;
           });
-          
+
           // If we got updated customer data, use it
           if (result is Customer) {
             setState(() {
@@ -253,24 +278,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             // Refresh customer data from API
             context.read<CustomerCubit>().refreshCustomer();
           }
-          
+
           // Re-check customer address to update button text and card visibility
           await _checkCustomerAddress();
-          
+
           // Hide shimmer after refresh
           setState(() {
             _isRefreshingAddress = false;
           });
-          
-          // Show success message if address was updated
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('Address information refreshed'),
-          //     backgroundColor: AppColors.success,
-          //     duration: Duration(seconds: 2),
-          //     behavior: SnackBarBehavior.floating,
-          //   ),
-          // );
         }
       });
     }
@@ -821,7 +836,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       _hasCheckedAddress = false;
                       _buttonTextReady = false;
                     });
-                    
+
                     // Update customer state if we got updated customer data
                     if (updatedCustomer != null) {
                       setState(() {
@@ -833,10 +848,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       // Even if no customer returned, refresh customer data from API
                       context.read<CustomerCubit>().refreshCustomer();
                     }
-                    
+
                     // Re-check customer address to update button text and card visibility
                     await _checkCustomerAddress();
-                    
+
                     // Hide shimmer after refresh
                     setState(() {
                       _isRefreshingAddress = false;
@@ -972,8 +987,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           }
         },
         builder: (context, state) {
-          // Show shimmer when refreshing address or loading product details
-          if (state is ProductDetailsLoading || _isRefreshingAddress) {
+          // Show shimmer when refreshing address, loading product details, or processing payment
+          if (state is ProductDetailsLoading || _isRefreshingAddress || _isPaymentLoading) {
             return Column(
               children: [
                 const SizedBox(height: 10),

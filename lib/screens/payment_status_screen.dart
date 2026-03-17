@@ -182,7 +182,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
 
         // Bottom buttons shimmer
         Container(
-          padding: EdgeInsets.all(17.w),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
           decoration: BoxDecoration(
             color: AppColors.white,
             boxShadow: [
@@ -202,7 +202,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
                 // Primary button shimmer
                 Container(
                   width: double.infinity,
-                  height: 48.h,
+                  height: 40.h,
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(10.r),
@@ -214,7 +214,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
                 // Secondary button shimmer
                 Container(
                   width: double.infinity,
-                  height: 48.h,
+                  height: 40.h,
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(10.r),
@@ -281,7 +281,12 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
 
   Widget _buildOrderDetailsCard() {
     final totalAmount = widget.order.totalPrice ?? '0';
-    final formattedTotal = formatIndianCurrency(totalAmount);
+
+    // Parse the total amount to check if shipping charges should be added
+    final numericTotal = double.tryParse(totalAmount.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    final finalTotal = numericTotal < 1000 ? numericTotal + 99 : numericTotal;
+    final formattedTotal = formatIndianCurrency(finalTotal.toString());
+
     final itemCount = widget.order.lineItems.length;
     final createdAt = widget.order.createdAt != null ? _formatDateTime(widget.order.createdAt!) : 'N/A';
 
@@ -413,7 +418,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
 
   Widget _buildBottomButtons(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(17.w),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
       decoration: BoxDecoration(
         color: AppColors.white,
         boxShadow: [
@@ -475,7 +480,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
   ) {
     return SizedBox(
       width: double.infinity,
-      height: 48.h,
+      height: 40.h,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -505,7 +510,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
   ) {
     return SizedBox(
       width: double.infinity,
-      height: 48.h,
+      height: 40.h,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(

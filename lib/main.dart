@@ -24,6 +24,7 @@ import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/payment_status/payment_status_cubit.dart';
 import 'package:glocure/cubits/order_summary/order_summary_cubit.dart';
 import 'package:glocure/cubits/signup/signup_cubit.dart';
+import 'package:glocure/cubits/payment_flow/payment_flow_cubit.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/utils/app_theme.dart';
 import 'package:glocure/utils/app_colors.dart';
@@ -145,6 +146,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => PaymentStatusCubit()),
           BlocProvider(create: (_) => OrderSummaryCubit()),
           BlocProvider(create: (_) => SignupCubit()),
+          BlocProvider(create: (_) => PaymentFlowCubit()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
