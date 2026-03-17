@@ -134,7 +134,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
                 // Saved reports
                 _AccountMenuItem(
-                  icon: Icons.receipt_long_outlined,
+                  icon: Icons.newspaper,
                   title: 'Saved reports',
                   onTap: () {
                     // TODO: Navigate to saved reports screen

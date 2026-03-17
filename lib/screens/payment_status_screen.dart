@@ -15,11 +15,13 @@ import 'main_navigation_screen.dart';
 class PaymentStatusScreen extends StatefulWidget {
   final String status; // 'success', 'failed', 'cancelled'
   final OrderModel order;
+  final Map<String, dynamic>? payuData; // PayU response data
 
   const PaymentStatusScreen({
     super.key,
     required this.status,
     required this.order,
+    this.payuData, // Optional PayU data
   });
 
   @override
@@ -280,7 +282,13 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
   }
 
   Widget _buildOrderDetailsCard() {
-    final totalAmount = widget.order.totalPrice ?? '0';
+    // Use PayU transaction amount if available, otherwise use order total
+    String totalAmount;
+    if (widget.payuData != null && widget.payuData!['txnAmount'] != null) {
+      totalAmount = widget.payuData!['txnAmount'].toString();
+    } else {
+      totalAmount = widget.order.totalPrice ?? '0';
+    }
 
     // Parse the total amount to check if shipping charges should be added
     final numericTotal = double.tryParse(totalAmount.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
@@ -346,6 +354,18 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
             'Payment Method',
             _getPaymentMethod(),
           ),
+
+          // Transaction Reference ID (if available from PayU)
+          if (widget.payuData != null && 
+              widget.payuData!['txnRefId'] != null && 
+              widget.payuData!['txnRefId'].toString().isNotEmpty)
+            ...[
+              SizedBox(height: 16),
+              _buildDetailRow(
+                'Transaction Ref ID',
+                widget.payuData!['txnRefId'].toString(),
+              ),
+            ],
 
           SizedBox(height: 20),
 

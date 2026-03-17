@@ -30,6 +30,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
   bool _canGoBack = false;
   bool _showingResult = false;
   String? _paymentStatus;
+  String? _lastProcessedUrl; // Store the last processed URL for data extraction
 
   @override
   void initState() {
@@ -59,20 +60,20 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
   void _initializeWebView() {
     // Prepare payment parameters
     // Use the total amount with shipping if provided, otherwise use order's total price
-    final amount = widget.totalAmountWithShipping != null 
+    final amount = widget.totalAmountWithShipping != null
         ? widget.totalAmountWithShipping!.toStringAsFixed(2)
         : (widget.order.totalPrice?.replaceAll(RegExp(r'[^0-9.]'), '') ?? '0');
-    
+
     final productInfo = 'Order #${widget.order.orderNumber} - ${widget.order.lineItems.length} items';
     final firstName = widget.customer.firstName ?? 'Customer';
     final lastName = widget.customer.lastName ?? '';
-    
+
     // Ensure email is valid, use default if not provided
     String email = widget.customer.email ?? '';
     if (email.isEmpty || !email.contains('@')) {
       email = 'test@glocure.com';
     }
-    
+
     // Ensure phone is valid, use default if not provided
     String phone = widget.customer.phone ?? widget.customer.defaultAddress?.phone ?? '';
     if (phone.isEmpty) {
@@ -151,7 +152,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       await _controller.goBack();
       return false; // Don't pop the screen
     }
-    
+
     // If can't go back, show confirmation dialog
     debugPrint('⚠️ No WebView history, showing cancel confirmation');
     final shouldPop = await showDialog<bool>(
@@ -171,57 +172,66 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
         ],
       ),
     );
-    
+
     if (shouldPop == true) {
       _handlePaymentCancelled();
     }
-    
+
     return false; // We handle the pop manually
   }
 
   void _handleNavigation(String url) {
     debugPrint('🔗 Navigation: $url');
 
+    // Store the URL for data extraction
+    _lastProcessedUrl = url;
+
     // Check for success URL patterns (case-insensitive)
     final lowerUrl = url.toLowerCase();
-    
+
     // Check if URL contains success indicators
     if (lowerUrl.contains('success') && !lowerUrl.contains('failure')) {
       debugPrint('✅ Payment Success detected from URL');
+      _extractAndLogPayUData(url);
       _handlePaymentSuccess();
       return;
     }
-    
+
     // Check for failure URL patterns
     if (lowerUrl.contains('failure') || lowerUrl.contains('failed')) {
       debugPrint('❌ Payment Failure detected from URL');
+      _extractAndLogPayUData(url);
       _handlePaymentFailure();
       return;
     }
-    
+
     // Check for cancel patterns
     if (lowerUrl.contains('cancel')) {
       debugPrint('⚠️ Payment Cancelled detected from URL');
+      _extractAndLogPayUData(url);
       _handlePaymentCancelled();
       return;
     }
-    
+
     // Check for PayU test response page with status parameter
     if (lowerUrl.contains('testpg_response.php')) {
       debugPrint('📋 PayU test response page detected, checking for status...');
-      
+
+      // Extract and log all PayU data
+      _extractAndLogPayUData(url);
+
       // Try to extract status from URL parameters
       final uri = Uri.parse(url);
       final status = uri.queryParameters['status'];
-      
+
       debugPrint('Status parameter: $status');
-      
+
       // PayU status codes:
       // 000 = Success
       // 001 = Failure
       // 002 = Pending
       // 003 = Cancelled
-      
+
       if (status == '000') {
         debugPrint('✅ Payment Success detected (status: $status)');
         _showPaymentResultOverlay('success');
@@ -238,19 +248,135 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
     }
   }
 
+  /// Extract and log all PayU response data
+  void _extractAndLogPayUData(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final queryParams = uri.queryParameters;
+
+      debugPrint('═══════════════════════════════════════════════════════');
+      debugPrint('🔍 PAYU RESPONSE DATA - COMPLETE ANALYSIS');
+      debugPrint('═══════════════════════════════════════════════════════');
+      debugPrint('📍 Full URL: $url');
+      debugPrint('📍 Host: ${uri.host}');
+      debugPrint('📍 Path: ${uri.path}');
+      debugPrint('📍 Query Parameters Count: ${queryParams.length}');
+      debugPrint('');
+
+      if (queryParams.isNotEmpty) {
+        debugPrint('📋 ALL QUERY PARAMETERS:');
+        queryParams.forEach((key, value) {
+          debugPrint('   $key: $value');
+        });
+        debugPrint('');
+
+        // Log specific PayU parameters that are commonly returned
+        debugPrint('🎯 KEY PAYU PARAMETERS:');
+        _logPayUParameter(queryParams, 'status', 'Payment Status');
+        _logPayUParameter(queryParams, 'txnid', 'Transaction ID');
+        _logPayUParameter(queryParams, 'amount', 'Amount');
+        _logPayUParameter(queryParams, 'productinfo', 'Product Info');
+        _logPayUParameter(queryParams, 'firstname', 'First Name');
+        _logPayUParameter(queryParams, 'lastname', 'Last Name');
+        _logPayUParameter(queryParams, 'email', 'Email');
+        _logPayUParameter(queryParams, 'phone', 'Phone');
+        _logPayUParameter(queryParams, 'hash', 'Hash');
+        _logPayUParameter(queryParams, 'key', 'Merchant Key');
+        _logPayUParameter(queryParams, 'salt', 'Salt');
+        _logPayUParameter(queryParams, 'error', 'Error Message');
+        _logPayUParameter(queryParams, 'error_Message', 'Error Message 2');
+        _logPayUParameter(queryParams, 'bankcode', 'Bank Code');
+        _logPayUParameter(queryParams, 'PG_TYPE', 'Payment Gateway Type');
+        _logPayUParameter(queryParams, 'bank_ref_num', 'Bank Reference Number');
+        _logPayUParameter(queryParams, 'bankcode', 'Bank Code');
+        _logPayUParameter(queryParams, 'name_on_card', 'Name on Card');
+        _logPayUParameter(queryParams, 'cardnum', 'Card Number');
+        _logPayUParameter(queryParams, 'issuing_bank', 'Issuing Bank');
+        _logPayUParameter(queryParams, 'card_type', 'Card Type');
+        _logPayUParameter(queryParams, 'discount', 'Discount');
+        _logPayUParameter(queryParams, 'net_amount_debit', 'Net Amount Debit');
+        _logPayUParameter(queryParams, 'addedon', 'Added On');
+        _logPayUParameter(queryParams, 'payment_source', 'Payment Source');
+        _logPayUParameter(queryParams, 'udf1', 'User Defined Field 1');
+        _logPayUParameter(queryParams, 'udf2', 'User Defined Field 2');
+        _logPayUParameter(queryParams, 'udf3', 'User Defined Field 3');
+        _logPayUParameter(queryParams, 'udf4', 'User Defined Field 4');
+        _logPayUParameter(queryParams, 'udf5', 'User Defined Field 5');
+        _logPayUParameter(queryParams, 'field1', 'Field 1');
+        _logPayUParameter(queryParams, 'field2', 'Field 2');
+        _logPayUParameter(queryParams, 'field3', 'Field 3');
+        _logPayUParameter(queryParams, 'field4', 'Field 4');
+        _logPayUParameter(queryParams, 'field5', 'Field 5');
+        _logPayUParameter(queryParams, 'field6', 'Field 6');
+        _logPayUParameter(queryParams, 'field7', 'Field 7');
+        _logPayUParameter(queryParams, 'field8', 'Field 8');
+        _logPayUParameter(queryParams, 'field9', 'Field 9');
+        _logPayUParameter(queryParams, 'unmappedstatus', 'Unmapped Status');
+        _logPayUParameter(queryParams, 'mode', 'Payment Mode');
+        _logPayUParameter(queryParams, 'easypayid', 'EasyPay ID');
+        _logPayUParameter(queryParams, 'mihpayid', 'MihPay ID');
+
+        debugPrint('');
+        debugPrint('💰 FINANCIAL DETAILS:');
+        final amount = queryParams['amount'];
+        final netAmountDebit = queryParams['net_amount_debit'];
+        final discount = queryParams['discount'];
+        if (amount != null) debugPrint('   💵 Original Amount: ₹$amount');
+        if (netAmountDebit != null) debugPrint('   💳 Net Amount Debited: ₹$netAmountDebit');
+        if (discount != null) debugPrint('   🎁 Discount Applied: ₹$discount');
+
+        debugPrint('');
+        debugPrint('🏦 PAYMENT METHOD DETAILS:');
+        final pgType = queryParams['PG_TYPE'];
+        final bankCode = queryParams['bankcode'];
+        final paymentSource = queryParams['payment_source'];
+        final mode = queryParams['mode'];
+        if (pgType != null) debugPrint('   🏛️ Payment Gateway: $pgType');
+        if (bankCode != null) debugPrint('   🏦 Bank Code: $bankCode');
+        if (paymentSource != null) debugPrint('   📱 Payment Source: $paymentSource');
+        if (mode != null) debugPrint('   💳 Payment Mode: $mode');
+
+        debugPrint('');
+        debugPrint('🔐 SECURITY & REFERENCE:');
+        final txnId = queryParams['txnid'];
+        final bankRefNum = queryParams['bank_ref_num'];
+        final mihPayId = queryParams['mihpayid'];
+        final easyPayId = queryParams['easypayid'];
+        if (txnId != null) debugPrint('   🆔 Transaction ID: $txnId');
+        if (bankRefNum != null) debugPrint('   🏦 Bank Reference: $bankRefNum');
+        if (mihPayId != null) debugPrint('   🔗 MihPay ID: $mihPayId');
+        if (easyPayId != null) debugPrint('   ⚡ EasyPay ID: $easyPayId');
+      } else {
+        debugPrint('⚠️ No query parameters found in URL');
+      }
+
+      debugPrint('═══════════════════════════════════════════════════════');
+    } catch (e) {
+      debugPrint('❌ Error extracting PayU data: $e');
+    }
+  }
+
+  /// Helper method to log PayU parameters
+  void _logPayUParameter(Map<String, String> params, String key, String description) {
+    final value = params[key];
+    if (value != null && value.isNotEmpty) {
+      debugPrint('   ✅ $description ($key): $value');
+    }
+  }
+
   void _showPaymentResultOverlay(String status) {
     if (_showingResult) return; // Prevent multiple overlays
-    
+
     setState(() {
       _showingResult = true;
       _paymentStatus = status;
     });
-    
+
     // Auto-redirect after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _showingResult) {
         debugPrint('🔄 Auto-redirecting to payment status screen');
-        
+
         if (status == 'success') {
           _handlePaymentSuccess();
         } else if (status == 'failed') {
@@ -264,7 +390,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
 
   void _handlePaymentSuccess() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -272,17 +398,21 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
+    // Get current URL to extract PayU data
+    final payuData = _extractPayUDataForReturn();
+
     Navigator.pop(context, {
       'status': 'success',
       'orderId': widget.order.id,
       'orderNumber': widget.order.orderNumber,
+      'payuData': payuData, // Include all PayU response data
     });
   }
 
   void _handlePaymentFailure() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -290,17 +420,21 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
+    // Get current URL to extract PayU data
+    final payuData = _extractPayUDataForReturn();
+
     Navigator.pop(context, {
       'status': 'failed',
       'orderId': widget.order.id,
       'orderNumber': widget.order.orderNumber,
+      'payuData': payuData, // Include all PayU response data
     });
   }
 
   void _handlePaymentCancelled() {
     if (!mounted) return;
-    
+
     // Ensure status bar is visible before popping
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -308,17 +442,54 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.light,
     ));
-    
+
+    // Get current URL to extract PayU data
+    final payuData = _extractPayUDataForReturn();
+
     Navigator.pop(context, {
       'status': 'cancelled',
       'orderId': widget.order.id,
       'orderNumber': widget.order.orderNumber,
+      'payuData': payuData, // Include all PayU response data
     });
+  }
+
+  /// Extract PayU data for returning to parent screen
+  Map<String, dynamic> _extractPayUDataForReturn() {
+    // Store the last processed URL data
+    if (_lastProcessedUrl != null) {
+      try {
+        final uri = Uri.parse(_lastProcessedUrl!);
+        final queryParams = uri.queryParameters;
+
+        // Return relevant PayU data
+        return {
+          'txnAmount': queryParams['amount'],
+          'txnRefId': queryParams['txnid'],
+          'bankRefNum': queryParams['bank_ref_num'],
+          'mihPayId': queryParams['mihpayid'],
+          'paymentMode': queryParams['mode'],
+          'bankCode': queryParams['bankcode'],
+          'pgType': queryParams['PG_TYPE'],
+          'paymentSource': queryParams['payment_source'],
+          'netAmountDebit': queryParams['net_amount_debit'],
+          'discount': queryParams['discount'],
+          'timestamp': DateTime.now().toIso8601String(),
+        };
+      } catch (e) {
+        debugPrint('Error extracting PayU data for return: $e');
+      }
+    }
+
+    return {
+      'timestamp': DateTime.now().toIso8601String(),
+      'note': 'PayU data extraction failed - check logs',
+    };
   }
 
   Widget _buildPaymentResultOverlay() {
     final config = _getResultConfig(_paymentStatus!);
-    
+
     return Container(
       color: Colors.black.withValues(alpha: 0.85),
       child: Center(
@@ -346,9 +517,9 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                   color: Colors.white,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Status title
               Text(
                 config['title'],
@@ -359,9 +530,9 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Status message
               Text(
                 config['message'],
@@ -372,9 +543,9 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Loading indicator
               const SizedBox(
                 width: 24,
@@ -384,9 +555,9 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               Text(
                 'Redirecting...',
                 style: TextStyle(
@@ -474,7 +645,7 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
                     ],
                   ),
                 );
-                
+
                 if (shouldCancel == true) {
                   _handlePaymentCancelled();
                 }
@@ -484,84 +655,83 @@ class _PayUPaymentScreenState extends State<PayUPaymentScreen> {
         ),
         body: Stack(
           children: [
-          Column(
-            children: [
-              // Test mode banner
-              if (!ApiConfig.payuIsProduction)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  color: Colors.orange.shade100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.info_outline, color: Colors.orange.shade900, size: 20),
-                          const SizedBox(width: 8),
-                          Text(
-                            'TEST MODE',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade900,
-                              fontSize: 14,
+            Column(
+              children: [
+                // Test mode banner
+                if (!ApiConfig.payuIsProduction)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.orange.shade100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Colors.orange.shade900, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'TEST MODE',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange.shade900,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Use test card: 5123456789012346, CVV: 123',
-                        style: TextStyle(
-                          color: Colors.orange.shade900,
-                          fontSize: 12,
+                          ],
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Use test card: 5123456789012346, CVV: 123',
+                          style: TextStyle(
+                            color: Colors.orange.shade900,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text(
+                          '⚠️ UPI may show validation errors in test mode',
+                          style: TextStyle(
+                            color: Colors.orange.shade900,
+                            fontSize: 11,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // WebView
+                Expanded(
+                  child: WebViewWidget(controller: _controller),
+                ),
+              ],
+            ),
+
+            // Loading overlay
+            if (_isLoading)
+              Container(
+                color: Colors.white,
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
                       ),
+                      SizedBox(height: 16),
                       Text(
-                        '⚠️ UPI may show validation errors in test mode',
+                        'Loading payment gateway...',
                         style: TextStyle(
-                          color: Colors.orange.shade900,
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
+                          fontSize: 16,
+                          color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
                 ),
-              // WebView
-              Expanded(
-                child: WebViewWidget(controller: _controller),
               ),
-            ],
-          ),
-          
-          // Loading overlay
-          if (_isLoading)
-            Container(
-              color: Colors.white,
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF5C9A)),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Loading payment gateway...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          
-          // Payment result overlay
-          if (_showingResult && _paymentStatus != null)
-            _buildPaymentResultOverlay(),
+
+            // Payment result overlay
+            if (_showingResult && _paymentStatus != null) _buildPaymentResultOverlay(),
           ],
         ),
       ),

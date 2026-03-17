@@ -216,6 +216,12 @@ class CommonPaymentFlow extends StatelessWidget {
               // Handle PayU result
               if (result != null && context.mounted) {
                 AppLogger.info('PayU returned result: $result');
+                
+                // Log PayU data if available
+                if (result['payuData'] != null) {
+                  AppLogger.info('PayU Data: ${result['payuData']}');
+                }
+                
                 _handlePaymentResult(context, result, state.order, paymentFlowCubit, onSuccess, onLoadingStart, onLoadingEnd);
               } else if (context.mounted) {
                 // User cancelled or closed PayU screen
@@ -239,6 +245,7 @@ class CommonPaymentFlow extends StatelessWidget {
                     builder: (context) => PaymentStatusScreen(
                       status: 'success',
                       order: state.order,
+                      payuData: null, // No PayU data for COD
                     ),
                   ),
                 );
@@ -358,6 +365,7 @@ class CommonPaymentFlow extends StatelessWidget {
           builder: (context) => PaymentStatusScreen(
             status: status,
             order: order,
+            payuData: result, // Pass the complete PayU result data
           ),
         ),
       );
