@@ -213,7 +213,7 @@ class _AddressScreenState extends State<AddressScreen> {
               topRight: Radius.circular(24),
             ),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+          padding: EdgeInsets.all(20.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -623,44 +623,44 @@ class _AddressScreenState extends State<AddressScreen> {
       if (widget.customer != null) {
         _customer = widget.customer;
         AppLogger.info('Customer object from previous screen: ${jsonEncode({
-          'id': _customer?.id,
-          'firstName': _customer?.firstName,
-          'lastName': _customer?.lastName,
-          'email': _customer?.email,
-          'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null
-              ? {
-                  'id': _customer?.defaultAddress?.id,
-                  'name': _customer?.defaultAddress?.name,
-                  'firstName': _customer?.defaultAddress?.firstName,
-                  'lastName': _customer?.defaultAddress?.lastName,
-                  'address1': _customer?.defaultAddress?.address1,
-                  'address2': _customer?.defaultAddress?.address2,
-                  'city': _customer?.defaultAddress?.city,
-                  'province': _customer?.defaultAddress?.province,
-                  'country': _customer?.defaultAddress?.country,
-                  'zip': _customer?.defaultAddress?.zip,
-                  'company': _customer?.defaultAddress?.company,
-                  'phone': _customer?.defaultAddress?.phone,
-                }
-              : null,
-          'addresses': _customer?.addresses
-              .map((addr) => {
-                    'id': addr.id,
-                    'name': addr.name,
-                    'firstName': addr.firstName,
-                    'lastName': addr.lastName,
-                    'address1': addr.address1,
-                    'address2': addr.address2,
-                    'city': addr.city,
-                    'province': addr.province,
-                    'country': addr.country,
-                    'zip': addr.zip,
-                    'company': addr.company,
-                    'phone': addr.phone,
-                  })
-              .toList(),
-        })}');
+              'id': _customer?.id,
+              'firstName': _customer?.firstName,
+              'lastName': _customer?.lastName,
+              'email': _customer?.email,
+              'phone': _customer?.phone,
+              'defaultAddress': _customer?.defaultAddress != null
+                  ? {
+                      'id': _customer?.defaultAddress?.id,
+                      'name': _customer?.defaultAddress?.name,
+                      'firstName': _customer?.defaultAddress?.firstName,
+                      'lastName': _customer?.defaultAddress?.lastName,
+                      'address1': _customer?.defaultAddress?.address1,
+                      'address2': _customer?.defaultAddress?.address2,
+                      'city': _customer?.defaultAddress?.city,
+                      'province': _customer?.defaultAddress?.province,
+                      'country': _customer?.defaultAddress?.country,
+                      'zip': _customer?.defaultAddress?.zip,
+                      'company': _customer?.defaultAddress?.company,
+                      'phone': _customer?.defaultAddress?.phone,
+                    }
+                  : null,
+              'addresses': _customer?.addresses
+                  .map((addr) => {
+                        'id': addr.id,
+                        'name': addr.name,
+                        'firstName': addr.firstName,
+                        'lastName': addr.lastName,
+                        'address1': addr.address1,
+                        'address2': addr.address2,
+                        'city': addr.city,
+                        'province': addr.province,
+                        'country': addr.country,
+                        'zip': addr.zip,
+                        'company': addr.company,
+                        'phone': addr.phone,
+                      })
+                  .toList(),
+            })}');
 
         // Populate fields
         _populateFields();
@@ -692,44 +692,44 @@ class _AddressScreenState extends State<AddressScreen> {
 
       if (_customer != null) {
         AppLogger.info('Customer object from API: ${jsonEncode({
-          'id': _customer?.id,
-          'firstName': _customer?.firstName,
-          'lastName': _customer?.lastName,
-          'email': _customer?.email,
-          'phone': _customer?.phone,
-          'defaultAddress': _customer?.defaultAddress != null
-              ? {
-                  'id': _customer?.defaultAddress?.id,
-                  'name': _customer?.defaultAddress?.name,
-                  'firstName': _customer?.defaultAddress?.firstName,
-                  'lastName': _customer?.defaultAddress?.lastName,
-                  'address1': _customer?.defaultAddress?.address1,
-                  'address2': _customer?.defaultAddress?.address2,
-                  'city': _customer?.defaultAddress?.city,
-                  'province': _customer?.defaultAddress?.province,
-                  'country': _customer?.defaultAddress?.country,
-                  'zip': _customer?.defaultAddress?.zip,
-                  'company': _customer?.defaultAddress?.company,
-                  'phone': _customer?.defaultAddress?.phone,
-                }
-              : null,
-          'addresses': _customer?.addresses
-              .map((addr) => {
-                    'id': addr.id,
-                    'name': addr.name,
-                    'firstName': addr.firstName,
-                    'lastName': addr.lastName,
-                    'address1': addr.address1,
-                    'address2': addr.address2,
-                    'city': addr.city,
-                    'province': addr.province,
-                    'country': addr.country,
-                    'zip': addr.zip,
-                    'company': addr.company,
-                    'phone': addr.phone,
-                  })
-              .toList(),
-        })}');
+              'id': _customer?.id,
+              'firstName': _customer?.firstName,
+              'lastName': _customer?.lastName,
+              'email': _customer?.email,
+              'phone': _customer?.phone,
+              'defaultAddress': _customer?.defaultAddress != null
+                  ? {
+                      'id': _customer?.defaultAddress?.id,
+                      'name': _customer?.defaultAddress?.name,
+                      'firstName': _customer?.defaultAddress?.firstName,
+                      'lastName': _customer?.defaultAddress?.lastName,
+                      'address1': _customer?.defaultAddress?.address1,
+                      'address2': _customer?.defaultAddress?.address2,
+                      'city': _customer?.defaultAddress?.city,
+                      'province': _customer?.defaultAddress?.province,
+                      'country': _customer?.defaultAddress?.country,
+                      'zip': _customer?.defaultAddress?.zip,
+                      'company': _customer?.defaultAddress?.company,
+                      'phone': _customer?.defaultAddress?.phone,
+                    }
+                  : null,
+              'addresses': _customer?.addresses
+                  .map((addr) => {
+                        'id': addr.id,
+                        'name': addr.name,
+                        'firstName': addr.firstName,
+                        'lastName': addr.lastName,
+                        'address1': addr.address1,
+                        'address2': addr.address2,
+                        'city': addr.city,
+                        'province': addr.province,
+                        'country': addr.country,
+                        'zip': addr.zip,
+                        'company': addr.company,
+                        'phone': addr.phone,
+                      })
+                  .toList(),
+            })}');
 
         // Populate fields
         _populateFields();
@@ -1158,7 +1158,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                       scale: 1.2, // Increase checkbox size
                                       child: Checkbox(
                                         value: _isDefaultAddress,
-                                        onChanged: _isDefaultAddressDisabled 
+                                        onChanged: _isDefaultAddressDisabled
                                             ? null // Disable checkbox if already default
                                             : (value) {
                                                 setState(() {
@@ -1167,7 +1167,8 @@ class _AddressScreenState extends State<AddressScreen> {
                                               },
                                         activeColor: _isDefaultAddressDisabled
                                             ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
-                                            : const Color(0xFFFF5C9A), // Full pink for enabled
+                                            : const Color(0xFFFF5C9A),
+                                        // Full pink for enabled
                                         checkColor: Colors.white,
                                         fillColor: WidgetStateProperty.resolveWith<Color>((states) {
                                           if (states.contains(WidgetState.selected)) {
@@ -1196,7 +1197,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                         style: TextStyle(
                                           fontSize: 12.fSize,
                                           fontWeight: FontWeight.w500,
-                                          color: _isDefaultAddressDisabled 
+                                          color: _isDefaultAddressDisabled
                                               ? Colors.black.withOpacity(0.5) // Faded text for disabled
                                               : Colors.black, // Full black for enabled
                                         ),
@@ -1234,12 +1235,12 @@ class _AddressScreenState extends State<AddressScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
       child: SafeArea(
         top: false,
         child: SizedBox(
           width: double.infinity,
-          height: 48.h,
+          height: 40.h,
           child: ElevatedButton(
             onPressed: _handleAddAddress,
             style: ElevatedButton.styleFrom(
@@ -1600,7 +1601,7 @@ class _AddressScreenState extends State<AddressScreen> {
               highlightColor: Colors.grey[100]!,
               child: Container(
                 width: double.infinity,
-                height: 48.h,
+                height: 40.h,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.r),

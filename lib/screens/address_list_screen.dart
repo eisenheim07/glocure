@@ -48,7 +48,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   /// Example: gid://shopify/MailingAddress/10194549440690?model_name=... -> 10194549440690
   String? _extractBaseAddressId(String? fullAddressId) {
     if (fullAddressId == null || fullAddressId.isEmpty) return null;
-    
+
     try {
       // Extract the numeric ID from the Shopify GID
       final regex = RegExp(r'MailingAddress/(\d+)');
@@ -62,7 +62,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   /// Find address by base ID and update selected address ID to current full ID
   void _updateSelectedAddressAfterRefresh(List<CustomerAddress> addresses) {
     if (_selectedBaseAddressId == null) return;
-    
+
     // Find address with matching base ID
     for (final address in addresses) {
       final baseId = _extractBaseAddressId(address.id);
@@ -72,7 +72,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         return;
       }
     }
-    
+
     // If no matching address found, clear selection
     _selectedAddressId = null;
     _selectedBaseAddressId = null;
@@ -151,64 +151,64 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
               // Buttons
               Row(
-              children: [
-                // Cancel button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, false),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                          width: 1.w,
+                children: [
+                  // Cancel button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, false),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1.w,
+                          ),
+                          borderRadius: BorderRadius.circular(10.r),
                         ),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14.fSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade700,
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                // Delete button
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context, true),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF5C9A),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(
-                            fontSize: 14.fSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                  // Delete button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, true),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF5C9A),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom),
-          ],
-        ),
+                ],
+              ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
         ),
       ),
     );
@@ -682,7 +682,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button
         Container(
-          padding: EdgeInsets.all(14.w),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -714,7 +714,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 14.h),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF5C9A),
                   borderRadius: BorderRadius.circular(10.r),
