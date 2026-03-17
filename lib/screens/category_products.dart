@@ -313,18 +313,6 @@ class _CategoryProductsState extends State<CategoryProducts> {
               child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  if (title.isNotEmpty && products.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 19.fSize,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.25),
                   Center(
                     child: Column(

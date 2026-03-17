@@ -2263,4 +2263,87 @@ class ApiService {
       rethrow;
     }
   }
+
+  /// Create a new customer account
+  /// [firstName] - Customer's first name
+  /// [lastName] - Customer's last name
+  /// [email] - Customer's email address
+  /// [password] - Customer's password
+  Future<Map<String, dynamic>> createCustomer({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      AppLogger.api('Creating new customer account for email: $email');
+
+      const query = r'''
+        mutation customerCreate($input: CustomerCreateInput!) {
+          customerCreate(input: $input) {
+            customer {
+              id
+              firstName
+              lastName
+              email
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }
+      ''';
+
+      final variables = {
+        'input': {
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': email,
+          'password': password,
+        }
+      };
+
+      final responseData = await _makeGraphQLRequest(
+        query,
+        variables: variables,
+        skipTokenValidation: true, // Skip token validation for signup
+      );
+
+      // Check for user errors
+      final customerCreate = responseData['data']?['customerCreate'];
+      final userErrors = customerCreate?['userErrors'] as List<dynamic>? ?? [];
+
+      if (userErrors.isNotEmpty) {
+        final errorMessages = userErrors.map((e) => e['message']).toList();
+        AppLogger.error('Customer creation failed: $errorMessages');
+        return {
+          'success': false,
+          'errors': errorMessages,
+        };
+      }
+
+      final customer = customerCreate?['customer'];
+      if (customer == null) {
+        AppLogger.error('No customer data received');
+        return {
+          'success': false,
+          'errors': ['Failed to create account. Please try again.'],
+        };
+      }
+
+      AppLogger.success('Successfully created customer account: ${customer['email']}');
+
+      return {
+        'success': true,
+        'customer': customer,
+      };
+    } catch (e) {
+      AppLogger.error('Failed to create customer: $e');
+      return {
+        'success': false,
+        'errors': [e.toString().replaceAll('Exception: ', '')],
+      };
+    }
+  }
 }

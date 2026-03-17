@@ -10,6 +10,9 @@ import '../services/api_service.dart';
 import '../utils/auth_storage.dart';
 import 'language_selection_screen.dart';
 import 'main_navigation_screen.dart';
+import 'signup_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubits/signup/signup_cubit.dart';
 
 /// Login Screen with sliding backgrounds and phone/OTP or email/password authentication
 class LoginScreen extends StatefulWidget {
@@ -1043,6 +1046,42 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
           ),
+        ),
+        SizedBox(height: 16),
+
+        // Signup navigation link
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Don't have account? ",
+              style: TextStyle(
+                fontSize: 12.fSize,
+                color: AppColors.gray400,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<SignupCubit>(),
+                      child: const SignupScreen(),
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'Sign-up here',
+                style: TextStyle(
+                  fontSize: 12.fSize,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
