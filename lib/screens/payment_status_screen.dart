@@ -564,15 +564,30 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
   }
 
   Map<String, dynamic> _getStatusConfig() {
+    // Check if this is a COD order (no PayU data and success status)
+    final isCODOrder = widget.payuData == null && widget.status.toLowerCase() == 'success';
+    
     switch (widget.status.toLowerCase()) {
       case 'success':
-        return {
-          'icon': Icons.check_circle_outline,
-          'iconColor': AppColors.white,
-          'backgroundColor': AppColors.success,
-          'title': 'Payment Successful!',
-          'message': 'Your order has been placed successfully.\nYou will receive a confirmation email shortly.',
-        };
+        if (isCODOrder) {
+          // COD order - show order placed successfully
+          return {
+            'icon': Icons.check_circle_outline,
+            'iconColor': AppColors.white,
+            'backgroundColor': AppColors.success,
+            'title': 'Order Placed Successfully!',
+            'message': 'Your order has been placed successfully.\nPayment will be collected upon delivery.',
+          };
+        } else {
+          // Online payment - show payment successful
+          return {
+            'icon': Icons.check_circle_outline,
+            'iconColor': AppColors.white,
+            'backgroundColor': AppColors.success,
+            'title': 'Payment Successful!',
+            'message': 'Your order has been placed successfully.\nYou will receive a confirmation email shortly.',
+          };
+        }
       case 'failed':
         return {
           'icon': Icons.error_outline,
@@ -601,11 +616,19 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
   }
 
   String _getPaymentMethod() {
+    // Check if this is a COD order (no PayU data)
+    final isCODOrder = widget.payuData == null;
+    
+    if (isCODOrder) {
+      return 'COD (Cash on Delivery)';
+    }
+    
+    // For online payments, check the order tags
     final tags = widget.order.tags?.split(',') ?? [];
     final isPrePaid = tags.any(
       (tag) => tag.trim().toLowerCase().contains('pre-paid') || tag.trim().toLowerCase().contains('prepaid'),
     );
-    return isPrePaid ? 'Pre-paid (Online)' : 'Cash on Delivery';
+    return isPrePaid ? 'Pre-paid (Online)' : 'COD (Cash on Delivery)';
   }
 
   String _formatDateTime(DateTime dateTime) {

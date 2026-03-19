@@ -174,17 +174,17 @@ class _AccountScreenState extends State<AccountScreen> {
                 // const SizedBox(height: 8),
 
                 // Help Center
-                _AccountMenuItem(
-                  icon: Icons.help_outline,
-                  title: 'Help Center',
-                  onTap: () {
-                    // TODO: Navigate to help center screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Help Center - Coming Soon')),
-                    );
-                  },
-                ),
-                SizedBox(height: 8.h),
+                // _AccountMenuItem(
+                //   icon: Icons.help_outline,
+                //   title: 'Help Center',
+                //   onTap: () {
+                //     // TODO: Navigate to help center screen
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       const SnackBar(content: Text('Help Center - Coming Soon')),
+                //     );
+                //   },
+                // ),
+                // SizedBox(height: 8.h),
 
                 // GloCure Disclaimer
                 _AccountMenuItem(
