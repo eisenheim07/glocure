@@ -444,7 +444,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button or Done Button
         Container(
-          padding: EdgeInsets.all(14.w),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [

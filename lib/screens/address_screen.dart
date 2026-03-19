@@ -13,6 +13,61 @@ import '../utils/app_logger.dart';
 import '../widgets/custom_app_bar.dart';
 import 'order_summary_screen.dart';
 
+// Custom input formatter to allow only numeric characters
+class NumericInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Allow only numeric characters (0-9)
+    final numericRegex = RegExp(r'^[0-9]*$');
+
+    if (numericRegex.hasMatch(newValue.text)) {
+      return newValue;
+    }
+
+    // If the new value contains non-numeric characters, return the old value
+    return oldValue;
+  }
+}
+
+// Custom input formatter to allow only alphabetic characters with auto-capitalization
+class AlphabeticInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Allow only alphabetic characters and spaces (a-z, A-Z, space)
+    final alphabetRegex = RegExp(r'^[a-zA-Z ]*$');
+
+    if (!alphabetRegex.hasMatch(newValue.text)) {
+      // If the new value contains non-alphabetic characters, return the old value
+      return oldValue;
+    }
+
+    // Auto-capitalize first character of each word
+    String formattedText = newValue.text;
+    if (formattedText.isNotEmpty) {
+      // Split by spaces and capitalize first letter of each word
+      List<String> words = formattedText.split(' ');
+      words = words.map((word) {
+        if (word.isNotEmpty) {
+          return word[0].toUpperCase() + (word.length > 1 ? word.substring(1).toLowerCase() : '');
+        }
+        return word;
+      }).toList();
+      formattedText = words.join(' ');
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
 class AddressScreen extends StatefulWidget {
   final Customer? customer;
   final bool isAddingNew;
@@ -616,7 +671,7 @@ class _AddressScreenState extends State<AddressScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Fetch current location first
+      // Fetch current location first and wait for it to complete
       await _fetchCurrentLocation();
 
       // If customer object is passed, use it
@@ -662,7 +717,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   .toList(),
             })}');
 
-        // Populate fields
+        // Populate fields after geolocation is ready
         _populateFields();
       } else {
         // Fetch customer data
@@ -731,7 +786,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   .toList(),
             })}');
 
-        // Populate fields
+        // Populate fields after customer data is fetched (geolocation should already be ready)
         _populateFields();
       }
     } catch (e) {
@@ -787,14 +842,28 @@ class _AddressScreenState extends State<AddressScreen> {
       return;
     }
 
-    // If this is for adding a new address, leave all address fields empty
+    // If this is for adding a new address, check if we should use geolocation
     if (widget.isAddingNew) {
-      AppLogger.info('Adding new address - leaving address fields empty');
-      setState(() {
-        _isDefaultAddress = false;
-        _isDefaultAddressDisabled = false; // Enable checkbox for new addresses
-        _isAddressFromGeolocation = false;
-      });
+      AppLogger.info('Adding new address - checking if we should use geolocation');
+      
+      // Even for new addresses, if there's no default address, use geolocation
+      if (_customer!.defaultAddress == null) {
+        AppLogger.info('No default address exists, using geolocation for new address');
+        _populateFromGeolocation();
+        setState(() {
+          _isDefaultAddress = false;
+          _isDefaultAddressDisabled = false;
+          _isAddressFromGeolocation = true;
+        });
+        _validateForm();
+      } else {
+        AppLogger.info('Default address exists, leaving new address fields empty');
+        setState(() {
+          _isDefaultAddress = false;
+          _isDefaultAddressDisabled = false;
+          _isAddressFromGeolocation = false;
+        });
+      }
       return;
     }
 
@@ -811,6 +880,9 @@ class _AddressScreenState extends State<AddressScreen> {
         _isDefaultAddressDisabled = false; // Enable checkbox for geolocation addresses
         _isAddressFromGeolocation = true;
       });
+      
+      // Validate form after populating from geolocation
+      _validateForm();
       return;
     }
 
@@ -823,6 +895,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
     if (hasValidDefaultAddress) {
       // Populate from default address
+      AppLogger.info('Using valid default address');
       _address1Controller.text = defaultAddr.address1 ?? '';
       _address2Controller.text = defaultAddr.address2 ?? '';
       _cityController.text = defaultAddr.city ?? '';
@@ -840,11 +913,13 @@ class _AddressScreenState extends State<AddressScreen> {
       });
     } else {
       // Populate from geolocation if available
+      AppLogger.info('Default address exists but has invalid data, using geolocation');
       _populateFromGeolocation();
 
       // Set checkbox to false since we're creating a new address
       setState(() {
         _isDefaultAddress = false;
+        _isDefaultAddressDisabled = false; // Enable checkbox for geolocation addresses
         _isAddressFromGeolocation = true; // Address from geolocation
       });
     }
@@ -875,46 +950,85 @@ class _AddressScreenState extends State<AddressScreen> {
 
   /// Populate address fields from geolocation data
   void _populateFromGeolocation() {
+    AppLogger.info('_populateFromGeolocation called');
+    
     if (_currentPlacemark == null) {
-      AppLogger.warning('No geolocation data available for address population');
+      AppLogger.warning('No geolocation data available for address population - _currentPlacemark is null');
       return;
     }
 
     final place = _currentPlacemark!;
+    AppLogger.info('Geolocation placemark data: ${jsonEncode({
+      'street': place.street,
+      'subLocality': place.subLocality,
+      'thoroughfare': place.thoroughfare,
+      'locality': place.locality,
+      'administrativeArea': place.administrativeArea,
+      'country': place.country,
+      'postalCode': place.postalCode,
+    })}');
 
-    // Populate Address Line 1 (street)
-    if (place.street != null && place.street!.isNotEmpty) {
-      _address1Controller.text = place.street!;
-    }
+    // Force UI update by wrapping in setState
+    setState(() {
+      // Populate Address Line 1 (street)
+      if (place.street != null && place.street!.isNotEmpty) {
+        _address1Controller.text = place.street!;
+        AppLogger.info('Populated Address Line 1: ${place.street}');
+      } else {
+        // Fallback to subLocality or thoroughfare for Address Line 1
+        if (place.subLocality != null && place.subLocality!.isNotEmpty) {
+          _address1Controller.text = place.subLocality!;
+          AppLogger.info('Populated Address Line 1 with subLocality: ${place.subLocality}');
+        } else if (place.thoroughfare != null && place.thoroughfare!.isNotEmpty) {
+          _address1Controller.text = place.thoroughfare!;
+          AppLogger.info('Populated Address Line 1 with thoroughfare: ${place.thoroughfare}');
+        }
+      }
 
-    // Populate Address Line 2 (subLocality or thoroughfare)
-    if (place.subLocality != null && place.subLocality!.isNotEmpty) {
-      _address2Controller.text = place.subLocality!;
-    } else if (place.thoroughfare != null && place.thoroughfare!.isNotEmpty) {
-      _address2Controller.text = place.thoroughfare!;
-    }
+      // Populate Address Line 2 (subLocality or thoroughfare)
+      if (place.subLocality != null && place.subLocality!.isNotEmpty && _address1Controller.text != place.subLocality) {
+        _address2Controller.text = place.subLocality!;
+        AppLogger.info('Populated Address Line 2 with subLocality: ${place.subLocality}');
+      } else if (place.thoroughfare != null && place.thoroughfare!.isNotEmpty && _address1Controller.text != place.thoroughfare) {
+        _address2Controller.text = place.thoroughfare!;
+        AppLogger.info('Populated Address Line 2 with thoroughfare: ${place.thoroughfare}');
+      } else {
+        // Fallback to locality for Address Line 2 if different from city
+        if (place.locality != null && place.locality!.isNotEmpty) {
+          _address2Controller.text = place.locality!;
+          AppLogger.info('Populated Address Line 2 with locality: ${place.locality}');
+        }
+      }
 
-    // Populate City (locality)
-    if (place.locality != null && place.locality!.isNotEmpty) {
-      _cityController.text = place.locality!;
-    }
+      // Populate City (locality)
+      if (place.locality != null && place.locality!.isNotEmpty) {
+        _cityController.text = place.locality!;
+        AppLogger.info('Populated City: ${place.locality}');
+      }
 
-    // Populate State/Province (administrativeArea)
-    if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
-      _provinceController.text = place.administrativeArea!;
-    }
+      // Populate State/Province (administrativeArea)
+      if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
+        _provinceController.text = place.administrativeArea!;
+        AppLogger.info('Populated State/Province: ${place.administrativeArea}');
+      }
 
-    // Populate Country
-    if (place.country != null && place.country!.isNotEmpty) {
-      _countryController.text = place.country!;
-    }
+      // Populate Country
+      if (place.country != null && place.country!.isNotEmpty) {
+        _countryController.text = place.country!;
+        AppLogger.info('Populated Country: ${place.country}');
+      }
 
-    // Populate ZIP/Postal Code
-    if (place.postalCode != null && place.postalCode!.isNotEmpty) {
-      _zipController.text = place.postalCode!;
-    }
+      // Populate ZIP/Postal Code
+      if (place.postalCode != null && place.postalCode!.isNotEmpty) {
+        _zipController.text = place.postalCode!;
+        AppLogger.info('Populated ZIP: ${place.postalCode}');
+      }
+    });
 
     AppLogger.success('Address fields populated from geolocation');
+    
+    // Validate form after populating fields from geolocation
+    _validateForm();
   }
 
   Future<void> _fetchCurrentLocation() async {
@@ -1109,6 +1223,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   hint: 'Enter state or province',
                                   focusNode: _provinceFocusNode,
                                   errorText: _provinceError,
+                                  inputFormatters: [AlphabeticInputFormatter()],
                                 ),
                                 SizedBox(height: 16),
                                 _buildTextField(
@@ -1128,6 +1243,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                   maxLength: 6,
                                   focusNode: _zipFocusNode,
                                   errorText: _zipError,
+                                  inputFormatters: [NumericInputFormatter()],
                                 ),
                                 SizedBox(height: 16),
                                 _buildTextField(
