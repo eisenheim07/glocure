@@ -1,0 +1,89 @@
+name: glocure
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.3.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  
+  # State Management
+  flutter_bloc: ^8.1.6
+  
+  # HTTP Client for API calls
+  http: ^1.2.2
+  
+  # Logger for API debugging
+  logger: ^2.4.0
+  
+  # Shimmer effect for loading states
+  shimmer: ^3.0.0
+
+  flutter_svg: ^2.0.9
+
+  # Shared Preferences for local storage
+  shared_preferences: ^2.2.2
+
+  # WebView for in-app browser
+  flutter_inappwebview: ^6.0.0
+
+  # PayU Checkout Pro SDK for native payment integration
+  payu_checkoutpro_flutter: 1.4.0
+
+  # Permission handling
+  permission_handler: ^11.0.1
+
+  # Location services
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+
+  # URL Launcher for UPI apps
+  url_launcher: ^6.2.2
+
+  # Crypto for hash generation
+  crypto: ^3.0.3
+
+  # WebView for PayU payment page
+  webview_flutter: ^4.4.2
+
+  # Connectivity checking
+  connectivity_plus: ^6.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/images/home/
+    - assets/images/splash/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/InterRegular.ttf
+          weight: 400
+        - asset: assets/fonts/InterBold.ttf
+          weight: 700
+        - asset: assets/fonts/InterExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/InterSemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/InterMedium.ttf
+          weight: 500
+        - asset: assets/fonts/InterLight.ttf
+          weight: 300
