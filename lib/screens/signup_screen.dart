@@ -7,6 +7,35 @@ import '../utils/size_utils.dart';
 import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 
+// Custom input formatter to allow only alphabetic characters with auto-capitalization
+class AlphabeticInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Allow only alphabetic characters (a-z, A-Z)
+    final alphabetRegex = RegExp(r'^[a-zA-Z]*$');
+
+    if (!alphabetRegex.hasMatch(newValue.text)) {
+      // If the new value contains non-alphabetic characters, return the old value
+      return oldValue;
+    }
+
+    // Auto-capitalize first character and make rest lowercase
+    String formattedText = newValue.text;
+    if (formattedText.isNotEmpty) {
+      formattedText = formattedText[0].toUpperCase() + 
+                     (formattedText.length > 1 ? formattedText.substring(1).toLowerCase() : '');
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
@@ -74,6 +103,12 @@ class _SignupScreenState extends State<SignupScreen> {
         _emailController.text.length > 30 ||
         _passwordController.text.length > 30 ||
         _confirmPasswordController.text.length > 30) {
+      return false;
+    }
+
+    // Check first name and last name contain only alphabets with first character capitalized
+    final alphabetRegex = RegExp(r'^[A-Z][a-z]*$');
+    if (!alphabetRegex.hasMatch(_firstNameController.text.trim()) || !alphabetRegex.hasMatch(_lastNameController.text.trim())) {
       return false;
     }
 
@@ -156,7 +191,10 @@ class _SignupScreenState extends State<SignupScreen> {
     // Hide error if user has started typing (field is not empty)
     if (_firstNameController.text.isNotEmpty) {
       // Only show error if there's still an issue after typing
-      if (_firstNameController.text.trim().length >= 2 && _firstNameController.text.length <= 30) {
+      final alphabetRegex = RegExp(r'^[A-Z][a-z]*$');
+      if (_firstNameController.text.trim().length >= 2 &&
+          _firstNameController.text.length <= 30 &&
+          alphabetRegex.hasMatch(_firstNameController.text.trim())) {
         return null;
       }
     }
@@ -170,6 +208,11 @@ class _SignupScreenState extends State<SignupScreen> {
     if (_firstNameController.text.length > 30) {
       return 'First name must not exceed 30 characters';
     }
+
+    final alphabetRegex = RegExp(r'^[A-Z][a-z]*$');
+    if (!alphabetRegex.hasMatch(_firstNameController.text.trim())) {
+      return 'First name must start with capital letter and contain only letters';
+    }
     return null;
   }
 
@@ -179,7 +222,10 @@ class _SignupScreenState extends State<SignupScreen> {
     // Hide error if user has started typing (field is not empty)
     if (_lastNameController.text.isNotEmpty) {
       // Only show error if there's still an issue after typing
-      if (_lastNameController.text.trim().length >= 2 && _lastNameController.text.length <= 30) {
+      final alphabetRegex = RegExp(r'^[A-Z][a-z]*$');
+      if (_lastNameController.text.trim().length >= 2 &&
+          _lastNameController.text.length <= 30 &&
+          alphabetRegex.hasMatch(_lastNameController.text.trim())) {
         return null;
       }
     }
@@ -192,6 +238,11 @@ class _SignupScreenState extends State<SignupScreen> {
     }
     if (_lastNameController.text.length > 30) {
       return 'Last name must not exceed 30 characters';
+    }
+
+    final alphabetRegex = RegExp(r'^[A-Z][a-z]*$');
+    if (!alphabetRegex.hasMatch(_lastNameController.text.trim())) {
+      return 'Last name must start with capital letter and contain only letters';
     }
     return null;
   }
@@ -323,7 +374,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             fontFamily: 'Inter',
                           ),
                         ),
-                        SizedBox(height: 32.h),
+                        SizedBox(height: 24.h),
 
                         // First Name
                         _buildInputField(
@@ -331,7 +382,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           controller: _firstNameController,
                           hintText: 'Enter your first name',
                           keyboardType: TextInputType.name,
+                          textCapitalization: TextCapitalization.words,
                           errorText: _getFirstNameError(),
+                          inputFormatters: [AlphabeticInputFormatter()],
                           onChanged: (value) {
                             setState(() {
                               _validateForm();
@@ -346,7 +399,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           controller: _lastNameController,
                           hintText: 'Enter your last name',
                           keyboardType: TextInputType.name,
+                          textCapitalization: TextCapitalization.words,
                           errorText: _getLastNameError(),
+                          inputFormatters: [AlphabeticInputFormatter()],
                           onChanged: (value) {
                             setState(() {
                               _validateForm();
@@ -428,7 +483,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 8.h),
+                        SizedBox(height: 12.h),
 
                         // Terms and conditions
                         Center(
@@ -530,10 +585,12 @@ class _SignupScreenState extends State<SignupScreen> {
     required TextEditingController controller,
     required String hintText,
     TextInputType? keyboardType,
+    TextCapitalization? textCapitalization,
     bool obscureText = false,
     Widget? suffixIcon,
     Function(String)? onChanged,
     String? errorText,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,6 +614,7 @@ class _SignupScreenState extends State<SignupScreen> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            textCapitalization: textCapitalization ?? TextCapitalization.none,
             obscureText: obscureText,
             maxLength: 30,
             onChanged: onChanged ??
@@ -566,6 +624,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 },
             inputFormatters: [
               LengthLimitingTextInputFormatter(30),
+              ...?inputFormatters, // Add custom input formatters
             ],
             decoration: InputDecoration(
               hintText: hintText,

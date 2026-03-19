@@ -8,6 +8,7 @@ import 'package:glocure/models/shopify_order_model.dart';
 import 'package:glocure/utils/format_utils.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
+import '../config/api_config.dart';
 import 'main_navigation_screen.dart';
 import 'ordered_items_details.dart';
 import 'custom_webview_screen.dart';
@@ -732,7 +733,7 @@ class _OrderCardState extends State<_OrderCard> {
       MaterialPageRoute(
         builder: (context) => const CustomWebViewScreen(
           title: 'Track Order',
-          url: 'https://www.delhivery.com/tracking',
+          url: ApiConfig.orderTrackingUrl,
           showAppBar: true,
         ),
       ),
