@@ -132,33 +132,35 @@ class _CartScreenState extends State<CartScreen> {
         type: AppBarType.simple,
         title: 'My Cart',
       ),
-      body: BlocBuilder<CartCubit, CartState>(
-        builder: (context, state) {
-          if (state is CartLoading) {
-            return _buildLoadingState();
-          }
-
-          if (state is CartError) {
-            return _buildErrorState(state.message);
-          }
-
-          if (state is CartEmpty) {
-            return _buildEmptyState();
-          }
-
-          if (state is CartSuccess) {
-            // Check address only when cart has items and hasn't been checked yet
-            if (!_hasCheckedAddress) {
-              // Schedule address check after this frame
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _deleteDefaultAddressAndCheck();
-              });
+      body: SafeArea(
+        child: BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            if (state is CartLoading) {
+              return _buildLoadingState();
             }
-            return _buildCartContent(state.cart);
-          }
 
-          return _buildEmptyState();
-        },
+            if (state is CartError) {
+              return _buildErrorState(state.message);
+            }
+
+            if (state is CartEmpty) {
+              return _buildEmptyState();
+            }
+
+            if (state is CartSuccess) {
+              // Check address only when cart has items and hasn't been checked yet
+              if (!_hasCheckedAddress) {
+                // Schedule address check after this frame
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _deleteDefaultAddressAndCheck();
+                });
+              }
+              return _buildCartContent(state.cart);
+            }
+
+            return _buildEmptyState();
+          },
+        ),
       ),
     );
   }
@@ -222,7 +224,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
       child: SafeArea(
         top: false,
         child: Column(
@@ -495,7 +497,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ],
           ),
-          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
           child: SafeArea(
             top: false,
             child: Column(

@@ -110,7 +110,9 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
       ),
-      body: _buildLoadingScreen(),
+      body: SafeArea(
+        child: _buildLoadingScreen(),
+      ),
     );
   }
 

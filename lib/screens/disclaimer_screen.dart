@@ -75,9 +75,10 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
                   )
                 : null,
           ),
-          body: () {
-            if (state is PagesLoading || state is PagesInitial) {
-              return _buildLoadingState();
+          body: SafeArea(
+            child: () {
+              if (state is PagesLoading || state is PagesInitial) {
+                return _buildLoadingState();
             } else if (state is PagesError) {
               return _buildErrorState(state.message);
             } else if (state is PagesSuccess) {
@@ -85,6 +86,7 @@ class _DisclaimerScreenState extends State<DisclaimerScreen> with SingleTickerPr
             }
             return const SizedBox.shrink();
           }(),
+          ),
         );
       },
     );

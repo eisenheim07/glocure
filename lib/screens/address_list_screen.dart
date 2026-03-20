@@ -100,114 +100,116 @@ class _AddressListScreenState extends State<AddressListScreen> {
     // Show confirmation bottom sheet
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SafeArea(
-        top: false,
-        child: Container(
-          padding: EdgeInsets.all(20.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Container(
-                width: 34.w,
-                height: 3.h,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2.r),
+      builder: (context) => Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: SafeArea(
+          child: Container(
+            padding: EdgeInsets.all(20.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 34.w,
+                  height: 3.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // Title
-              Text(
-                'Delete Address',
-                style: TextStyle(
-                  fontSize: 17.fSize,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                // Title
+                Text(
+                  'Delete Address',
+                  style: TextStyle(
+                    fontSize: 17.fSize,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // Message
-              Text(
-                'Are you sure you want to delete this address?',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12.fSize,
-                  color: Colors.grey.shade600,
-                  height: 1.4,
+                // Message
+                Text(
+                  'Are you sure you want to delete this address?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.fSize,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // Buttons
-              Row(
-                children: [
-                  // Cancel button
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context, false),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1.w,
+                // Buttons
+                Row(
+                  children: [
+                    // Cancel button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context, false),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              width: 1.w,
+                            ),
+                            borderRadius: BorderRadius.circular(10.r),
                           ),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 14.fSize,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade700,
+                          child: Center(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 14.fSize,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade700,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
+                    const SizedBox(width: 12),
 
-                  // Delete button
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(context, true),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF5C9A),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(
-                              fontSize: 14.fSize,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                    // Delete button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context, true),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF5C9A),
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Delete',
+                              style: TextStyle(
+                                fontSize: 14.fSize,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: MediaQuery.of(context).padding.bottom),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -273,30 +275,32 @@ class _AddressListScreenState extends State<AddressListScreen> {
         type: AppBarType.simple,
         title: 'My Addresses',
       ),
-      body: BlocBuilder<CustomerCubit, CustomerState>(
-        builder: (context, state) {
-          if (_isDeleting || state is CustomerLoading) {
-            return _buildLoadingState();
-          }
-
-          if (state is CustomerError) {
-            return _buildErrorState(state.message);
-          }
-
-          if (state is CustomerSuccess) {
-            // Update selected address ID when customer data changes
-            if (_selectedAddressId == null) {
-              _selectedAddressId = state.customer.defaultAddress?.id;
-              _selectedBaseAddressId = _extractBaseAddressId(_selectedAddressId);
-            } else {
-              // Update selected address ID after refresh to handle new access tokens
-              _updateSelectedAddressAfterRefresh(state.customer.addresses);
+      body: SafeArea(
+        child: BlocBuilder<CustomerCubit, CustomerState>(
+          builder: (context, state) {
+            if (_isDeleting || state is CustomerLoading) {
+              return _buildLoadingState();
             }
-            return _buildAddressListContent(state.customer);
-          }
 
-          return _buildLoadingState();
-        },
+            if (state is CustomerError) {
+              return _buildErrorState(state.message);
+            }
+
+            if (state is CustomerSuccess) {
+              // Update selected address ID when customer data changes
+              if (_selectedAddressId == null) {
+                _selectedAddressId = state.customer.defaultAddress?.id;
+                _selectedBaseAddressId = _extractBaseAddressId(_selectedAddressId);
+              } else {
+                // Update selected address ID after refresh to handle new access tokens
+                _updateSelectedAddressAfterRefresh(state.customer.addresses);
+              }
+              return _buildAddressListContent(state.customer);
+            }
+
+            return _buildLoadingState();
+          },
+        ),
       ),
     );
   }
@@ -444,7 +448,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button or Done Button
         Container(
-          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -682,7 +686,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         ),
         // Add New Address Button
         Container(
-          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+          padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [

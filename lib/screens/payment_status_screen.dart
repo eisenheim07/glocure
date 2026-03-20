@@ -446,7 +446,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
 
   Widget _buildBottomButtons(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
       decoration: BoxDecoration(
         color: AppColors.white,
         boxShadow: [

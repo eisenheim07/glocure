@@ -1134,207 +1134,209 @@ class _AddressScreenState extends State<AddressScreen> {
           type: AppBarType.simple,
           title: widget.existingAddress != null ? 'Update Address' : 'Add Address',
         ),
-        body: _isLoading || _isSavingAddress
-            ? _buildLoadingShimmer()
-            : Column(
-                children: [
-                  // Scrollable content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      child: Column(
-                        children: [
-                          SizedBox(height: 8),
+        body: SafeArea(
+          child: _isLoading || _isSavingAddress
+              ? _buildLoadingShimmer()
+              : Column(
+                  children: [
+                    // Scrollable content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Column(
+                          children: [
+                            SizedBox(height: 8),
 
-                          // Current Location Section
-                          _buildCurrentLocationSection(),
+                            // Current Location Section
+                            _buildCurrentLocationSection(),
 
-                          SizedBox(height: 8),
+                            SizedBox(height: 8),
 
-                          // User Information Form
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 14.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // User Information Section
-                                _buildTextField(
-                                  controller: _fullNameController,
-                                  label: 'Full Name',
-                                  hint: 'Enter your full name',
-                                  enabled: false,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _firstNameController,
-                                  label: 'First Name',
-                                  hint: 'Enter your first name',
-                                  enabled: false,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _lastNameController,
-                                  label: 'Last Name',
-                                  hint: 'Enter your last name',
-                                  enabled: false,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _emailController,
-                                  label: 'Email',
-                                  hint: 'Enter your email',
-                                  keyboardType: TextInputType.emailAddress,
-                                  enabled: false,
-                                ),
+                            // User Information Form
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 14.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // User Information Section
+                                  _buildTextField(
+                                    controller: _fullNameController,
+                                    label: 'Full Name',
+                                    hint: 'Enter your full name',
+                                    enabled: false,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _firstNameController,
+                                    label: 'First Name',
+                                    hint: 'Enter your first name',
+                                    enabled: false,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _lastNameController,
+                                    label: 'Last Name',
+                                    hint: 'Enter your last name',
+                                    enabled: false,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _emailController,
+                                    label: 'Email',
+                                    hint: 'Enter your email',
+                                    keyboardType: TextInputType.emailAddress,
+                                    enabled: false,
+                                  ),
 
-                                SizedBox(height: 24),
+                                  SizedBox(height: 24),
 
-                                // Address Information Section
-                                _buildTextField(
-                                  controller: _address1Controller,
-                                  label: 'Address Line 1',
-                                  hint: 'Enter address line 1',
-                                  maxLength: 100,
-                                  focusNode: _address1FocusNode,
-                                  errorText: _address1Error,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _address2Controller,
-                                  label: 'Address Line 2',
-                                  hint: 'Enter address line 2',
-                                  maxLength: 100,
-                                  focusNode: _address2FocusNode,
-                                  errorText: _address2Error,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _cityController,
-                                  label: 'City',
-                                  hint: 'Enter city',
-                                  maxLength: 30,
-                                  focusNode: _cityFocusNode,
-                                  errorText: _cityError,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _provinceController,
-                                  label: 'State/Province',
-                                  hint: 'Enter state or province',
-                                  focusNode: _provinceFocusNode,
-                                  errorText: _provinceError,
-                                  inputFormatters: [AlphabeticInputFormatter()],
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _countryController,
-                                  label: 'Country',
-                                  hint: 'Enter country',
-                                  maxLength: 30,
-                                  focusNode: _countryFocusNode,
-                                  errorText: _countryError,
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _zipController,
-                                  label: 'ZIP/Postal Code',
-                                  hint: 'Enter ZIP or postal code',
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 6,
-                                  focusNode: _zipFocusNode,
-                                  errorText: _zipError,
-                                  inputFormatters: [NumericInputFormatter()],
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _companyController,
-                                  label: 'Company (Optional)',
-                                  hint: 'Enter company name',
-                                ),
-                                SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _phoneController,
-                                  label: 'Phone',
-                                  hint: 'Enter phone number',
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 10,
-                                  focusNode: _phoneFocusNode,
-                                  errorText: _phoneError,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                  ],
-                                ),
+                                  // Address Information Section
+                                  _buildTextField(
+                                    controller: _address1Controller,
+                                    label: 'Address Line 1',
+                                    hint: 'Enter address line 1',
+                                    maxLength: 100,
+                                    focusNode: _address1FocusNode,
+                                    errorText: _address1Error,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _address2Controller,
+                                    label: 'Address Line 2',
+                                    hint: 'Enter address line 2',
+                                    maxLength: 100,
+                                    focusNode: _address2FocusNode,
+                                    errorText: _address2Error,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _cityController,
+                                    label: 'City',
+                                    hint: 'Enter city',
+                                    maxLength: 30,
+                                    focusNode: _cityFocusNode,
+                                    errorText: _cityError,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _provinceController,
+                                    label: 'State/Province',
+                                    hint: 'Enter state or province',
+                                    focusNode: _provinceFocusNode,
+                                    errorText: _provinceError,
+                                    inputFormatters: [AlphabeticInputFormatter()],
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _countryController,
+                                    label: 'Country',
+                                    hint: 'Enter country',
+                                    maxLength: 30,
+                                    focusNode: _countryFocusNode,
+                                    errorText: _countryError,
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _zipController,
+                                    label: 'ZIP/Postal Code',
+                                    hint: 'Enter ZIP or postal code',
+                                    keyboardType: TextInputType.number,
+                                    maxLength: 6,
+                                    focusNode: _zipFocusNode,
+                                    errorText: _zipError,
+                                    inputFormatters: [NumericInputFormatter()],
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _companyController,
+                                    label: 'Company (Optional)',
+                                    hint: 'Enter company name',
+                                  ),
+                                  SizedBox(height: 16),
+                                  _buildTextField(
+                                    controller: _phoneController,
+                                    label: 'Phone',
+                                    hint: 'Enter phone number',
+                                    keyboardType: TextInputType.number,
+                                    maxLength: 10,
+                                    focusNode: _phoneFocusNode,
+                                    errorText: _phoneError,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                  ),
 
-                                SizedBox(height: 24),
+                                  SizedBox(height: 24),
 
-                                // Make Default Address Checkbox
-                                Row(
-                                  children: [
-                                    Transform.scale(
-                                      scale: 1.2, // Increase checkbox size
-                                      child: Checkbox(
-                                        value: _isDefaultAddress,
-                                        onChanged: _isDefaultAddressDisabled
-                                            ? null // Disable checkbox if already default
-                                            : (value) {
-                                                setState(() {
-                                                  _isDefaultAddress = value ?? false;
-                                                });
-                                              },
-                                        activeColor: _isDefaultAddressDisabled
-                                            ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
-                                            : const Color(0xFFFF5C9A),
-                                        // Full pink for enabled
-                                        checkColor: Colors.white,
-                                        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-                                          if (states.contains(WidgetState.selected)) {
-                                            return _isDefaultAddressDisabled
-                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
-                                                : const Color(0xFFFF5C9A); // Full pink for enabled
-                                          }
-                                          return Colors.transparent;
-                                        }),
-                                        side: WidgetStateBorderSide.resolveWith((states) {
-                                          return BorderSide(
+                                  // Make Default Address Checkbox
+                                  Row(
+                                    children: [
+                                      Transform.scale(
+                                        scale: 1.2, // Increase checkbox size
+                                        child: Checkbox(
+                                          value: _isDefaultAddress,
+                                          onChanged: _isDefaultAddressDisabled
+                                              ? null // Disable checkbox if already default
+                                              : (value) {
+                                                  setState(() {
+                                                    _isDefaultAddress = value ?? false;
+                                                  });
+                                                },
+                                          activeColor: _isDefaultAddressDisabled
+                                              ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                              : const Color(0xFFFF5C9A),
+                                          // Full pink for enabled
+                                          checkColor: Colors.white,
+                                          fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                                            if (states.contains(WidgetState.selected)) {
+                                              return _isDefaultAddressDisabled
+                                                  ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink for disabled
+                                                  : const Color(0xFFFF5C9A); // Full pink for enabled
+                                            }
+                                            return Colors.transparent;
+                                          }),
+                                          side: WidgetStateBorderSide.resolveWith((states) {
+                                            return BorderSide(
+                                              color: _isDefaultAddressDisabled
+                                                  ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
+                                                  : const Color(0xFFFF5C9A), // Full pink border for enabled
+                                              width: 2.w,
+                                            );
+                                          }),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(3.r),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          'Make this my default address', // Keep same text for both states
+                                          style: TextStyle(
+                                            fontSize: 12.fSize,
+                                            fontWeight: FontWeight.w500,
                                             color: _isDefaultAddressDisabled
-                                                ? Color(0xFFFF5C9A).withOpacity(0.4) // Faded pink border for disabled
-                                                : const Color(0xFFFF5C9A), // Full pink border for enabled
-                                            width: 2.w,
-                                          );
-                                        }),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(3.r),
+                                                ? Colors.black.withOpacity(0.5) // Faded text for disabled
+                                                : Colors.black, // Full black for enabled
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        'Make this my default address', // Keep same text for both states
-                                        style: TextStyle(
-                                          fontSize: 12.fSize,
-                                          fontWeight: FontWeight.w500,
-                                          color: _isDefaultAddressDisabled
-                                              ? Colors.black.withOpacity(0.5) // Faded text for disabled
-                                              : Colors.black, // Full black for enabled
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
-                                SizedBox(height: 24),
-                              ],
+                                  SizedBox(height: 24),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Fixed bottom button
-                  _buildBottomButton(),
-                ],
-              ),
+                    // Fixed bottom button
+                    _buildBottomButton(),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -1351,7 +1353,7 @@ class _AddressScreenState extends State<AddressScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
       child: SafeArea(
         top: false,
         child: SizedBox(

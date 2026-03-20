@@ -31,17 +31,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         type: AppBarType.simple,
         title: 'My Profile',
       ),
-      body: BlocBuilder<CustomerCubit, CustomerState>(
-        builder: (context, state) {
-          if (state is CustomerLoading) {
-            return _buildLoadingState();
-          } else if (state is CustomerError) {
-            return _buildErrorState(state.message);
-          } else if (state is CustomerSuccess) {
-            return _buildProfileContent(state.customer);
-          }
-          return const SizedBox.shrink();
-        },
+      body: SafeArea(
+        child: BlocBuilder<CustomerCubit, CustomerState>(
+          builder: (context, state) {
+            if (state is CustomerLoading) {
+              return _buildLoadingState();
+            } else if (state is CustomerError) {
+              return _buildErrorState(state.message);
+            } else if (state is CustomerSuccess) {
+              return _buildProfileContent(state.customer);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -190,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// Build profile content
   Widget _buildProfileContent(Customer customer) {
     return ListView(
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, MediaQuery.of(context).padding.bottom + 20.h),
       children: [
         // Personal Information Section
         _buildSectionTitle('Personal Information'),

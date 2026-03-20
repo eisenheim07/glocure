@@ -210,8 +210,9 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             ),
           ),
         ),
-        body: BlocBuilder<ProductSearchCubit, ProductSearchState>(
-          builder: (context, searchState) {
+        body: SafeArea(
+          child: BlocBuilder<ProductSearchCubit, ProductSearchState>(
+            builder: (context, searchState) {
             // Show search results if searching
             if (searchState is ProductSearchLoading) {
               return _buildSearchShimmer();
@@ -248,117 +249,121 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             }
 
             // Show default discover view
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Search History Section
-                if (_searchHistory.isNotEmpty) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Search history',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+            return Padding(
+              padding: EdgeInsets.only(bottom: 16.h), // Add bottom padding for 3-button navigation
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Search History Section
+                  if (_searchHistory.isNotEmpty) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Search history',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppColors.primary),
-                        onPressed: _clearSearchHistory,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _searchHistory.map((term) {
-                      return _SearchChip(
-                        label: term,
-                        onTap: () => _onSearchTermSelected(term),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-
-                // Recommendations Section
-                if (_recommendations.isNotEmpty) ...[
-                  const Text(
-                    'Recommendations',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: AppColors.primary),
+                          onPressed: _clearSearchHistory,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _recommendations.map((tag) {
-                      return _SearchChip(
-                        label: tag,
-                        onTap: () => _onSearchTermSelected(tag),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _searchHistory.map((term) {
+                        return _SearchChip(
+                          label: term,
+                          onTap: () => _onSearchTermSelected(term),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
 
-                // Discover Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                  // Recommendations Section
+                  if (_recommendations.isNotEmpty) ...[
                     const Text(
-                      'Discover',
+                      'Recommendations',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CategoryProducts(
-                              isDiscounted: true,
-                              showAllProducts: true,
-                            ),
-                          ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _recommendations.map((tag) {
+                        return _SearchChip(
+                          label: tag,
+                          onTap: () => _onSearchTermSelected(tag),
                         );
-                      },
-                      child: const Row(
-                        children: [
-                          Text(
-                            'View all',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: AppColors.primary,
-                            size: 18,
-                          ),
-                        ],
-                      ),
+                      }).toList(),
                     ),
+                    const SizedBox(height: 24),
                   ],
-                ),
-                const SizedBox(height: 16),
 
-                // Products Horizontal Grid
-                _ProductsHorizontalGrid(products: widget.allProducts),
-              ],
+                  // Discover Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Discover',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CategoryProducts(
+                                isDiscounted: true,
+                                showAllProducts: true,
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Row(
+                          children: [
+                            Text(
+                              'View all',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Products Horizontal Grid
+                  _ProductsHorizontalGrid(products: widget.allProducts),
+                ],
+              ),
             );
-          },
+            },
+          ),
         ),
       ),
     );
@@ -665,10 +670,10 @@ class _ProductCard extends StatelessWidget {
             ),
           ],
         ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.only(

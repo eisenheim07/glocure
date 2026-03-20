@@ -983,16 +983,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         type: AppBarType.simple,
         title: 'Product detail',
       ),
-      body: BlocConsumer<ProductDetailsCubit, ProductDetailsState>(
-        listener: (context, state) {
-          // Handle error state by showing error bottom sheet
-          if (state is ProductDetailsError && !state.hasProductFallback) {
-            _showErrorBottomSheet();
-          }
-        },
-        builder: (context, state) {
-          // Show shimmer when refreshing address, loading product details, or processing payment
-          if (state is ProductDetailsLoading || _isRefreshingAddress || _isPaymentLoading) {
+      body: SafeArea(
+        child: BlocConsumer<ProductDetailsCubit, ProductDetailsState>(
+          listener: (context, state) {
+            // Handle error state by showing error bottom sheet
+            if (state is ProductDetailsError && !state.hasProductFallback) {
+              _showErrorBottomSheet();
+            }
+          },
+          builder: (context, state) {
+            // Show shimmer when refreshing address, loading product details, or processing payment
+            if (state is ProductDetailsLoading || _isRefreshingAddress || _isPaymentLoading) {
+              return Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Expanded(child: _buildLoadingShimmer()),
+                  _buildBottomBarShimmer(),
+                ],
+              );
+            }
+
+            if (state is ProductDetailsLoaded) {
+              return _buildProductContent(state);
+            }
+
+            // Error state with fallback or initial state
             return Column(
               children: [
                 const SizedBox(height: 10),
@@ -1000,21 +1015,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                 _buildBottomBarShimmer(),
               ],
             );
-          }
-
-          if (state is ProductDetailsLoaded) {
-            return _buildProductContent(state);
-          }
-
-          // Error state with fallback or initial state
-          return Column(
-            children: [
-              const SizedBox(height: 10),
-              Expanded(child: _buildLoadingShimmer()),
-              _buildBottomBarShimmer(),
-            ],
-          );
-        },
+          },
+        ),
       ),
     );
   }
@@ -2233,7 +2235,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     final totalPrice = needsShipping ? itemPrice + shippingCharges : itemPrice;
 
     return Container(
-      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 0.h),
+      padding: EdgeInsets.fromLTRB(8.h, 12.h, 12.h, 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [

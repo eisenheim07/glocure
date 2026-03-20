@@ -480,7 +480,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           ),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(8.h, 8.h, 8.h, 2.h),
+      padding: EdgeInsets.fromLTRB(8.h, 8.h, 8.h, 18.h),
       child: SafeArea(
         top: false,
         child: Column(
