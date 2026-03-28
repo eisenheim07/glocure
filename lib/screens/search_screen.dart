@@ -178,7 +178,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                 textAlignVertical: TextAlignVertical.center,
                 style: TextStyle(
                   fontSize: 13.fSize,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                   fontWeight: FontWeight.w400,
                 ),
                 decoration: InputDecoration(
@@ -294,7 +294,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -320,7 +320,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       TextButton(
@@ -387,7 +387,7 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
             highlightColor: AppColors.shimmerHighlight,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(15.r),
               ),
               child: Column(
@@ -656,7 +656,7 @@ class _ProductCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.borderSecondary,
@@ -664,7 +664,7 @@ class _ProductCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: AppColors.shadowLight,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -713,7 +713,7 @@ class _ProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -737,7 +737,7 @@ class _ProductCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -760,7 +760,7 @@ class _ProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (compareAtPrice != null) ...[

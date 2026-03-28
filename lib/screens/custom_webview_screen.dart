@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/custom_app_bar.dart';
 import '../utils/size_utils.dart';
+import '../utils/app_colors.dart';
 
 /// Custom WebView Screen
 /// Displays web content with optional camera permission handling
@@ -164,7 +165,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Could not open the URL'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppColors.error,
                       ),
                     );
                   }
@@ -174,7 +175,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error: $e'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                     ),
                   );
                 }
@@ -214,7 +215,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Could not open the URL'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppColors.error,
                       ),
                     );
                   }
@@ -224,7 +225,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Error: $e'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.error,
                     ),
                   );
                 }
@@ -243,7 +244,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
       onWillPop: _onWillPop,
       child: SafeArea(
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.white,
           appBar: widget.showAppBar
               ? CustomAppBar(
                   type: AppBarType.simple,
@@ -300,7 +301,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(error.description),
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppColors.error,
                         ),
                       );
                     }
@@ -385,7 +386,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (jsPromptRequest.message?.isNotEmpty == true) Text(jsPromptRequest.message!),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             TextField(
                               controller: textController,
                               decoration: const InputDecoration(
@@ -419,7 +420,7 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
               if (_isLoading)
                 const Center(
                   child: CircularProgressIndicator(
-                    color: Color(0xFFFF5C9A),
+                    color: AppColors.primary,
                   ),
                 ),
 
@@ -431,8 +432,8 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
                   right: 0,
                   child: LinearProgressIndicator(
                     value: _progress,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: const AlwaysStoppedAnimation(Color(0xFFFF5C9A)),
+                    backgroundColor: AppColors.gray200,
+                    valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                   ),
                 ),
             ],

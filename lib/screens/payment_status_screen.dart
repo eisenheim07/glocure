@@ -8,6 +8,7 @@ import '../utils/app_colors.dart';
 import '../widgets/custom_app_bar.dart';
 import '../cubits/payment_status/payment_status_cubit.dart';
 import '../cubits/payment_status/payment_status_state.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
 import 'main_navigation_screen.dart';
 
 /// Payment Status Screen
@@ -63,11 +64,19 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
           onBackPressed: () => _navigateToHome(context),
         ),
         body: SafeArea(
-          child: BlocBuilder<PaymentStatusCubit, PaymentStatusState>(
-            builder: (context, state) {
-              final isGeneratingCart = state is PaymentStatusGeneratingCart;
-              return isGeneratingCart ? _buildLoadingShimmer() : _buildContent(context);
+          child: BlocListener<PaymentStatusCubit, PaymentStatusState>(
+            listener: (context, state) {
+              // Clear cart indicator when cart generation is completed
+              if (state is PaymentStatusCartGenerated) {
+                context.read<CartIndicatorCubit>().clearCartIndicator();
+              }
             },
+            child: BlocBuilder<PaymentStatusCubit, PaymentStatusState>(
+              builder: (context, state) {
+                final isGeneratingCart = state is PaymentStatusGeneratingCart;
+                return isGeneratingCart ? _buildLoadingShimmer() : _buildContent(context);
+              },
+            ),
           ),
         ),
       ),

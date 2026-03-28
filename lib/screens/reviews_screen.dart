@@ -49,7 +49,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'Reviews',
@@ -76,7 +76,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     style: TextStyle(
                       fontSize: 18.fSize,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(height: 8.h),
@@ -94,8 +94,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       context.read<ReviewsCubit>().refreshReviews();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF5C9A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: 24.h,
                         vertical: 12.h,
@@ -120,7 +120,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                     Icon(
                       Icons.rate_review_outlined,
                       size: 54.h,
-                      color: Colors.grey.shade400,
+                      color: AppColors.gray400,
                     ),
                     SizedBox(height: 16.h),
                     Text(
@@ -128,7 +128,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       style: TextStyle(
                         fontSize: 18.fSize,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -136,7 +136,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                       'Be the first to review this product',
                       style: TextStyle(
                         fontSize: 14.fSize,
-                        color: Colors.grey.shade600,
+                        color: AppColors.gray600,
                       ),
                     ),
                   ],

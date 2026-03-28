@@ -102,14 +102,18 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       customer: customer,
       cart: cart,
       onLoadingStart: () {
-        setState(() {
-          _isPaymentLoading = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isPaymentLoading = true;
+          });
+        }
       },
       onLoadingEnd: () {
-        setState(() {
-          _isPaymentLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isPaymentLoading = false;
+          });
+        }
       },
       onSuccess: () {
         // Payment successful - could refresh data or show success message
@@ -160,7 +164,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   void _showGrandTotalInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundPrimary,
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
@@ -190,20 +194,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Container(
-                        //   width: 36.w,
-                        //   height: 36.h,
-                        //   decoration: BoxDecoration(
-                        //     color: AppColors.primary.withValues(alpha: 0.1),
-                        //     shape: BoxShape.circle,
-                        //   ),
-                        //   child: Icon(
-                        //     Icons.info_outline,
-                        //     size: 20.h,
-                        //     color: AppColors.primary,
-                        //   ),
-                        // ),
-                        // SizedBox(width: 12.w),
                         Text(
                           'Grand Total Breakdown',
                           style: TextStyle(
@@ -250,7 +240,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                             borderRadius: BorderRadius.circular(8.r),
                             border: Border.all(
                               color: AppColors.success.withValues(alpha: 0.3),
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                           child: Row(
@@ -279,8 +269,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     ),
                   ),
 
-                  // SizedBox(height: 16.h),
-
                   // Close button
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
@@ -291,7 +279,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.r),
                           ),
@@ -308,8 +296,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       ),
                     ),
                   ),
-
-                  // SizedBox(height: 16.h),
                 ],
               ),
             ));
@@ -347,7 +333,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.backgroundPrimary,
       appBar: const CustomAppBar(
         type: AppBarType.simple,
         title: 'Order Summary',
@@ -489,16 +475,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.backgroundPrimary,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: AppColors.shadowLight,
+            blurRadius: 10.r,
+            offset: Offset(0, -2.h),
           ),
         ],
       ),
-      padding: EdgeInsets.fromLTRB(8.h, 8.h, 8.h, 18.h),
+      padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 18.h),
       child: SafeArea(
         top: false,
         child: Column(
@@ -508,11 +494,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Container(
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.backgroundSecondary,
                 borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
-                  color: Colors.grey.shade200,
-                  width: 1,
+                  color: AppColors.borderSecondary,
+                  width: 1.w,
                 ),
               ),
               child: Column(
@@ -587,7 +573,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   // Divider
                   Divider(
                     color: AppColors.borderSecondary,
-                    thickness: 1,
+                    thickness: 1.h,
                   ),
 
                   SizedBox(height: 4.h),
@@ -629,8 +615,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               child: ElevatedButton(
                 onPressed: () => customer.hasCompleteAddress() ? _handleProceedToPay(context, cart, customer) : _handleAddAddress(context, customer),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5C9A),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.r),
                   ),
@@ -690,10 +676,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.borderSecondary,
           width: 1.w,
         ),
       ),
@@ -708,7 +694,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 style: TextStyle(
                   fontSize: 14.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
               // Edit button
@@ -743,7 +729,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             fullAddress.isNotEmpty ? fullAddress : 'Address not available',
             style: TextStyle(
               fontSize: 12.fSize,
-              color: Colors.grey.shade700,
+              color: AppColors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -763,10 +749,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.borderSecondary,
           width: 1.w,
         ),
       ),
@@ -781,30 +767,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 style: TextStyle(
                   fontSize: 14.fSize,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
-              // Edit button for contact info
-              // Container(
-              //   width: 34.w,
-              //   height: 34.h,
-              //   decoration: BoxDecoration(
-              //     color: Color(0xFFFF5C9A),
-              //     shape: BoxShape.circle,
-              //   ),
-              //   child: IconButton(
-              //     icon: Icon(
-              //       Icons.edit_outlined,
-              //       color: Colors.white,
-              //       size: 17.h,
-              //     ),
-              //     onPressed: () {
-              //       // TODO: Navigate to edit contact screen
-              //       debugPrint('Edit contact tapped');
-              //     },
-              //     padding: EdgeInsets.zero,
-              //   ),
-              // ),
             ],
           ),
           if (phone.isNotEmpty) ...[
@@ -812,7 +777,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               phone,
               style: TextStyle(
                 fontSize: 12.fSize,
-                color: Colors.grey.shade700,
+                color: AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -822,7 +787,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               email,
               style: TextStyle(
                 fontSize: 12.fSize,
-                color: Colors.grey.shade700,
+                color: AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -836,10 +801,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.borderSecondary,
           width: 1.w,
         ),
       ),
@@ -851,15 +816,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             style: TextStyle(
               fontSize: 14.fSize,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.textPrimary,
             ),
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             message,
             style: TextStyle(
               fontSize: 12.fSize,
-              color: Colors.grey.shade500,
+              color: AppColors.textMuted,
             ),
           ),
         ],
@@ -875,10 +840,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.backgroundSecondary,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.borderSecondary,
           width: 1.w,
         ),
       ),
@@ -893,7 +858,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             style: TextStyle(
               fontSize: 14.fSize,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: AppColors.textPrimary,
             ),
           ),
           children: [
@@ -950,10 +915,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       margin: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.backgroundPrimary,
         borderRadius: BorderRadius.circular(7.r),
         border: Border.all(
-          color: Colors.grey.shade200,
+          color: AppColors.borderSecondary,
           width: 1.w,
         ),
       ),
@@ -966,7 +931,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             child: Container(
               width: 68.w,
               height: 68.h,
-              color: Colors.grey.shade50,
+              color: AppColors.backgroundSecondary,
               child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                   ? NetworkImageLoader(
                       imageUrl: product.imageUrl!,
@@ -975,9 +940,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       fit: BoxFit.cover,
                     )
                   : Container(
-                      color: Colors.grey.shade200,
+                      color: AppColors.borderSecondary,
                       child: Center(
-                        child: Icon(Icons.image_outlined, color: Colors.grey),
+                        child: Icon(Icons.image_outlined, color: AppColors.textMuted),
                       ),
                     ),
             ),
@@ -998,23 +963,23 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   style: TextStyle(
                     fontSize: 12.fSize,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                     height: 1.3,
                   ),
                 ),
 
-                SizedBox(height: 6),
+                SizedBox(height: 6.h),
 
                 // Quantity
                 Text(
                   'Qty: ${cartLine.quantity}',
                   style: TextStyle(
                     fontSize: 11.fSize,
-                    color: Colors.grey.shade600,
+                    color: AppColors.textSecondary,
                   ),
                 ),
 
-                SizedBox(height: 6),
+                SizedBox(height: 6.h),
 
                 // Price row
                 Row(
@@ -1024,27 +989,27 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       style: TextStyle(
                         fontSize: 14.fSize,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (originalPrice.isNotEmpty) ...[
-                      SizedBox(width: 6),
+                      SizedBox(width: 6.w),
                       Text(
                         originalPrice,
                         style: TextStyle(
                           fontSize: 10.fSize,
-                          color: Colors.grey.shade400,
+                          color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
-                          decorationColor: Colors.grey.shade400,
+                          decorationColor: AppColors.textMuted,
                         ),
                       ),
                     ],
                     if (discount > 0) ...[
-                      SizedBox(width: 6),
+                      SizedBox(width: 6.w),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 2.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50),
+                          color: AppColors.success,
                           borderRadius: BorderRadius.circular(3.r),
                         ),
                         child: Text(
@@ -1052,7 +1017,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                           style: TextStyle(
                             fontSize: 9.fSize,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -1080,13 +1045,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
   Widget _buildCartProductsShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
       child: Container(
         width: double.infinity,
         height: 213.h,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.backgroundPrimary,
           borderRadius: BorderRadius.circular(10.r),
         ),
       ),
@@ -1103,11 +1068,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           style: TextStyle(
             fontSize: 17.fSize,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: AppColors.textPrimary,
           ),
         ),
 
-        SizedBox(height: 16),
+        SizedBox(height: 16.h),
 
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -1177,11 +1142,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.backgroundPrimary,
               borderRadius: BorderRadius.circular(10.r),
               border: Border.all(
-                color: Colors.grey.shade200,
-                width: 0.8,
+                color: AppColors.borderSecondary,
+                width: 0.8.w,
               ),
             ),
             child: Column(
@@ -1195,16 +1160,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       height: 120.h, // Reduced height to prevent overflow
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
+                        color: AppColors.backgroundSecondary,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10.r),
+                          topRight: Radius.circular(10.r),
                         ),
                       ),
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10.r),
+                          topRight: Radius.circular(10.r),
                         ),
                         child: imageUrl.isNotEmpty
                             ? NetworkImageLoader(
@@ -1217,7 +1182,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                 child: Icon(
                                   Icons.image_outlined,
                                   size: 30.h,
-                                  color: Colors.grey.shade400,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                       ),
@@ -1231,7 +1196,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4CAF50),
+                            color: AppColors.success,
                             borderRadius: BorderRadius.circular(3.r),
                           ),
                           child: Text(
@@ -1239,7 +1204,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                             style: TextStyle(
                               fontSize: 9.fSize,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
                         ),
@@ -1333,8 +1298,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
                 // Divider
                 Container(
-                  height: 1,
-                  color: Colors.grey.shade200,
+                  height: 1.h,
+                  color: AppColors.borderSecondary,
                 ),
 
                 // Product details with flexible layout
@@ -1353,7 +1318,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                           style: TextStyle(
                             fontSize: 11.fSize,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black,
+                            color: AppColors.textPrimary,
                             height: 1.2,
                           ),
                         ),
@@ -1376,7 +1341,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                     style: TextStyle(
                                       fontSize: 13.fSize,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.black,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                   if (originalPrice.isNotEmpty)
@@ -1384,9 +1349,9 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                       originalPrice,
                                       style: TextStyle(
                                         fontSize: 9.fSize,
-                                        color: Colors.grey.shade400,
+                                        color: AppColors.textMuted,
                                         decoration: TextDecoration.lineThrough,
-                                        decorationColor: Colors.grey.shade400,
+                                        decorationColor: AppColors.textMuted,
                                       ),
                                     ),
                                 ],
@@ -1407,33 +1372,33 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                 width: 22.w,
                                 height: 22.h,
                                 decoration: BoxDecoration(
-                                  color: isAddingToCart ? Colors.grey.shade300 : const Color(0xFFFF5C9A),
+                                  color: isAddingToCart ? AppColors.buttonDisabled : AppColors.primary,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
+                                      color: AppColors.shadowLight,
+                                      blurRadius: 4.r,
+                                      offset: Offset(0, 2.h),
                                     ),
                                   ],
                                 ),
                                 child: isAddingToCart
                                     ? Shimmer.fromColors(
-                                        baseColor: Colors.grey[400]!,
-                                        highlightColor: Colors.grey[200]!,
+                                        baseColor: AppColors.shimmerBase,
+                                        highlightColor: AppColors.shimmerHighlight,
                                         child: Container(
                                           width: 12.w,
                                           height: 12.h,
                                           margin: EdgeInsets.all(5.w),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.white,
                                             shape: BoxShape.circle,
                                           ),
                                         ),
                                       )
                                     : Icon(
                                         Icons.add_shopping_cart,
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         size: 12.h,
                                       ),
                               ),
@@ -1458,19 +1423,19 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       children: [
         // Header shimmer
         Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: AppColors.shimmerBase,
+          highlightColor: AppColors.shimmerHighlight,
           child: Container(
             width: 128.w,
             height: 20.h,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.backgroundPrimary,
               borderRadius: BorderRadius.circular(3.r),
             ),
           ),
         ),
 
-        SizedBox(height: 16),
+        SizedBox(height: 16.h),
 
         // Product cards shimmer with proper constraints
         SizedBox(
@@ -1484,16 +1449,16 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 width: 136.w,
                 margin: EdgeInsets.only(right: 10.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.backgroundPrimary,
                   borderRadius: BorderRadius.circular(10.r),
                   border: Border.all(
-                    color: Colors.grey.shade200,
-                    width: 0.8,
+                    color: AppColors.borderSecondary,
+                    width: 0.8.w,
                   ),
                 ),
                 child: Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1502,10 +1467,10 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                         height: 120.h, // Updated to match the fixed card height
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
+                          color: AppColors.shimmerBase,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10.r),
+                            topRight: Radius.circular(10.r),
                           ),
                         ),
                       ),
@@ -1520,25 +1485,25 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: double.infinity,
                               height: 12.h,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: AppColors.shimmerBase,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: 6.h),
                             Container(
                               width: 85.w,
                               height: 12.h,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: AppColors.shimmerBase,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
-                            SizedBox(height: 12),
+                            SizedBox(height: 12.h),
                             Container(
                               width: 68.w,
                               height: 15.h,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: AppColors.shimmerBase,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1566,25 +1531,25 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             Icon(
               Icons.error_outline,
               size: 68.h,
-              color: Colors.red.shade300,
+              color: AppColors.error,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               'Failed to load customer data',
               style: TextStyle(
                 fontSize: 15.fSize,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade700,
+                color: AppColors.textSecondary,
               ),
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
                 _initializeScreen();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF5C9A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 padding: EdgeInsets.symmetric(horizontal: 27.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(7.r),
@@ -1609,61 +1574,61 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               children: [
                 // Shipping Address Card Shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 102.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundPrimary,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // Contact Information Card Shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 102.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundPrimary,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // Cart Products Card Shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 213.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundPrimary,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 // Related Products Shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 213.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundPrimary,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                   ),
@@ -1675,14 +1640,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
         // Bottom section shimmer
         Container(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 16.h),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.backgroundPrimary,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
+                color: AppColors.shadowLight,
+                blurRadius: 8.r,
+                offset: Offset(0, -2.h),
               ),
             ],
           ),
@@ -1695,19 +1660,19 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: AppColors.backgroundSecondary,
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
-                      color: Colors.grey.shade200,
-                      width: 1,
+                      color: AppColors.borderSecondary,
+                      width: 1.w,
                     ),
                   ),
                   child: Column(
                     children: [
                       // Subtotal row shimmer
                       Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1715,7 +1680,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 70.w,
                               height: 14.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1723,7 +1688,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 120.w,
                               height: 14.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1735,8 +1700,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
                       // Shipping charges row shimmer
                       Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1744,7 +1709,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 110.w,
                               height: 14.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1752,7 +1717,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 50.w,
                               height: 14.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1765,15 +1730,15 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                       // Divider
                       Divider(
                         color: AppColors.borderSecondary,
-                        thickness: 1,
+                        thickness: 1.h,
                       ),
 
                       SizedBox(height: 4.h),
 
                       // Grand Total row shimmer
                       Shimmer.fromColors(
-                        baseColor: Colors.grey[300]!,
-                        highlightColor: Colors.grey[100]!,
+                        baseColor: AppColors.shimmerBase,
+                        highlightColor: AppColors.shimmerHighlight,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1781,7 +1746,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 80.w,
                               height: 16.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1789,7 +1754,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                               width: 90.w,
                               height: 16.h,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.backgroundPrimary,
                                 borderRadius: BorderRadius.circular(3.r),
                               ),
                             ),
@@ -1804,13 +1769,13 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
                 // Button shimmer
                 Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: AppColors.shimmerBase,
+                  highlightColor: AppColors.shimmerHighlight,
                   child: Container(
                     width: double.infinity,
                     height: 48.h,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundPrimary,
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
