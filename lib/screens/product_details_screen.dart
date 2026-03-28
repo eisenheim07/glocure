@@ -980,8 +980,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(
-        type: AppBarType.simple,
-        title: 'Product detail',
+        type: AppBarType.full,
+        showBackButton: true,
       ),
       body: SafeArea(
         child: BlocConsumer<ProductDetailsCubit, ProductDetailsState>(

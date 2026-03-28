@@ -169,92 +169,94 @@ class _CustomWebViewScreenState extends State<CustomWebViewScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: widget.showAppBar
-            ? CustomAppBar(
-                type: AppBarType.simple,
-                title: widget.title,
-                onBackPressed: _handleAppBarBack,
-              )
-            : null,
-        body: Stack(
-          children: [
-            InAppWebView(
-              initialUrlRequest: URLRequest(
-                url: WebUri(widget.url),
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                  'Accept-Language': 'en-US,en;q=0.5',
-                  'Accept-Encoding': 'gzip, deflate',
-                  'DNT': '1',
-                  'Connection': 'keep-alive',
-                  'Upgrade-Insecure-Requests': '1',
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: widget.showAppBar
+              ? CustomAppBar(
+                  type: AppBarType.simple,
+                  title: widget.title,
+                  onBackPressed: _handleAppBarBack,
+                )
+              : null,
+          body: Stack(
+            children: [
+              InAppWebView(
+                initialUrlRequest: URLRequest(
+                  url: WebUri(widget.url),
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'DNT': '1',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                  },
+                ),
+                initialSettings: _settings,
+                onWebViewCreated: (controller) {
+                  _controller = controller;
+                },
+                onLoadStart: (_, __) {
+                  setState(() => _isLoading = true);
+                },
+                onLoadStop: (_, __) {
+                  setState(() => _isLoading = false);
+                },
+                onProgressChanged: (_, progress) {
+                  setState(() {
+                    _progress = progress / 100;
+                  });
+                },
+                onPermissionRequest: (_, request) async {
+                  return PermissionResponse(
+                    resources: request.resources,
+                    action: PermissionResponseAction.GRANT,
+                  );
+                },
+                onReceivedError: (_, __, error) {
+                  if (mounted) {
+                    // Check if it's an ORB error
+                    if (error.description.contains('ERR_BLOCKED_BY_ORB') ||
+                        error.description.contains('ERR_BLOCKED_BY_CLIENT') ||
+                        error.description.contains('ERR_ACCESS_DENIED')) {
+                      // Show dialog to open in external browser
+                      _showOpenInBrowserDialog();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(error.description),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
-              initialSettings: _settings,
-              onWebViewCreated: (controller) {
-                _controller = controller;
-              },
-              onLoadStart: (_, __) {
-                setState(() => _isLoading = true);
-              },
-              onLoadStop: (_, __) {
-                setState(() => _isLoading = false);
-              },
-              onProgressChanged: (_, progress) {
-                setState(() {
-                  _progress = progress / 100;
-                });
-              },
-              onPermissionRequest: (_, request) async {
-                return PermissionResponse(
-                  resources: request.resources,
-                  action: PermissionResponseAction.GRANT,
-                );
-              },
-              onReceivedError: (_, __, error) {
-                if (mounted) {
-                  // Check if it's an ORB error
-                  if (error.description.contains('ERR_BLOCKED_BY_ORB') || 
-                      error.description.contains('ERR_BLOCKED_BY_CLIENT') ||
-                      error.description.contains('ERR_ACCESS_DENIED')) {
-                    // Show dialog to open in external browser
-                    _showOpenInBrowserDialog();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(error.description),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
 
-            // Loader
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFFFF5C9A),
+              // Loader
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFFFF5C9A),
+                  ),
                 ),
-              ),
 
-            // Progress bar
-            if (_progress < 1.0 && !_isLoading)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(
-                  value: _progress,
-                  backgroundColor: Colors.grey[200],
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFF5C9A)),
+              // Progress bar
+              if (_progress < 1.0 && !_isLoading)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: LinearProgressIndicator(
+                    value: _progress,
+                    backgroundColor: Colors.grey[200],
+                    valueColor: const AlwaysStoppedAnimation(Color(0xFFFF5C9A)),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

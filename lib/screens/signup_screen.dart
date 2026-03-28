@@ -132,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   bool _isPasswordValid(String password) {
-    if (password.length <= 15) return false;
+    if (password.length < 10) return false;
 
     int upperCount = 0;
     int lowerCount = 0;
@@ -154,7 +154,7 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     }
 
-    return upperCount >= 2 && lowerCount >= 2 && digitCount >= 2 && specialCount >= 2;
+    return upperCount >= 1 && lowerCount >= 1 && digitCount >= 1 && specialCount >= 1;
   }
 
   void _handleSignup() {
@@ -663,7 +663,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _buildPasswordRequirements() {
     final password = _passwordController.text;
-    final hasMinLength = password.length > 15;
+    final hasMinLength = password.length > 10;
 
     // Count character types in real-time
     int upperCount = 0;
@@ -686,10 +686,10 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     }
 
-    final hasUpperCase = upperCount >= 2;
-    final hasLowerCase = lowerCount >= 2;
-    final hasDigits = digitCount >= 2;
-    final hasSpecialChars = specialCount >= 2;
+    final hasUpperCase = upperCount >= 1;
+    final hasLowerCase = lowerCount >= 1;
+    final hasDigits = digitCount >= 1;
+    final hasSpecialChars = specialCount >= 1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,11 +704,11 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
         SizedBox(height: 4.h),
-        _buildRequirement('More than 15 characters', hasMinLength),
-        _buildRequirement('At least 2 uppercase letters (${upperCount}/2)', hasUpperCase),
-        _buildRequirement('At least 2 lowercase letters (${lowerCount}/2)', hasLowerCase),
-        _buildRequirement('At least 2 numbers (${digitCount}/2)', hasDigits),
-        _buildRequirement('At least 2 special characters (${specialCount}/2)', hasSpecialChars),
+        _buildRequirement('Atleast 10 characters', hasMinLength),
+        _buildRequirement('At least 1 uppercase letters (${upperCount}/1)', hasUpperCase),
+        _buildRequirement('At least 1 lowercase letters (${lowerCount}/1)', hasLowerCase),
+        _buildRequirement('At least 1 numbers (${digitCount}/1)', hasDigits),
+        _buildRequirement('At least 1 special characters (${specialCount}/1)', hasSpecialChars),
       ],
     );
   }

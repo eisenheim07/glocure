@@ -16,6 +16,7 @@ class ImageConstant {
   static String icBrandBG = "$imagePathHome/ic_brand_BG.png";
   static String icMedicalStaff = "$imagePathHome/ic_assistant.png";
   static String icDashboard = "$imagePathHome/ic_dashboard.png";
+  static String icFaceScan = "$imagePathHome/ic_face_scan.png";
 
   // splash & login screen
   // static String icMainLogo = "$imagePathSplashLogin/glocure_main_logo.svg";

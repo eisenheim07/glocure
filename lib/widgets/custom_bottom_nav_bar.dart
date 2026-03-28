@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glocure/utils/image_constant.dart';
 import '../utils/size_utils.dart';
 import '../utils/app_colors.dart';
 
@@ -18,7 +19,7 @@ class CustomBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get the bottom padding for system navigation
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    
+
     return Container(
       height: 70 + bottomPadding,
       decoration: BoxDecoration(
@@ -81,29 +82,24 @@ class CustomBottomNavBar extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onTap(2),
               child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [AppColors.primary, AppColors.primaryLight],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, AppColors.primaryLight],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.qr_code_scanner_rounded,
-                  color: AppColors.white,
-                  size: 28,
-                ),
-              ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(ImageConstant.icFaceScan)),
             ),
           ),
 
@@ -113,14 +109,14 @@ class CustomBottomNavBar extends StatelessWidget {
             left: MediaQuery.of(context).size.width / 2 - 20,
             child: GestureDetector(
               onTap: () => onTap(2),
-              child: Text(
-                'Scan',
-                style: TextStyle(
-                  fontSize: 11.fSize,
-                  fontWeight: FontWeight.w500,
-                  color: currentIndex == 2
-                      ? AppColors.primary
-                      : AppColors.textMuted,
+              child: Center(
+                child: Text(
+                  ' Scan',
+                  style: TextStyle(
+                    fontSize: 11.fSize,
+                    fontWeight: FontWeight.w500,
+                    color: currentIndex == 2 ? AppColors.primary : AppColors.textMuted,
+                  ),
                 ),
               ),
             ),
@@ -159,9 +155,7 @@ class _NavItem extends StatelessWidget {
             Icon(
               icon,
               size: 24,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textMuted,
+              color: isSelected ? AppColors.primary : AppColors.textMuted,
             ),
             const SizedBox(height: 4),
             Text(
@@ -169,9 +163,7 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11.fSize,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textMuted,
+                color: isSelected ? AppColors.primary : AppColors.textMuted,
               ),
             ),
           ],
