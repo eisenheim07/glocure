@@ -18,6 +18,7 @@ import '../widgets/common_bottom_sheet.dart';
 import '../widgets/common_payment_flow.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
 import '../cubits/customer/customer_cubit.dart';
 import '../cubits/customer/customer_state.dart';
 import '../cubits/order_summary/order_summary_cubit.dart';
@@ -42,7 +43,7 @@ class OrderSummaryScreen extends StatefulWidget {
 
 class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   bool _isPaymentLoading = false; // Payment loading state
-  
+
   @override
   void initState() {
     super.initState();
@@ -142,7 +143,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
           // Refresh customer data from API
           context.read<CustomerCubit>().refreshCustomer();
         }
-        
+
         // Show success message
         // ScaffoldMessenger.of(context).showSnackBar(
         //   const SnackBar(
@@ -609,9 +610,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
               width: double.infinity,
               height: 40.h,
               child: ElevatedButton(
-                onPressed: () => customer.hasCompleteAddress() 
-                    ? _handleProceedToPay(context, cart, customer)
-                    : _handleAddAddress(context, customer),
+                onPressed: () => customer.hasCompleteAddress() ? _handleProceedToPay(context, cart, customer) : _handleAddAddress(context, customer),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF5C9A),
                   foregroundColor: Colors.white,
@@ -1093,16 +1092,20 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
         SizedBox(height: 16),
 
-        // Horizontal scrollable product list
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: relatedProducts.map((product) {
-              return _buildRelatedProductCard(product);
-            }).toList(),
+            children: List.generate(relatedProducts.length, (index) {
+              return Padding(
+                padding: EdgeInsets.only(right: 10.w),
+                child: SizedBox(
+                  width: 136.w,
+                  child: _buildRelatedProductCard(relatedProducts[index]),
+                ),
+              );
+            }),
           ),
-        ),
+        )
       ],
     );
   }
@@ -1128,8 +1131,6 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       imageUrl = 'https:$imageUrl';
     }
 
-    debugPrint('Product: $title, Image URL: $imageUrl');
-
     // Format prices
     final currentPrice = formatIndianCurrency((price / 100).toString());
     final originalPrice = compareAtPrice != null ? formatIndianCurrency((compareAtPrice / 100).toString()) : '';
@@ -1140,163 +1141,329 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
       discountPercent = ((compareAtPrice - price) / compareAtPrice * 100).round();
     }
 
-    return GestureDetector(
-      onTap: () async {
-        // Navigate to product details using productId
-        debugPrint('Product tapped: $productId');
-        debugPrint('Product tapped: $product');
+    return BlocBuilder<OrderSummaryCubit, OrderSummaryState>(
+      builder: (context, orderSummaryState) {
+        final isAddingToCart = orderSummaryState is OrderSummaryLoaded ? orderSummaryState.isAddingToCart(productId) : false;
 
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailsScreen(productId: productId),
-          ),
-        );
+        return GestureDetector(
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProductDetailsScreen(productId: productId),
+              ),
+            );
 
-        // Refresh cart data when returning from product details
-        // This ensures newly added items are visible in the cart
-        if (mounted) {
-          await _handleRefresh();
-        }
-      },
-      child: Container(
-        width: 136.w,
-        margin: EdgeInsets.only(right: 10.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(
-            color: Colors.grey.shade200,
-            width: 0.8,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image with discount badge
-            Stack(
-              children: [
-                Container(
-                  height: 136.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                    child: imageUrl.isNotEmpty
-                        ? NetworkImageLoader(
-                            imageUrl: imageUrl,
-                            width: double.infinity,
-                            height: 136.h,
-                            fit: BoxFit.cover,
-                          )
-                        : Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              size: 34.h,
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                  ),
-                ),
-
-                // Discount badge
-                if (discountPercent > 0)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50),
-                        borderRadius: BorderRadius.circular(3.r),
-                      ),
-                      child: Text(
-                        '-$discountPercent%',
-                        style: TextStyle(
-                          fontSize: 10.fSize,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-
-            // Divider between image and text
-            Container(
-              height: 1,
-              color: Colors.grey.shade200,
-            ),
-
-            // Product details
-            Padding(
-              padding: EdgeInsets.all(10.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product title
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.fSize,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
-                      height: 1.3,
-                    ),
-                  ),
-
-                  SizedBox(height: 8),
-
-                  // Price row
-                  Row(
-                    children: [
-                      Text(
-                        currentPrice,
-                        style: TextStyle(
-                          fontSize: 14.fSize,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      if (originalPrice.isNotEmpty) ...[
-                        SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            originalPrice,
-                            style: TextStyle(
-                              fontSize: 10.fSize,
-                              color: Colors.grey.shade400,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: Colors.grey.shade400,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+            if (mounted) {
+              await _handleRefresh();
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(
+                color: Colors.grey.shade200,
+                width: 0.8,
               ),
             ),
-          ],
-        ),
-      ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Product Image with discount badge and add to cart icon
+                Stack(
+                  children: [
+                    Container(
+                      height: 120.h, // Reduced height to prevent overflow
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                        child: imageUrl.isNotEmpty
+                            ? NetworkImageLoader(
+                                imageUrl: imageUrl,
+                                width: double.infinity,
+                                height: 120.h,
+                                fit: BoxFit.cover,
+                              )
+                            : Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  size: 30.h,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                      ),
+                    ),
+
+                    // Discount badge
+                    if (discountPercent > 0)
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50),
+                            borderRadius: BorderRadius.circular(3.r),
+                          ),
+                          child: Text(
+                            '-$discountPercent%',
+                            style: TextStyle(
+                              fontSize: 9.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // Add to cart icon
+                    // Positioned(
+                    //   bottom: 6,
+                    //   right: 6,
+                    //   child: GestureDetector(
+                    //     onTap: isAddingToCart
+                    //         ? null
+                    //         : () async {
+                    //             try {
+                    //               await context.read<OrderSummaryCubit>().addProductToCart(productId, product);
+                    //               if (mounted) {
+                    //                 context.read<CartIndicatorCubit>().setCartHasItems(true);
+                    //                 context.read<CartCubit>().refreshCart();
+                    //                 ScaffoldMessenger.of(context).showSnackBar(
+                    //                   SnackBar(
+                    //                     content: Row(
+                    //                       children: [
+                    //                         const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                    //                         const SizedBox(width: 12),
+                    //                         Expanded(
+                    //                           child: Text(
+                    //                             '${title.length > 25 ? '${title.substring(0, 25)}...' : title} added to cart',
+                    //                             maxLines: 1,
+                    //                             overflow: TextOverflow.ellipsis,
+                    //                             style: const TextStyle(fontSize: 14),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                     backgroundColor: const Color(0xFF4CAF50),
+                    //                     duration: const Duration(seconds: 2),
+                    //                     behavior: SnackBarBehavior.floating,
+                    //                   ),
+                    //                 );
+                    //               }
+                    //             } catch (e) {
+                    //               if (mounted) {
+                    //                 ScaffoldMessenger.of(context).showSnackBar(
+                    //                   SnackBar(
+                    //                     content: Text('Failed to add to cart: ${e.toString().replaceAll('Exception: ', '')}'),
+                    //                     backgroundColor: Colors.red,
+                    //                     duration: const Duration(seconds: 3),
+                    //                   ),
+                    //                 );
+                    //               }
+                    //             }
+                    //           },
+                    //     child: Container(
+                    //       width: 28.w,
+                    //       height: 28.h,
+                    //       decoration: BoxDecoration(
+                    //         color: isAddingToCart ? Colors.grey.shade300 : const Color(0xFFFF5C9A),
+                    //         shape: BoxShape.circle,
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //             color: Colors.black.withOpacity(0.1),
+                    //             blurRadius: 4,
+                    //             offset: const Offset(0, 2),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       child: isAddingToCart
+                    //           ? Shimmer.fromColors(
+                    //               baseColor: Colors.grey[400]!,
+                    //               highlightColor: Colors.grey[200]!,
+                    //               child: Container(
+                    //                 width: 14.w,
+                    //                 height: 14.h,
+                    //                 margin: EdgeInsets.all(7.w),
+                    //                 decoration: const BoxDecoration(
+                    //                   color: Colors.white,
+                    //                   shape: BoxShape.circle,
+                    //                 ),
+                    //               ),
+                    //             )
+                    //           : Icon(
+                    //               Icons.add_shopping_cart,
+                    //               color: Colors.white,
+                    //               size: 14.h,
+                    //             ),
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
+
+                // Divider
+                Container(
+                  height: 1,
+                  color: Colors.grey.shade200,
+                ),
+
+                // Product details with flexible layout
+                Flexible(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Product title with limited height
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11.fSize,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            height: 1.2,
+                          ),
+                        ),
+
+                        SizedBox(height: 8.h),
+
+                        // Price row with flexible layout
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Price section
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    currentPrice,
+                                    style: TextStyle(
+                                      fontSize: 13.fSize,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  if (originalPrice.isNotEmpty)
+                                    Text(
+                                      originalPrice,
+                                      style: TextStyle(
+                                        fontSize: 9.fSize,
+                                        color: Colors.grey.shade400,
+                                        decoration: TextDecoration.lineThrough,
+                                        decorationColor: Colors.grey.shade400,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            // Add to cart icon
+                            GestureDetector(
+                              onTap: isAddingToCart
+                                  ? null
+                                  : () async {
+                                      try {
+                                        await context.read<OrderSummaryCubit>().addProductToCart(productId, product);
+                                        if (mounted) {
+                                          context.read<CartIndicatorCubit>().setCartHasItems(true);
+                                          context.read<CartCubit>().refreshCart();
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Row(
+                                                children: [
+                                                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                                  const SizedBox(width: 12),
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${title.length > 25 ? '${title.substring(0, 25)}...' : title} added to cart',
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(fontSize: 14),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              backgroundColor: const Color(0xFF4CAF50),
+                                              duration: const Duration(seconds: 2),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Failed to add to cart: ${e.toString().replaceAll('Exception: ', '')}'),
+                                              backgroundColor: Colors.red,
+                                              duration: const Duration(seconds: 3),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                              child: Container(
+                                width: 22.w,
+                                height: 22.h,
+                                decoration: BoxDecoration(
+                                  color: isAddingToCart ? Colors.grey.shade300 : const Color(0xFFFF5C9A),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: isAddingToCart
+                                    ? Shimmer.fromColors(
+                                        baseColor: Colors.grey[400]!,
+                                        highlightColor: Colors.grey[200]!,
+                                        child: Container(
+                                          width: 12.w,
+                                          height: 12.h,
+                                          margin: EdgeInsets.all(5.w),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      )
+                                    : Icon(
+                                        Icons.add_shopping_cart,
+                                        color: Colors.white,
+                                        size: 12.h,
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1320,12 +1487,14 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
         SizedBox(height: 16),
 
-        // Product cards shimmer
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: List.generate(4, (index) {
+        // Product cards shimmer with proper constraints
+        SizedBox(
+          height: 250.h, // Updated height to match the fixed layout
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.zero,
+            itemCount: 4,
+            itemBuilder: (context, index) {
               return Container(
                 width: 136.w,
                 margin: EdgeInsets.only(right: 10.w),
@@ -1345,20 +1514,20 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     children: [
                       // Image shimmer
                       Container(
-                        height: 136.h,
+                        height: 120.h, // Updated to match the fixed card height
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            topRight: Radius.circular(12),
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10),
                           ),
                         ),
                       ),
 
                       // Content shimmer
                       Padding(
-                        padding: EdgeInsets.all(10.w),
+                        padding: EdgeInsets.all(8.w),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1395,7 +1564,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                   ),
                 ),
               );
-            }),
+            },
           ),
         ),
       ],
