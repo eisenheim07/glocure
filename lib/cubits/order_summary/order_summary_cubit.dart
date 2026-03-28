@@ -78,11 +78,8 @@ class OrderSummaryCubit extends Cubit<OrderSummaryState> {
     if (currentState.isAddingToCart(productId)) return;
 
     try {
-      // Start adding to cart - show shimmer
-      final updatedAddingIds = Set<String>.from(currentState.addingToCartProductIds);
-      updatedAddingIds.add(productId);
-      
-      emit(currentState.copyWith(addingToCartProductIds: updatedAddingIds));
+      // Start adding to cart - show full-screen shimmer
+      emit(currentState.copyWith(isAddingProductToCart: true));
 
       // Debug: Log the product data structure
       AppLogger.info('Product data structure: $product');
@@ -178,18 +175,27 @@ class OrderSummaryCubit extends Cubit<OrderSummaryState> {
 
       AppLogger.success('Product added to cart successfully');
 
-    } catch (e) {
-      AppLogger.error('Error adding product to cart: $e');
-      rethrow;
-    } finally {
-      // Stop adding to cart - hide shimmer
+      // Stop adding to cart and set flag that we just added to cart
+      emit(currentState.copyWith(
+        isAddingProductToCart: false,
+        justAddedToCart: true,
+      ));
+
+      // Clear the flag after a brief moment
+      await Future.delayed(const Duration(milliseconds: 100));
       if (state is OrderSummaryLoaded) {
         final currentState = state as OrderSummaryLoaded;
-        final updatedAddingIds = Set<String>.from(currentState.addingToCartProductIds);
-        updatedAddingIds.remove(productId);
-        
-        emit(currentState.copyWith(addingToCartProductIds: updatedAddingIds));
+        emit(currentState.copyWith(justAddedToCart: false));
       }
+
+    } catch (e) {
+      AppLogger.error('Error adding product to cart: $e');
+      // Stop adding to cart - hide full-screen shimmer even on error
+      if (state is OrderSummaryLoaded) {
+        final currentState = state as OrderSummaryLoaded;
+        emit(currentState.copyWith(isAddingProductToCart: false));
+      }
+      rethrow;
     }
   }
 
@@ -204,5 +210,21 @@ class OrderSummaryCubit extends Cubit<OrderSummaryState> {
   /// Reset to initial loaded state
   void reset() {
     emit(const OrderSummaryLoaded());
+  }
+
+  /// Trigger a complete refresh after cart update
+  void triggerRefresh() {
+    if (state is OrderSummaryLoaded) {
+      final currentState = state as OrderSummaryLoaded;
+      // Emit a new state to trigger UI rebuild
+      emit(currentState.copyWith(
+        // Force state change by toggling a boolean
+        isRefreshing: true,
+      ));
+      // Immediately set it back to false
+      emit(currentState.copyWith(
+        isRefreshing: false,
+      ));
+    }
   }
 }

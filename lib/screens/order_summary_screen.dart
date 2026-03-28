@@ -352,46 +352,63 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
         type: AppBarType.simple,
         title: 'Order Summary',
       ),
-      body: BlocBuilder<CustomerCubit, CustomerState>(
-        builder: (context, customerState) {
-          return BlocBuilder<OrderSummaryCubit, OrderSummaryState>(
-            builder: (context, orderSummaryState) {
-              // Show loading if any state is loading or payment is processing
-              if (orderSummaryState is OrderSummaryLoading ||
-                  customerState is CustomerLoading ||
-                  _isPaymentLoading ||
-                  (orderSummaryState is OrderSummaryLoaded && orderSummaryState.isRefreshing)) {
-                return _buildLoadingShimmer();
+      body: BlocListener<OrderSummaryCubit, OrderSummaryState>(
+        listener: (context, state) {
+          // Listen for when add-to-cart operation completes
+          if (state is OrderSummaryLoaded && state.justAddedToCart) {
+            // Update cart indicator and refresh cart data
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                // Update cart indicator
+                context.read<CartIndicatorCubit>().setCartHasItems(true);
+                // Refresh cart data to reflect new item
+                context.read<CartCubit>().refreshCart();
               }
-
-              if (customerState is CustomerError) {
-                return _buildErrorState();
-              }
-
-              if (customerState is! CustomerSuccess) {
-                return _buildLoadingShimmer();
-              }
-
-              final customer = customerState.customer;
-
-              return BlocBuilder<CartCubit, CartState>(
-                builder: (context, cartState) {
-                  return Column(
-                    children: [
-                      // Scrollable content
-                      Expanded(
-                        child: _buildContent(customer, orderSummaryState),
-                      ),
-
-                      // Fixed bottom section with total and button
-                      if (cartState is CartSuccess) _buildBottomSection(cartState.cart, customer),
-                    ],
-                  );
-                },
-              );
-            },
-          );
+            });
+          }
         },
+        child: BlocBuilder<CustomerCubit, CustomerState>(
+          builder: (context, customerState) {
+            return BlocBuilder<OrderSummaryCubit, OrderSummaryState>(
+              builder: (context, orderSummaryState) {
+                // Show loading if any state is loading or payment is processing
+                if (orderSummaryState is OrderSummaryLoading ||
+                    customerState is CustomerLoading ||
+                    _isPaymentLoading ||
+                    (orderSummaryState is OrderSummaryLoaded && orderSummaryState.isRefreshing) ||
+                    (orderSummaryState is OrderSummaryLoaded && orderSummaryState.isAddingProductToCart)) {
+                  return _buildLoadingShimmer();
+                }
+
+                if (customerState is CustomerError) {
+                  return _buildErrorState();
+                }
+
+                if (customerState is! CustomerSuccess) {
+                  return _buildLoadingShimmer();
+                }
+
+                final customer = customerState.customer;
+
+                return BlocBuilder<CartCubit, CartState>(
+                  builder: (context, cartState) {
+                    return Column(
+                      children: [
+                        // Scrollable content
+                        Expanded(
+                          child: _buildContent(customer, orderSummaryState),
+                        ),
+
+                        // Fixed bottom section with total and button
+                        if (cartState is CartSuccess) _buildBottomSection(cartState.cart, customer),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -886,7 +903,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
             // View More/Less button
             if (totalItems > 2)
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 7.h),
+                padding: EdgeInsets.symmetric(horizontal: 14.w),
                 child: TextButton(
                   onPressed: () {
                     context.read<OrderSummaryCubit>().toggleShowAllProducts();
@@ -1345,6 +1362,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
 
                         // Price row with flexible layout
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Price section
@@ -1381,41 +1399,8 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                                   : () async {
                                       try {
                                         await context.read<OrderSummaryCubit>().addProductToCart(productId, product);
-                                        if (mounted) {
-                                          context.read<CartIndicatorCubit>().setCartHasItems(true);
-                                          context.read<CartCubit>().refreshCart();
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Row(
-                                                children: [
-                                                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                                                  const SizedBox(width: 12),
-                                                  Expanded(
-                                                    child: Text(
-                                                      '${title.length > 25 ? '${title.substring(0, 25)}...' : title} added to cart',
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
-                                                      style: const TextStyle(fontSize: 14),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              backgroundColor: const Color(0xFF4CAF50),
-                                              duration: const Duration(seconds: 2),
-                                              behavior: SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                        }
                                       } catch (e) {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Failed to add to cart: ${e.toString().replaceAll('Exception: ', '')}'),
-                                              backgroundColor: Colors.red,
-                                              duration: const Duration(seconds: 3),
-                                            ),
-                                          );
-                                        }
+                                        // Error handling is done in the cubit
                                       }
                                     },
                               child: Container(
