@@ -219,12 +219,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   /// Handle Buy Now button press
   void _handleBuyNow() {
     if (_hasCompleteAddress && _customer != null) {
+      /*NEW CHECKOUT FLOW*/
+      final currentState = context.read<ProductDetailsCubit>().state;
+      if (currentState is! ProductDetailsLoaded) return;
+
+      final selectedVariant = _getSelectedVariant(currentState);
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => OrderDetailsCheckout(customer: _customer),
+          builder: (_) => OrderDetailsCheckout(
+            customer: _customer!,
+            product: currentState.product,
+            selectedVariant: selectedVariant,
+            quantity: 1,
+          ),
         ),
       );
+
+      /*OLD CHECKOUT FLOW*/
       /*final currentState = context.read<ProductDetailsCubit>().state;
       if (currentState is! ProductDetailsLoaded) return;
 

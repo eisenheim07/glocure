@@ -24,6 +24,7 @@ import 'package:glocure/cubits/reviews/reviews_cubit.dart';
 import 'package:glocure/cubits/orders/orders_cubit.dart';
 import 'package:glocure/cubits/payment_status/payment_status_cubit.dart';
 import 'package:glocure/cubits/order_summary/order_summary_cubit.dart';
+import 'package:glocure/cubits/order_details_checkout/order_details_checkout_cubit.dart';
 import 'package:glocure/cubits/signup/signup_cubit.dart';
 import 'package:glocure/cubits/payment_flow/payment_flow_cubit.dart';
 import 'package:glocure/utils/size_utils.dart';
@@ -147,6 +148,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => OrdersCubit()),
           BlocProvider(create: (_) => PaymentStatusCubit()),
           BlocProvider(create: (_) => OrderSummaryCubit()),
+          BlocProvider(create: (_) => OrderDetailsCheckoutCubit()),
           BlocProvider(create: (_) => SignupCubit()),
           BlocProvider(create: (_) => PaymentFlowCubit()),
         ],
