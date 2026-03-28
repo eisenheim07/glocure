@@ -29,6 +29,7 @@ import '../screens/reviews_screen.dart';
 import 'category_products.dart';
 import 'address_screen.dart';
 import 'address_list_screen.dart';
+import 'order_details_checkout.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final TopProduct? product;
@@ -218,7 +219,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
   /// Handle Buy Now button press
   void _handleBuyNow() {
     if (_hasCompleteAddress && _customer != null) {
-      final currentState = context.read<ProductDetailsCubit>().state;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OrderDetailsCheckout(customer: _customer),
+        ),
+      );
+      /*final currentState = context.read<ProductDetailsCubit>().state;
       if (currentState is! ProductDetailsLoaded) return;
 
       final selectedVariant = _getSelectedVariant(currentState);
@@ -252,7 +259,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
           // Payment failed - could show error message or retry option
           AppLogger.error('Buy Now payment failed');
         },
-      );
+      );*/
     } else {
       // Navigate to address screen with source parameter
       Navigator.push(
