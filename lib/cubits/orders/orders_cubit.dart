@@ -90,6 +90,7 @@ class OrdersCubit extends Cubit<OrdersState> {
   /// Show pending orders tab (status = open)
   Future<void> showPendingTab() async {
     AppLogger.info('OrdersCubit: Showing PENDING orders tab with status=open');
+    print('🔥 OrdersCubit: showPendingTab() called - about to fetch orders with status=open');
     _currentTab = 'Pending';
     
     // Immediately emit loading state to clear old data
@@ -102,10 +103,13 @@ class OrdersCubit extends Cubit<OrdersState> {
 
     try {
       AppLogger.info('OrdersCubit: Calling _fetchOrdersForStatus with status=open');
+      print('🔥 OrdersCubit: About to call _fetchOrdersForStatus with status=open');
       final orders = await _fetchOrdersForStatus('open'); // Use 'open' for pending orders
+      print('🔥 OrdersCubit: Received ${orders.length} orders from API');
       emit(OrdersLoaded(orders, 'Pending'));
     } catch (e) {
       AppLogger.error('OrdersCubit: Error fetching pending orders: $e');
+      print('🔥 OrdersCubit: ERROR fetching pending orders: $e');
       emit(OrdersError('Failed to load pending orders: ${e.toString()}'));
     }
   }

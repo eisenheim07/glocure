@@ -26,7 +26,6 @@ class OrderScreenState extends State<OrderScreen> with SingleTickerProviderState
   late TabController _tabController;
   late PageController _pageController;
   int _currentIndex = 0;
-  bool _hasLoadedData = false;
 
   @override
   void initState() {
@@ -34,24 +33,14 @@ class OrderScreenState extends State<OrderScreen> with SingleTickerProviderState
     _tabController = TabController(length: 3, vsync: this); // Changed from 4 to 3
     _pageController = PageController();
 
-    print('OrderScreen:- initState called');
+    print('OrderScreen:- initState called, isVisible: ${widget.isVisible}');
   }
 
   @override
   void didUpdateWidget(OrderScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    // Check if screen just became visible
-    if (widget.isVisible && !oldWidget.isVisible && !_hasLoadedData) {
-      _hasLoadedData = true;
-      print('OrderScreen: Screen became visible - loading data');
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          context.read<OrdersCubit>().showPendingTab(); // Changed from showAllTab to showPendingTab
-        }
-      });
-    }
+    print('OrderScreen: didUpdateWidget called - oldVisible: ${oldWidget.isVisible}, newVisible: ${widget.isVisible}');
+    // API calls are now handled by MainNavigationScreen
   }
 
   void _onTabTapped(int index) {

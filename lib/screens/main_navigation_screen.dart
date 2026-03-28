@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/screens/account_screen.dart';
 import 'package:glocure/screens/categories_screen.dart';
 import 'package:glocure/screens/home_screen.dart';
 import 'package:glocure/screens/custom_webview_screen.dart';
 import 'package:glocure/screens/order_screen.dart';
+import 'package:glocure/cubits/orders/orders_cubit.dart';
 import '../config/api_config.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 
@@ -49,6 +51,18 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
     if (_currentIndex != 3) {
       setState(() {
         _currentIndex = 3;
+      });
+      
+      // Trigger orders loading after navigation
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          try {
+            context.read<OrdersCubit>().showPendingTab();
+            print('MainNavigationScreen: Triggered showPendingTab() from navigateToOrders');
+          } catch (e) {
+            print('MainNavigationScreen: Error triggering orders from navigateToOrders: $e');
+          }
+        }
       });
     }
   }
@@ -102,6 +116,29 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
     // Handle Scan button separately (index 2)
     if (index == 2) {
       _openSkinAnalysis();
+      return;
+    }
+
+    // If clicking on Orders tab (index 3), force refresh
+    if (index == 3 && _currentIndex != 3) {
+      // First set the state to show the Orders screen
+      setState(() {
+        _currentIndex = index;
+      });
+      
+      // Then trigger the orders loading after the frame is built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Find the OrderScreen in the widget tree and trigger data loading
+        final context = this.context;
+        if (context.mounted) {
+          try {
+            context.read<OrdersCubit>().showPendingTab();
+            print('MainNavigationScreen: Triggered showPendingTab() for Orders tab');
+          } catch (e) {
+            print('MainNavigationScreen: Error triggering orders: $e');
+          }
+        }
+      });
       return;
     }
 
