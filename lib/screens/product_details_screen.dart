@@ -19,6 +19,8 @@ import '../cubits/product_details/product_details_cubit.dart';
 import '../cubits/product_details/product_details_state.dart';
 import '../cubits/customer/customer_cubit.dart';
 import '../cubits/customer/customer_state.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
+import '../cubits/cart_indicator/cart_indicator_state.dart';
 import '../cubits/reviews/reviews_cubit.dart';
 import '../models/judgeme_reviews_model.dart';
 import '../models/judgeme_product_model.dart';
@@ -510,6 +512,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
         merchandiseId: variantId,
         quantity: 1,
       );
+
+      // Set cart indicator to show dot
+      if (mounted) {
+        context.read<CartIndicatorCubit>().setCartHasItems(true);
+      }
 
       // Hide loading and show success
       if (mounted) {
@@ -2448,17 +2455,41 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
                       width: 1,
                     ),
                   ),
-                  child: ScaleTransition(
-                    scale: _cartScaleAnimation,
-                    child: IconButton(
-                      onPressed: _addToCart,
-                      icon: const Icon(
-                        Icons.shopping_cart_outlined,
-                        color: Color(0xFFFF5C9A),
-                        size: 22,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ScaleTransition(
+                        scale: _cartScaleAnimation,
+                        child: IconButton(
+                          onPressed: _addToCart,
+                          icon: const Icon(
+                            Icons.shopping_cart_outlined,
+                            color: Color(0xFFFF5C9A),
+                            size: 22,
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
                       ),
-                      padding: EdgeInsets.zero,
-                    ),
+                      // Cart indicator dot
+                      BlocBuilder<CartIndicatorCubit, CartIndicatorState>(
+                        builder: (context, state) {
+                          if (!state.hasItems) return const SizedBox.shrink();
+
+                          return Positioned(
+                            top: 5.h,
+                            right: 8.h,
+                            child: Container(
+                              width: 6.w,
+                              height: 6.h,
+                              decoration: const BoxDecoration(
+                                color: AppColors.error,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
 

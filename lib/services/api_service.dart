@@ -1330,6 +1330,9 @@ class ApiService {
 
       // Save the new cart ID to preferences
       await AuthStorage.saveCartId(newCartId);
+      
+      // Clear cart indicator for new cart
+      await AuthStorage.setCartHasItems(false);
 
       return newCartId;
     } catch (e) {
@@ -1349,6 +1352,9 @@ class ApiService {
 
       // Replace the existing cart ID in preferences
       await AuthStorage.saveCartId(newCartId);
+      
+      // Clear cart indicator for new cart
+      await AuthStorage.setCartHasItems(false);
 
       AppLogger.success('✅ Successfully created and saved new cart ID: $newCartId');
       return newCartId;

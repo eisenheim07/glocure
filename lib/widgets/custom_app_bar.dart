@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/utils/app_colors.dart';
 import '../utils/image_constant.dart';
 import '../widgets/app_image.dart';
 import '../widgets/wishlist_icon_with_badge.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
+import '../cubits/cart_indicator/cart_indicator_state.dart';
 import '../screens/cart_screen.dart';
 
 /// Custom App Bar with two predefined types:
@@ -104,18 +107,42 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           onWishlistReturn: onWishlistReturn,
         ),
         const SizedBox(width: 12),
-        SmartImage(
-          source: ImageConstant.icCart,
-          width: 60,
-          height: 34,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CartScreen(),
-              ),
-            );
-          },
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SmartImage(
+              source: ImageConstant.icCart,
+              width: 60,
+              height: 34,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CartScreen(),
+                  ),
+                );
+              },
+            ),
+            // Cart indicator dot
+            BlocBuilder<CartIndicatorCubit, CartIndicatorState>(
+              builder: (context, state) {
+                if (!state.hasItems) return const SizedBox.shrink();
+
+                return Positioned(
+                  top: 4,
+                  right: 8,
+                  child: Container(
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      color: AppColors.error,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         SizedBox(width: 16.h),
       ],

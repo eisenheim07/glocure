@@ -42,6 +42,8 @@ class CartCubit extends Cubit<CartState> {
 
       // Check if cart has items
       if (cart.lines.isEmpty) {
+        // Clear cart indicator when cart is empty
+        await AuthStorage.setCartHasItems(false);
         emit(CartEmpty());
       } else {
         emit(CartSuccess(cart));
@@ -164,6 +166,8 @@ class CartCubit extends Cubit<CartState> {
       _updatingLineId = null;
       _isAnyOperationInProgress = false;
       if (freshCart.lines.isEmpty) {
+        // Clear cart indicator when cart becomes empty
+        await AuthStorage.setCartHasItems(false);
         emit(CartEmpty());
       } else {
         emit(CartSuccess(freshCart));

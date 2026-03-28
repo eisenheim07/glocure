@@ -64,10 +64,10 @@ class _WishlistIconWithBadgeState extends State<WishlistIconWithBadge> {
         builder: (_) => const WishlistScreen(),
       ),
     );
-    
+
     // Reload wishlist count after returning
     await _loadWishlistCount();
-    
+
     // Notify parent that we returned from wishlist
     widget.onWishlistReturn?.call();
   }
@@ -84,15 +84,15 @@ class _WishlistIconWithBadgeState extends State<WishlistIconWithBadge> {
           height: widget.height,
           onTap: _onWishlistTap,
         ),
-        
+
         // Badge Dot (only show if wishlist has items)
         if (_wishlistCount > 0)
           Positioned(
-            top: 6,
+            top: 4,
             right: 8,
             child: Container(
-              width: 8,
-              height: 8,
+              width: 5,
+              height: 5,
               decoration: const BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,

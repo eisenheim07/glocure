@@ -278,11 +278,11 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 16.h),
+                  // SizedBox(height: 16.h),
 
                   // Close button
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                     child: SizedBox(
                       width: double.infinity,
                       height: 40.h,

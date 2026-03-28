@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/screens/login_screen.dart';
 import '../utils/image_constant.dart';
 import '../utils/size_utils.dart';
 import '../widgets/app_image.dart';
 import '../utils/auth_storage.dart';
 import '../services/api_service.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
 import 'main_navigation_screen.dart';
 
 /// Splash Screen - Displays for 2 seconds then navigates to Login or Home
@@ -22,6 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Hide status bar on splash
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    
+    // Initialize cart indicator
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartIndicatorCubit>().initializeCartIndicator();
+    });
+    
     _navigateToNextScreen();
   }
 

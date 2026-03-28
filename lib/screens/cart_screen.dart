@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../cubits/cart/cart_cubit.dart';
 import '../cubits/cart/cart_state.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
 import '../models/cart_model.dart';
 import '../models/customer_model.dart';
 import '../utils/format_utils.dart';
@@ -144,6 +145,10 @@ class _CartScreenState extends State<CartScreen> {
             }
 
             if (state is CartEmpty) {
+              // Clear cart indicator when cart is empty
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                context.read<CartIndicatorCubit>().clearCartIndicator();
+              });
               return _buildEmptyState();
             }
 

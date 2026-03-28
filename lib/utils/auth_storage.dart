@@ -9,6 +9,7 @@ class AuthStorage {
   static const String _languageSelectedKey = 'language_selected';
   static const String _cartIdKey = 'cart_id';
   static const String _customerIdKey = 'customer_id';
+  static const String _cartHasItemsKey = 'cart_has_items';
 
   /// Save access token and expiry date
   static Future<void> saveToken(String accessToken, String expiresAt) async {
@@ -79,7 +80,7 @@ class AuthStorage {
   static Future<void> clearAllData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    AppLogger.info("All user data cleared (including cart ID)");
+    AppLogger.info("All user data cleared (including cart ID and cart indicator)");
   }
 
   /// Clear only authentication data (keep language selection)
@@ -153,5 +154,27 @@ class AuthStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_customerIdKey);
     AppLogger.info("Customer ID cleared");
+  }
+
+  /// Set cart has items flag
+  static Future<void> setCartHasItems(bool hasItems) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_cartHasItemsKey, hasItems);
+    AppLogger.info("Cart has items flag set: $hasItems");
+  }
+
+  /// Get cart has items flag
+  static Future<bool> getCartHasItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasItems = prefs.getBool(_cartHasItemsKey) ?? false;
+    AppLogger.info("Cart has items flag retrieved: $hasItems");
+    return hasItems;
+  }
+
+  /// Clear cart has items flag
+  static Future<void> clearCartHasItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_cartHasItemsKey);
+    AppLogger.info("Cart has items flag cleared");
   }
 }

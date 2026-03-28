@@ -13,6 +13,7 @@ import 'main_navigation_screen.dart';
 import 'signup_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/signup/signup_cubit.dart';
+import '../cubits/cart_indicator/cart_indicator_cubit.dart';
 
 /// Login Screen with sliding backgrounds and phone/OTP or email/password authentication
 class LoginScreen extends StatefulWidget {
@@ -173,6 +174,12 @@ class _LoginScreenState extends State<LoginScreen> {
       // Create or get cart ID after successful login
       try {
         await ApiService().getOrCreateCartId();
+
+        // Clear cart indicator for new session
+        if (mounted) {
+          context.read<CartIndicatorCubit>().clearCartIndicator();
+        }
+
         print('✅ Cart ID initialized successfully');
       } catch (cartError) {
         print('⚠️ Failed to initialize cart ID: $cartError');

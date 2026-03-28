@@ -1039,72 +1039,74 @@ class _FullPageShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Padding(
-        padding: EdgeInsets.all(14.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 153.w,
-              height: 20.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(3.r),
+    return SafeArea(
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Padding(
+          padding: EdgeInsets.all(14.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 153.w,
+                height: 20.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(3.r),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            Container(
-              width: 85.w,
-              height: 12.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(3.r),
+              SizedBox(height: 8),
+              Container(
+                width: 85.w,
+                height: 12.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(3.r),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            SizedBox(
-              height: 32.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 4,
-                itemBuilder: (context, index) => Padding(
-                  padding: EdgeInsets.only(right: 7.w),
-                  child: Container(
-                    width: 94.w,
-                    height: 32.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(17.r),
+              SizedBox(height: 16),
+              SizedBox(
+                height: 32.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 4,
+                  itemBuilder: (context, index) => Padding(
+                    padding: EdgeInsets.only(right: 7.w),
+                    child: Container(
+                      width: 94.w,
+                      height: 32.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(17.r),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12.h,
-                  mainAxisSpacing: 14.h,
-                  childAspectRatio: 0.68,
+              SizedBox(height: 16),
+              Expanded(
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12.h,
+                    mainAxisSpacing: 14.h,
+                    childAspectRatio: 0.68,
+                  ),
+                  itemCount: 6,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.r),
+                      ),
+                    );
+                  },
                 ),
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15.r),
-                    ),
-                  );
-                },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

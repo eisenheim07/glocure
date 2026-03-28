@@ -15,6 +15,7 @@ import 'package:glocure/cubits/categories/categories_cubit.dart';
 import 'package:glocure/cubits/category_products/category_products_cubit.dart';
 import 'package:glocure/cubits/filter/filter_cubit.dart';
 import 'package:glocure/cubits/cart/cart_cubit.dart';
+import 'package:glocure/cubits/cart_indicator/cart_indicator_cubit.dart';
 import 'package:glocure/cubits/customer/customer_cubit.dart';
 import 'package:glocure/cubits/pages/pages_cubit.dart';
 import 'package:glocure/cubits/product_details/product_details_cubit.dart';
@@ -137,6 +138,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => CategoryProductsCubit()),
           BlocProvider(create: (_) => FilterCubit()),
           BlocProvider(create: (_) => CartCubit()),
+          BlocProvider(create: (_) => CartIndicatorCubit()),
           BlocProvider(create: (_) => CustomerCubit()),
           BlocProvider(create: (_) => PagesCubit()),
           BlocProvider(create: (_) => ProductDetailsCubit()),
