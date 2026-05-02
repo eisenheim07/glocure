@@ -18,6 +18,7 @@ class OrderDetailsCheckoutLoaded extends OrderDetailsCheckoutState {
   final ProductVariant selectedVariant;
   final Customer customer;
   final int quantity;
+  final int? maxQuantity;
   final double itemPrice;
   final double shippingCharges;
   final double totalPrice;
@@ -28,6 +29,7 @@ class OrderDetailsCheckoutLoaded extends OrderDetailsCheckoutState {
     required this.selectedVariant,
     required this.customer,
     required this.quantity,
+    this.maxQuantity,
     required this.itemPrice,
     required this.shippingCharges,
     required this.totalPrice,

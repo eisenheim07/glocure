@@ -8,11 +8,13 @@ import '../utils/app_colors.dart';
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
+  final bool isFabExpanded;
 
   const CustomBottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.isFabExpanded = false,
   });
 
   @override
@@ -81,25 +83,35 @@ class CustomBottomNavBar extends StatelessWidget {
             left: MediaQuery.of(context).size.width / 2 - 32,
             child: GestureDetector(
               onTap: () => onTap(2),
-              child: Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryLight],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: isFabExpanded 
+                        ? [AppColors.primaryDark, AppColors.primary]
+                        : [AppColors.primary, AppColors.primaryLight],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  child: Image.asset(ImageConstant.icFaceScan)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: AnimatedRotation(
+                  duration: const Duration(milliseconds: 300),
+                  turns: isFabExpanded ? 0.125 : 0.0, // 45 degree rotation when expanded
+                  child: isFabExpanded 
+                      ? const Icon(Icons.close, color: Colors.white, size: 32)
+                      : Image.asset(ImageConstant.icFaceScan),
+                ),
+              ),
             ),
           ),
 

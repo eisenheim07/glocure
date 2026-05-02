@@ -18,6 +18,7 @@ class OrderDetailsCheckout extends StatefulWidget {
   final TopProduct product;
   final ProductVariant selectedVariant;
   final int quantity;
+  final int? maxQuantity;
 
   const OrderDetailsCheckout({
     super.key,
@@ -25,6 +26,7 @@ class OrderDetailsCheckout extends StatefulWidget {
     required this.product,
     required this.selectedVariant,
     this.quantity = 1,
+    this.maxQuantity,
   });
 
   @override
@@ -41,6 +43,7 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
           selectedVariant: widget.selectedVariant,
           customer: widget.customer,
           quantity: widget.quantity,
+          maxQuantity: widget.maxQuantity,
         );
   }
 
@@ -240,6 +243,9 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
 
   /// Build quantity controls
   Widget _buildQuantityControls(OrderDetailsCheckoutLoaded state) {
+    final maxQuantity = state.maxQuantity ?? 999;
+    final canIncrease = state.quantity < maxQuantity;
+    
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderPrimary),
@@ -291,12 +297,14 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
 
           // Increase button
           GestureDetector(
-            onTap: () => context.read<OrderDetailsCheckoutCubit>().updateQuantity(state.quantity + 1),
+            onTap: canIncrease 
+                ? () => context.read<OrderDetailsCheckoutCubit>().updateQuantity(state.quantity + 1)
+                : null,
             child: Container(
               width: 32.w,
               height: 32.h,
               decoration: BoxDecoration(
-                color: AppColors.backgroundSecondary,
+                color: canIncrease ? AppColors.backgroundSecondary : AppColors.gray200,
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(6.r),
                   bottomRight: Radius.circular(6.r),
@@ -305,7 +313,7 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
               child: Icon(
                 Icons.add,
                 size: 16.h,
-                color: AppColors.textPrimary,
+                color: canIncrease ? AppColors.textPrimary : AppColors.textDisabled,
               ),
             ),
           ),

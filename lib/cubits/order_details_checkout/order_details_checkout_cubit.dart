@@ -15,6 +15,7 @@ class OrderDetailsCheckoutCubit extends Cubit<OrderDetailsCheckoutState> {
     required ProductVariant selectedVariant,
     required Customer customer,
     int quantity = 1,
+    int? maxQuantity,
   }) {
     try {
       emit(OrderDetailsCheckoutLoading());
@@ -29,6 +30,7 @@ class OrderDetailsCheckoutCubit extends Cubit<OrderDetailsCheckoutState> {
       AppLogger.info('Product: ${product.title}');
       AppLogger.info('Variant: ${selectedVariant.title}');
       AppLogger.info('Quantity: $quantity');
+      AppLogger.info('Max Quantity: ${maxQuantity ?? 'unlimited'}');
       AppLogger.info('Item Price: ₹$itemPrice');
       AppLogger.info('Shipping: ${needsShipping ? '₹$shippingCharges' : 'FREE'}');
       AppLogger.info('Total: ₹$totalPrice');
@@ -38,6 +40,7 @@ class OrderDetailsCheckoutCubit extends Cubit<OrderDetailsCheckoutState> {
         selectedVariant: selectedVariant,
         customer: customer,
         quantity: quantity,
+        maxQuantity: maxQuantity,
         itemPrice: itemPrice,
         shippingCharges: shippingCharges,
         totalPrice: totalPrice,
@@ -67,6 +70,7 @@ class OrderDetailsCheckoutCubit extends Cubit<OrderDetailsCheckoutState> {
         selectedVariant: currentState.selectedVariant,
         customer: currentState.customer,
         quantity: newQuantity,
+        maxQuantity: currentState.maxQuantity,
         itemPrice: itemPrice,
         shippingCharges: shippingCharges,
         totalPrice: totalPrice,

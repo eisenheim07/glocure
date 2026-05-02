@@ -224,6 +224,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
       if (currentState is! ProductDetailsLoaded) return;
 
       final selectedVariant = _getSelectedVariant(currentState);
+      
+      // Get inventory quantity from product specifications
+      int? maxQuantity;
+      final specifications = currentState.specifications;
+      if (specifications != null && specifications['variants'] != null) {
+        final variants = specifications['variants'] as List<dynamic>;
+        if (variants.isNotEmpty && currentState.selectedVariantIndex < variants.length) {
+          final currentVariantSpec = variants[currentState.selectedVariantIndex] as Map<String, dynamic>;
+          if (currentVariantSpec['inventory_quantity'] != null) {
+            maxQuantity = currentVariantSpec['inventory_quantity'] as int?;
+          }
+        }
+      }
 
       Navigator.push(
         context,
@@ -233,6 +246,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
             product: currentState.product,
             selectedVariant: selectedVariant,
             quantity: 1,
+            maxQuantity: maxQuantity,
           ),
         ),
       );

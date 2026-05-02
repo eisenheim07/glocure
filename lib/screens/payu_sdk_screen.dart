@@ -5,6 +5,7 @@ import '../models/customer_model.dart';
 import '../utils/app_logger.dart';
 import '../utils/app_colors.dart';
 import '../utils/size_utils.dart';
+import '../widgets/custom_app_bar.dart';
 import 'payu_redirect_screen.dart';
 
 /// PayU SDK Payment Screen
@@ -105,10 +106,14 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: const Text('Payment'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+      // appBar: AppBar(
+      //   title: const Text('Payment'),
+      //   backgroundColor: AppColors.primary,
+      //   foregroundColor: AppColors.white,
+      // ),
+      appBar: const CustomAppBar(
+        type: AppBarType.simple,
+        title: 'Payment',
       ),
       body: SafeArea(
         child: _buildLoadingScreen(),
