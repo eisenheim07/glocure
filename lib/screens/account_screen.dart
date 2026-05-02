@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glocure/screens/help_screen.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'package:glocure/utils/size_utils.dart';
@@ -174,17 +175,19 @@ class _AccountScreenState extends State<AccountScreen> {
                 // const SizedBox(height: 8),
 
                 // Help Center
-                // _AccountMenuItem(
-                //   icon: Icons.help_outline,
-                //   title: 'Help Center',
-                //   onTap: () {
-                //     // TODO: Navigate to help center screen
-                //     ScaffoldMessenger.of(context).showSnackBar(
-                //       const SnackBar(content: Text('Help Center - Coming Soon')),
-                //     );
-                //   },
-                // ),
-                // SizedBox(height: 8.h),
+                _AccountMenuItem(
+                  icon: Icons.help_outline,
+                  title: 'Help Center',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HelpCenterScreen(),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 8.h),
 
                 // GloCure Disclaimer
                 _AccountMenuItem(
