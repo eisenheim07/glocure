@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/screens/help_screen.dart';
+import 'package:glocure/services/api_service.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'package:glocure/utils/size_utils.dart';
@@ -56,13 +57,13 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   /// Show logout confirmation bottom sheet
-  Future<void> _showLogoutBottomSheet() async {
+  Future<void> _showLogoutBottomSheet({String? title, String? message, String? primaryButtonText, String? secondaryButtonText}) async {
     final confirmed = await CommonBottomSheet.show(
       context: context,
-      title: 'Logout',
-      message: 'Are you sure you want to log out?',
-      primaryButtonText: 'Yes, Logout',
-      secondaryButtonText: 'Cancel',
+      title: title ?? 'Logout',
+      message: message ?? 'Are you sure you want to log out?',
+      primaryButtonText: primaryButtonText ?? 'Yes, Logout',
+      secondaryButtonText: secondaryButtonText ?? 'Cancel',
       onPrimaryPressed: () => Navigator.pop(context, true),
       onSecondaryPressed: () => Navigator.pop(context, false),
     );
@@ -93,19 +94,29 @@ class _AccountScreenState extends State<AccountScreen> {
               padding: EdgeInsets.all(12.w),
               children: [
                 // My Profile
-                _AccountMenuItem(
-                  icon: Icons.person_outline,
-                  title: 'My Profile',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ProfileScreen(),
-                      ),
-                    );
-                  },
+                Column(
+                  children: [
+                    _AccountMenuItem(
+                      icon: Icons.person_outline,
+                      title: 'My Profile',
+                      onTap: () {
+                        ApiService.getUserType()
+                            ? _showLogoutBottomSheet(
+                                title: "Alert",
+                                message: "To upgrade your user profile, please sign in first.",
+                                primaryButtonText: "Move to sign-in",
+                                secondaryButtonText: "cancel")
+                            : Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ProfileScreen(),
+                                ),
+                              );
+                      },
+                    ),
+                    SizedBox(height: 8.h),
+                  ],
                 ),
-                SizedBox(height: 8.h),
 
                 // Order
                 // _AccountMenuItem(
@@ -151,12 +162,18 @@ class _AccountScreenState extends State<AccountScreen> {
                   icon: Icons.location_on_outlined,
                   title: 'Address',
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AddressListScreen(),
-                      ),
-                    );
+                    ApiService.getUserType()
+                        ? _showLogoutBottomSheet(
+                            title: "Alert",
+                            message: "To upgrade your user profile, please sign in first.",
+                            primaryButtonText: "Move to sign-in",
+                            secondaryButtonText: "cancel")
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AddressListScreen(),
+                            ),
+                          );
                   },
                 ),
                 SizedBox(height: 8.h),
@@ -205,34 +222,36 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(height: 20.h),
 
                 // Log Out
-                GestureDetector(
-                  onTap: _showLogoutBottomSheet,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.power_settings_new,
-                          color: Color(0xFFFF5C9A),
-                          size: 22,
-                        ),
-                        SizedBox(width: 12.w),
-                        Text(
-                          'Log Out',
-                          style: TextStyle(
-                            fontSize: 14.fSize,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFFFF5C9A),
+                ApiService.getUserType()
+                    ? SizedBox.shrink()
+                    : GestureDetector(
+                        onTap: _showLogoutBottomSheet,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.power_settings_new,
+                                color: Color(0xFFFF5C9A),
+                                size: 22,
+                              ),
+                              SizedBox(width: 12.w),
+                              Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  fontSize: 14.fSize,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFFFF5C9A),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
               ],
             ),
     );

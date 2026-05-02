@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glocure/utils/image_constant.dart';
+import '../services/api_service.dart';
 import '../utils/size_utils.dart';
 import '../utils/app_colors.dart';
 
@@ -120,7 +121,8 @@ class CustomBottomNavBar extends StatelessWidget {
             bottom: 8 + bottomPadding,
             left: MediaQuery.of(context).size.width / 2 - 20,
             child: GestureDetector(
-              onTap: () => onTap(2),
+              onTap: () => /*ApiService.getUserType()
+                  ? :*/onTap(2),
               child: Center(
                 child: Text(
                   ' Scan',

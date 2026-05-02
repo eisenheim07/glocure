@@ -60,7 +60,7 @@ class ApiService {
     }
 
     // Validate token before making request (skip for login/public APIs)
-    if (!skipTokenValidation) {
+    if (!ApiService.IS_GUEST_LOGIN && !skipTokenValidation) {
       final isValid = await _validateToken();
       if (!isValid) {
         throw Exception('Token expired. Please login again.');
@@ -139,7 +139,7 @@ class ApiService {
 
     // Validate token before making request
     final isValid = await _validateToken();
-    if (!isValid) {
+    if (!ApiService.IS_GUEST_LOGIN && !isValid) {
       throw Exception('Token expired. Please login again.');
     }
 
@@ -1330,7 +1330,7 @@ class ApiService {
 
       // Save the new cart ID to preferences
       await AuthStorage.saveCartId(newCartId);
-      
+
       // Clear cart indicator for new cart
       await AuthStorage.setCartHasItems(false);
 
@@ -1352,7 +1352,7 @@ class ApiService {
 
       // Replace the existing cart ID in preferences
       await AuthStorage.saveCartId(newCartId);
-      
+
       // Clear cart indicator for new cart
       await AuthStorage.setCartHasItems(false);
 
@@ -2394,4 +2394,7 @@ class ApiService {
       };
     }
   }
+
+  static bool getUserType() => IS_GUEST_LOGIN;
+  static bool IS_GUEST_LOGIN = false;
 }
