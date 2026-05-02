@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glocure/config/api_config.dart';
 import 'package:glocure/utils/image_constant.dart';
 import '../services/api_service.dart';
 import '../utils/size_utils.dart';
@@ -65,7 +66,13 @@ class CustomBottomNavBar extends StatelessWidget {
                     icon: Icons.shopping_bag_outlined,
                     label: 'Orders',
                     isSelected: currentIndex == 3,
-                    onTap: () => onTap(3),
+                    onTap: () => ApiConfig.getUserType()
+                        ? ApiConfig.showLogoutBottomSheet(context,
+                            title: "Alert",
+                            message: "To upgrade your user profile, please sign in first.",
+                            primaryButtonText: "Move to sign-in",
+                            secondaryButtonText: "cancel")
+                        : onTap(3),
                   ),
                   _NavItem(
                     icon: Icons.person_outline,
@@ -91,9 +98,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
-                    colors: isFabExpanded 
-                        ? [AppColors.primaryDark, AppColors.primary]
-                        : [AppColors.primary, AppColors.primaryLight],
+                    colors: isFabExpanded ? [AppColors.primaryDark, AppColors.primary] : [AppColors.primary, AppColors.primaryLight],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -108,9 +113,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 child: AnimatedRotation(
                   duration: const Duration(milliseconds: 300),
                   turns: isFabExpanded ? 0.125 : 0.0, // 45 degree rotation when expanded
-                  child: isFabExpanded 
-                      ? const Icon(Icons.close, color: Colors.white, size: 32)
-                      : Image.asset(ImageConstant.icFaceScan),
+                  child: isFabExpanded ? const Icon(Icons.close, color: Colors.white, size: 32) : Image.asset(ImageConstant.icFaceScan),
                 ),
               ),
             ),
@@ -121,8 +124,7 @@ class CustomBottomNavBar extends StatelessWidget {
             bottom: 8 + bottomPadding,
             left: MediaQuery.of(context).size.width / 2 - 20,
             child: GestureDetector(
-              onTap: () => /*ApiService.getUserType()
-                  ? :*/onTap(2),
+              onTap: () => onTap(2),
               child: Center(
                 child: Text(
                   ' Scan',

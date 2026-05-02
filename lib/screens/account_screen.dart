@@ -21,59 +21,6 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  bool _isLoggingOut = false;
-
-  /// Handle logout
-  Future<void> _handleLogout() async {
-    setState(() {
-      _isLoggingOut = true;
-    });
-
-    try {
-      // Clear all local storage data
-      await AuthStorage.clearAllData();
-      await WishlistStorage.clearWishlist();
-
-      if (mounted) {
-        // Navigate to login screen and remove all previous routes
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      debugPrint('❌ Error during logout: $e');
-      if (mounted) {
-        setState(() {
-          _isLoggingOut = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Logout failed: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  /// Show logout confirmation bottom sheet
-  Future<void> _showLogoutBottomSheet({String? title, String? message, String? primaryButtonText, String? secondaryButtonText}) async {
-    final confirmed = await CommonBottomSheet.show(
-      context: context,
-      title: title ?? 'Logout',
-      message: message ?? 'Are you sure you want to log out?',
-      primaryButtonText: primaryButtonText ?? 'Yes, Logout',
-      secondaryButtonText: secondaryButtonText ?? 'Cancel',
-      onPrimaryPressed: () => Navigator.pop(context, true),
-      onSecondaryPressed: () => Navigator.pop(context, false),
-    );
-
-    if (confirmed == true) {
-      await _handleLogout();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,39 +32,34 @@ class _AccountScreenState extends State<AccountScreen> {
           MainNavigationScreen.navigateToHome(context);
         },
       ),
-      body: _isLoggingOut
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFF5C9A),
+      body: ListView(
+        padding: EdgeInsets.all(12.w),
+        children: [
+          // My Profile
+          Column(
+            children: [
+              _AccountMenuItem(
+                icon: Icons.person_outline,
+                title: 'My Profile',
+                onTap: () {
+                  ApiConfig.getUserType()
+                      ? ApiConfig.showLogoutBottomSheet(
+                          context,
+                          title: "Alert",
+                          message: "To upgrade your user profile, please sign in first.",
+                          primaryButtonText: "Move to sign-in",
+                          secondaryButtonText: "cancel")
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ProfileScreen(),
+                          ),
+                        );
+                },
               ),
-            )
-          : ListView(
-              padding: EdgeInsets.all(12.w),
-              children: [
-                // My Profile
-                Column(
-                  children: [
-                    _AccountMenuItem(
-                      icon: Icons.person_outline,
-                      title: 'My Profile',
-                      onTap: () {
-                        ApiConfig.getUserType()
-                            ? _showLogoutBottomSheet(
-                                title: "Alert",
-                                message: "To upgrade your user profile, please sign in first.",
-                                primaryButtonText: "Move to sign-in",
-                                secondaryButtonText: "cancel")
-                            : Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const ProfileScreen(),
-                                ),
-                              );
-                      },
-                    ),
-                    SizedBox(height: 8.h),
-                  ],
-                ),
+              SizedBox(height: 8.h),
+            ],
+          ),
 
                 // Order
                 // _AccountMenuItem(
@@ -164,7 +106,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   title: 'Address',
                   onTap: () {
                     ApiConfig.getUserType()
-                        ? _showLogoutBottomSheet(
+                        ? ApiConfig.showLogoutBottomSheet(
+                            context,
                             title: "Alert",
                             message: "To upgrade your user profile, please sign in first.",
                             primaryButtonText: "Move to sign-in",
@@ -226,7 +169,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 ApiConfig.getUserType()
                     ? SizedBox.shrink()
                     : GestureDetector(
-                        onTap: _showLogoutBottomSheet,
+                        onTap: () => ApiConfig.showLogoutBottomSheet(context),
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
                           decoration: BoxDecoration(

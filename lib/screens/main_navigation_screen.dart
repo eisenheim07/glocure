@@ -130,7 +130,13 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
   void _onNavItemTapped(int index) {
     // Handle Scan button separately (index 2)
     if (index == 2) {
-      _toggleFabMenu();
+      ApiConfig.getUserType()
+          ? ApiConfig.showLogoutBottomSheet(context,
+              title: "Alert",
+              message: "To upgrade your user profile, please sign in first.",
+              primaryButtonText: "Move to sign-in",
+              secondaryButtonText: "cancel")
+          : _toggleFabMenu();
       return;
     }
 

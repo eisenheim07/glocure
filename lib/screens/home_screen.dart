@@ -1306,6 +1306,15 @@ class _TopProductCardState extends State<_TopProductCard> with SingleTickerProvi
 
   /// Toggle wishlist status
   Future<void> _toggleWishlist() async {
+    if (ApiConfig.getUserType()) {
+      ApiConfig.showLogoutBottomSheet(context,
+          title: "Alert",
+          message: "To upgrade your user profile, please sign in first.",
+          primaryButtonText: "Move to sign-in",
+          secondaryButtonText: "cancel");
+      return;
+    }
+
     // Trigger animation
     _heartAnimationController.forward(from: 0.0);
 

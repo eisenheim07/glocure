@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+import '../config/api_config.dart';
 import '../models/top_products_model.dart';
 import '../models/customer_model.dart';
 import '../utils/format_utils.dart';
@@ -131,6 +132,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Toggle wishlist status
   Future<void> _toggleWishlist() async {
+    if (ApiConfig.getUserType()) {
+      ApiConfig.showLogoutBottomSheet(context,
+          title: "Alert",
+          message: "To upgrade your user profile, please sign in first.",
+          primaryButtonText: "Move to sign-in",
+          secondaryButtonText: "cancel");
+      return;
+    }
     // Trigger animation
     _heartAnimationController.forward(from: 0.0);
 
@@ -218,13 +227,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Handle Buy Now button press
   void _handleBuyNow() {
+    if (ApiConfig.getUserType()) {
+      ApiConfig.showLogoutBottomSheet(context,
+          title: "Alert",
+          message: "To upgrade your user profile, please sign in first.",
+          primaryButtonText: "Move to sign-in",
+          secondaryButtonText: "cancel");
+      return;
+    }
+
     if (_hasCompleteAddress && _customer != null) {
       /*NEW CHECKOUT FLOW*/
       final currentState = context.read<ProductDetailsCubit>().state;
       if (currentState is! ProductDetailsLoaded) return;
 
       final selectedVariant = _getSelectedVariant(currentState);
-      
+
       // Get inventory quantity from product specifications
       int? maxQuantity;
       final specifications = currentState.specifications;
@@ -477,6 +495,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> with Ticker
 
   /// Add product to cart
   Future<void> _addToCart() async {
+    if (ApiConfig.getUserType()) {
+      ApiConfig.showLogoutBottomSheet(context,
+          title: "Alert",
+          message: "To upgrade your user profile, please sign in first.",
+          primaryButtonText: "Move to sign-in",
+          secondaryButtonText: "cancel");
+      return;
+    }
+
     final currentState = context.read<ProductDetailsCubit>().state;
     if (currentState is! ProductDetailsLoaded) return;
 
