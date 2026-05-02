@@ -4,6 +4,7 @@ import 'package:glocure/services/api_service.dart';
 import 'package:glocure/widgets/custom_app_bar.dart';
 import 'package:glocure/widgets/common_bottom_sheet.dart';
 import 'package:glocure/utils/size_utils.dart';
+import '../config/api_config.dart';
 import '../utils/auth_storage.dart';
 import '../utils/wishlist_storage.dart';
 import 'address_list_screen.dart';
@@ -100,7 +101,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       icon: Icons.person_outline,
                       title: 'My Profile',
                       onTap: () {
-                        ApiService.getUserType()
+                        ApiConfig.getUserType()
                             ? _showLogoutBottomSheet(
                                 title: "Alert",
                                 message: "To upgrade your user profile, please sign in first.",
@@ -162,7 +163,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   icon: Icons.location_on_outlined,
                   title: 'Address',
                   onTap: () {
-                    ApiService.getUserType()
+                    ApiConfig.getUserType()
                         ? _showLogoutBottomSheet(
                             title: "Alert",
                             message: "To upgrade your user profile, please sign in first.",
@@ -222,7 +223,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(height: 20.h),
 
                 // Log Out
-                ApiService.getUserType()
+                ApiConfig.getUserType()
                     ? SizedBox.shrink()
                     : GestureDetector(
                         onTap: _showLogoutBottomSheet,

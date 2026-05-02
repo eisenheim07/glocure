@@ -60,7 +60,7 @@ class ApiService {
     }
 
     // Validate token before making request (skip for login/public APIs)
-    if (!ApiService.IS_GUEST_LOGIN && !skipTokenValidation) {
+    if (!ApiConfig.IS_GUEST_LOGIN && !skipTokenValidation) {
       final isValid = await _validateToken();
       if (!isValid) {
         throw Exception('Token expired. Please login again.');
@@ -139,7 +139,7 @@ class ApiService {
 
     // Validate token before making request
     final isValid = await _validateToken();
-    if (!ApiService.IS_GUEST_LOGIN && !isValid) {
+    if (!ApiConfig.IS_GUEST_LOGIN && !isValid) {
       throw Exception('Token expired. Please login again.');
     }
 
@@ -2394,7 +2394,4 @@ class ApiService {
       };
     }
   }
-
-  static bool getUserType() => IS_GUEST_LOGIN;
-  static bool IS_GUEST_LOGIN = false;
 }

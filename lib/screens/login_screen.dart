@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:glocure/screens/home_screen.dart';
 
+import '../config/api_config.dart';
 import '../utils/size_utils.dart';
 import '../utils/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -198,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (isLanguageSelected) {
             // Language already selected, go directly to Home
-            ApiService.IS_GUEST_LOGIN = false;
+            ApiConfig.IS_GUEST_LOGIN = false;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
@@ -743,7 +744,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Explore Now
         TextButton(
           onPressed: () {
-            ApiService.IS_GUEST_LOGIN = true;
+            ApiConfig.IS_GUEST_LOGIN = true;
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
           },
           child: Text(
