@@ -197,9 +197,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Navigate to appropriate screen
         Future.delayed(const Duration(milliseconds: 500), () {
-          if (isLanguageSelected) {
+          // SKIPING LANGUAGE SCREEN FOR NOW
+          if (true || isLanguageSelected) {
             // Language already selected, go directly to Home
-            ApiConfig.IS_GUEST_LOGIN = false;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
@@ -260,12 +260,21 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     _showSnackBar('OTP verified successfully');
+    ApiConfig.IS_GUEST_LOGIN = true;
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LanguageSelectionScreen()),
-      );
+      // SKIPING LANGUAGE SCREEN FOR NOW
+      if (true) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LanguageSelectionScreen()),
+        );
+      }
     });
   }
 
@@ -600,7 +609,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
 
-                              SizedBox(height: 24),
+                              // SizedBox(height: 24),
 
                               // Login/OTP Content with Slide Animation
                               Padding(
@@ -667,6 +676,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               ),
+
+                              SizedBox(height: 24),
                             ],
                           ),
                         ),
@@ -683,172 +694,184 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildPhoneNumberForm() {
-    return Column(
+    return SingleChildScrollView(
       key: const ValueKey('phone_form'),
-      children: [
-        SizedBox(height: 20),
-        _buildPhoneInput(),
-        SizedBox(height: 24),
-        // Sign In Button
-        SizedBox(
-          width: double.infinity,
-          height: 48.h,
-          child: ElevatedButton(
-            onPressed: _sendOtp,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.r),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 20),
+          _buildPhoneInput(),
+          SizedBox(height: 24),
+          // Sign In Button
+          SizedBox(
+            width: double.infinity,
+            height: 48.h,
+            child: ElevatedButton(
+              onPressed: _sendOtp,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                elevation: 0,
               ),
-              elevation: 0,
+              child: Text(
+                'SIGN IN',
+                style: TextStyle(
+                  fontSize: 14.fSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1,
+                ),
+              ),
             ),
-            child: Text(
-              'SIGN IN',
+          ),
+
+          SizedBox(height: 16),
+
+          // Terms and Conditions
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
               style: TextStyle(
-                fontSize: 14.fSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1,
+                fontSize: 10.fSize,
+                color: AppColors.gray400,
+              ),
+              children: [
+                TextSpan(text: 'By continuing you agree to our\n'),
+                TextSpan(
+                  text: 'terms and conditions',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+                TextSpan(text: ' and our '),
+                TextSpan(
+                  text: 'Privacy policy',
+                  style: TextStyle(color: AppColors.primary),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Explore Now
+          GestureDetector(
+            onTap: () {
+              ApiConfig.IS_GUEST_LOGIN = true;
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: AppColors.gray200, width: 1),
+              ),
+              child: Text(
+                'Explore Now',
+                style: TextStyle(
+                  fontSize: 10.fSize,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
-        ),
-
-        SizedBox(height: 16),
-
-        // Terms and Conditions
-        RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: 10.fSize,
-              color: AppColors.gray400,
-            ),
-            children: [
-              TextSpan(text: 'By continuing you agree to our\n'),
-              TextSpan(
-                text: 'terms and conditions',
-                style: TextStyle(color: AppColors.primary),
-              ),
-              TextSpan(text: ' and our '),
-              TextSpan(
-                text: 'Privacy policy',
-                style: TextStyle(color: AppColors.primary),
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(height: 16),
-
-        // Explore Now
-        TextButton(
-          onPressed: () {
-            ApiConfig.IS_GUEST_LOGIN = true;
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
-          },
-          child: Text(
-            'Explore Now',
-            style: TextStyle(
-              fontSize: 12.fSize,
-              fontWeight: FontWeight.w600,
-              color: AppColors.gray600,
-            ),
-          ),
-        ),
-        SizedBox(height: 40),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildOtpVerificationForm() {
-    return Column(
+    return SingleChildScrollView(
       key: const ValueKey('otp_form'),
-      children: [
-        Text(
-          'Verify your Phone Number',
-          style: TextStyle(
-            fontSize: 15.fSize,
-            fontWeight: FontWeight.w600,
-            color: AppColors.gray800,
-          ),
-        ),
-        SizedBox(height: 32),
-
-        _buildOtpInput(),
-
-        SizedBox(height: 16),
-
-        // Timer
-        Text(
-          '00:${_resendCountdown.toString().padLeft(2, '0')}',
-          style: TextStyle(
-            fontSize: 14.fSize,
-            fontWeight: FontWeight.w600,
-            color: AppColors.gray800,
-          ),
-        ),
-
-        SizedBox(height: 8),
-
-        // Resend OTP
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Didn't receive the code? ",
-              style: TextStyle(
-                fontSize: 12.fSize,
-                color: AppColors.gray400,
-              ),
+      child: Column(
+        children: [
+          Text(
+            'Verify your Phone Number',
+            style: TextStyle(
+              fontSize: 15.fSize,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gray800,
             ),
-            TextButton(
-              onPressed: _canResend ? _resendOtp : null,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 0),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'Resend',
+          ),
+          SizedBox(height: 32),
+
+          _buildOtpInput(),
+
+          SizedBox(height: 16),
+
+          // Timer
+          Text(
+            '00:${_resendCountdown.toString().padLeft(2, '0')}',
+            style: TextStyle(
+              fontSize: 14.fSize,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gray800,
+            ),
+          ),
+
+          SizedBox(height: 8),
+
+          // Resend OTP
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Didn't receive the code? ",
                 style: TextStyle(
                   fontSize: 12.fSize,
-                  fontWeight: FontWeight.w600,
-                  color: _canResend ? AppColors.primary : AppColors.gray300,
+                  color: AppColors.gray400,
+                ),
+              ),
+              TextButton(
+                onPressed: _canResend ? _resendOtp : null,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Resend',
+                  style: TextStyle(
+                    fontSize: 12.fSize,
+                    fontWeight: FontWeight.w600,
+                    color: _canResend ? AppColors.primary : AppColors.gray300,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 24),
+
+          // Sign In Button
+          SizedBox(
+            width: double.infinity,
+            height: 48.h,
+            child: ElevatedButton(
+              onPressed: _verifyOtp,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'SIGN IN',
+                style: TextStyle(
+                  fontSize: 14.fSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1,
                 ),
               ),
             ),
-          ],
-        ),
-
-        SizedBox(height: 24),
-
-        // Sign In Button
-        SizedBox(
-          width: double.infinity,
-          height: 48.h,
-          child: ElevatedButton(
-            onPressed: _verifyOtp,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'SIGN IN',
-              style: TextStyle(
-                fontSize: 14.fSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-            ),
           ),
-        ),
-        SizedBox(height: 40),
-      ],
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
@@ -924,180 +947,232 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildEmailPasswordForm() {
-    return Column(
+    return SingleChildScrollView(
       key: const ValueKey('email_form'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Email',
-          style: TextStyle(
-            fontSize: 12.fSize,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF333333),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Email',
+            style: TextStyle(
+              fontSize: 12.fSize,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF333333),
+            ),
           ),
-        ),
-        SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            maxLength: 30,
-            onChanged: (value) {
-              setState(() {}); // Rebuild to show/hide clear icon
-            },
-            decoration: InputDecoration(
-              hintText: 'Enter your email',
-              hintStyle: TextStyle(
-                fontSize: 14.fSize,
-                color: Color(0xFFCCCCCC),
+          SizedBox(height: 4),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              maxLength: 30,
+              onChanged: (value) {
+                setState(() {}); // Rebuild to show/hide clear icon
+              },
+              decoration: InputDecoration(
+                hintText: 'Enter your email',
+                hintStyle: TextStyle(
+                  fontSize: 14.fSize,
+                  color: Color(0xFFCCCCCC),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
+                counterText: '',
+                suffixIcon: _emailController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _emailController.clear();
+                          });
+                        },
+                        icon: Icon(
+                          Icons.clear,
+                          color: Color(0xFF999999),
+                          size: 17.h,
+                        ),
+                      )
+                    : null,
               ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
-              counterText: '',
-              suffixIcon: _emailController.text.isNotEmpty
-                  ? IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _emailController.clear();
-                        });
-                      },
-                      icon: Icon(
-                        Icons.clear,
-                        color: Color(0xFF999999),
-                        size: 17.h,
+              style: TextStyle(
+                fontSize: 14.fSize,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Password',
+            style: TextStyle(
+              fontSize: 12.fSize,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF333333),
+            ),
+          ),
+          SizedBox(height: 4),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: TextField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              maxLength: 30,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                hintStyle: TextStyle(
+                  fontSize: 14.fSize,
+                  color: Color(0xFFCCCCCC),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
+                counterText: '',
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: const Color(0xFF999999),
+                    size: 17.h,
+                  ),
+                ),
+              ),
+              style: TextStyle(
+                fontSize: 14.fSize,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48.h,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _loginWithEmail,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF5C9A),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                ),
+                elevation: 0,
+              ),
+              child: _isLoading
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.h,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
                       ),
                     )
-                  : null,
-            ),
-            style: TextStyle(
-              fontSize: 14.fSize,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        SizedBox(height: 16),
-        Text(
-          'Password',
-          style: TextStyle(
-            fontSize: 12.fSize,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF333333),
-          ),
-        ),
-        SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: TextField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            maxLength: 30,
-            decoration: InputDecoration(
-              hintText: 'Enter your password',
-              hintStyle: TextStyle(
-                fontSize: 14.fSize,
-                color: Color(0xFFCCCCCC),
-              ),
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
-              counterText: '',
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: const Color(0xFF999999),
-                  size: 17.h,
-                ),
-              ),
-            ),
-            style: TextStyle(
-              fontSize: 14.fSize,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 48.h,
-          child: ElevatedButton(
-            onPressed: _isLoading ? null : _loginWithEmail,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF5C9A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.r),
-              ),
-              elevation: 0,
-            ),
-            child: _isLoading
-                ? SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+                  : Text(
+                      'SIGN IN',
+                      style: TextStyle(
+                        fontSize: 14.fSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1,
+                      ),
                     ),
-                  )
-                : Text(
-                    'SIGN IN',
-                    style: TextStyle(
-                      fontSize: 14.fSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1,
-                    ),
-                  ),
+            ),
           ),
-        ),
-        SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
-        // Signup navigation link
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Don't have account? ",
-              style: TextStyle(
-                fontSize: 12.fSize,
-                color: AppColors.gray400,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<SignupCubit>(),
-                      child: const SignupScreen(),
+          // Signup navigation link
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have account? ",
+                    style: TextStyle(
+                      fontSize: 12.fSize,
+                      color: AppColors.gray400,
                     ),
                   ),
-                );
-              },
-              child: Text(
-                'Sign-up here',
-                style: TextStyle(
-                  fontSize: 12.fSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider.value(
+                            value: context.read<SignupCubit>(),
+                            child: const SignupScreen(),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Sign-up here',
+                      style: TextStyle(
+                        fontSize: 12.fSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  // SizedBox(width: 16.h),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     ApiConfig.IS_GUEST_LOGIN = true;
+                  //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+                  //   },
+                  //   child: Container(
+                  //     padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.grey.shade200,
+                  //       borderRadius: BorderRadius.circular(8.r),
+                  //       border: Border.all(color: AppColors.gray200, width: 1),
+                  //     ),
+                  //     child: Text(
+                  //       'Explore Now',
+                  //       style: TextStyle(
+                  //         fontSize: 10.fSize,
+                  //         fontWeight: FontWeight.w500,
+                  //         color: Colors.grey,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+              GestureDetector(
+                onTap: () {
+                  ApiConfig.IS_GUEST_LOGIN = true;
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: AppColors.gray200, width: 1),
+                  ),
+                  child: Text(
+                    'Explore Now',
+                    style: TextStyle(
+                      fontSize: 10.fSize,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 

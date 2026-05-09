@@ -87,3 +87,12 @@ flutter:
           weight: 500
         - asset: assets/fonts/InterLight.ttf
           weight: 300
+
+
+## App Icon Configuration
+#flutter_launcher_icons:
+#  android: true
+#  ios: false
+#  image_path: "assets/images/splash/glocure_main_logo.png"
+#  adaptive_icon_background: "#FFFFFF"
+#  adaptive_icon_foreground: "assets/images/splash/glocure_main_logo.png"

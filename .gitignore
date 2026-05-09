@@ -47,3 +47,9 @@ app.*.map.json
 # API Keys and Secrets - DO NOT COMMIT REAL TOKENS
 lib/config/api_config.dart
 lib/config/api_config_local.dart
+
+# App Signing - DO NOT COMMIT KEYSTORE FILES
+*.jks
+*.keystore
+android/key.properties
+glocure-release-key.jks

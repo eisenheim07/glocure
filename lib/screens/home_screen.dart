@@ -1112,13 +1112,15 @@ class _SkinGeniusCard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 4.h),
-            Text(
-              label,
-              style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            SizedBox(height: 2.h),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 10.fSize, color: Colors.black, fontWeight: FontWeight.normal, fontFamily: 'Inter'),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
