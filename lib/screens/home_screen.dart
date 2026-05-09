@@ -167,7 +167,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            // TODO: Navigate to Skin Analysis screen
+                            ApiConfig.getUserType()
+                                ? ApiConfig.showLogoutBottomSheet(context,
+                                    title: "Alert",
+                                    message: "To upgrade your user profile, please sign in first.",
+                                    primaryButtonText: "Move to sign-in",
+                                    secondaryButtonText: "cancel")
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const CustomWebViewScreen(
+                                        title: 'Skin Analysis',
+                                        url: ApiConfig.skinAnalysisUrl,
+                                        requestCameraPermission: true,
+                                        showAppBar: false,
+                                      ),
+                                    ),
+                                  );
                           },
                           child: Container(
                             height: 42.h,
@@ -210,16 +226,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CustomWebViewScreen(
-                                  title: 'Derma Video Consult',
-                                  url: ApiConfig.consultUrl,
-                                  requestCameraPermission: true,
-                                ),
-                              ),
-                            );
+                            ApiConfig.getUserType()
+                                ? ApiConfig.showLogoutBottomSheet(context,
+                                    title: "Alert",
+                                    message: "To upgrade your user profile, please sign in first.",
+                                    primaryButtonText: "Move to sign-in",
+                                    secondaryButtonText: "cancel")
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const CustomWebViewScreen(
+                                        title: 'Derma Video Consult',
+                                        url: ApiConfig.consultUrl,
+                                        requestCameraPermission: true,
+                                      ),
+                                    ),
+                                  );
                           },
                           child: Container(
                             height: 42.h,

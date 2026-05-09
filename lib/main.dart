@@ -32,6 +32,8 @@ import 'package:glocure/utils/app_theme.dart';
 import 'package:glocure/utils/app_colors.dart';
 import 'package:glocure/services/connectivity_service.dart';
 
+
+/*NEW BRANCH CREATED FROM ===>>> fresh-clean-branch-correction-v1.0*/
 // Global navigator key for navigation from anywhere
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
