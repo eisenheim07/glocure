@@ -766,9 +766,9 @@ class _CartItemCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Quantity: ',
+                      'Qty: ',
                       style: TextStyle(
-                        fontSize: 12.fSize,
+                        fontSize: 11.fSize,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -793,28 +793,28 @@ class _CartItemCard extends StatelessWidget {
                                   },
                             icon: Icon(
                               cartLine.quantity == 1 ? Icons.delete_outline : Icons.remove,
-                              size: 14.h,
+                              size: 13.h,
                               color: isAnyOperationInProgress ? Colors.grey.shade300 : (cartLine.quantity == 1 ? Colors.red : Colors.grey.shade700),
                             ),
                             padding: EdgeInsets.zero,
                             constraints: BoxConstraints(
-                              minWidth: 28.w,
-                              minHeight: 28.h,
+                              minWidth: 24.w,
+                              minHeight: 24.h,
                             ),
-                            splashRadius: 18,
+                            splashRadius: 16,
                           ),
                           Container(
                             width: 1,
-                            height: 18.h,
+                            height: 16.h,
                             color: Colors.grey.shade300,
                           ),
                           // Quantity display with loading indicator
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
                             child: isUpdating
                                 ? SizedBox(
-                                    width: 12.w,
-                                    height: 12.h,
+                                    width: 10.w,
+                                    height: 10.h,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
@@ -825,7 +825,7 @@ class _CartItemCard extends StatelessWidget {
                                 : Text(
                                     '${cartLine.quantity}',
                                     style: TextStyle(
-                                      fontSize: 13.fSize,
+                                      fontSize: 12.fSize,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black,
                                     ),
@@ -833,7 +833,7 @@ class _CartItemCard extends StatelessWidget {
                           ),
                           Container(
                             width: 1,
-                            height: 18.h,
+                            height: 16.h,
                             color: Colors.grey.shade300,
                           ),
                           // Increase button
@@ -841,26 +841,26 @@ class _CartItemCard extends StatelessWidget {
                             onPressed: isAnyOperationInProgress ? null : () => _updateQuantity(context, cartLine.quantity + 1),
                             icon: Icon(
                               Icons.add,
-                              size: 14.h,
+                              size: 13.h,
                               color: isAnyOperationInProgress ? Colors.grey.shade300 : Colors.grey.shade700,
                             ),
                             padding: EdgeInsets.zero,
                             constraints: BoxConstraints(
-                              minWidth: 28.w,
-                              minHeight: 28.h,
+                              minWidth: 24.w,
+                              minHeight: 24.h,
                             ),
-                            splashRadius: 18,
+                            splashRadius: 16,
                           ),
                         ],
                       ),
                     ),
                     if (merchandise.title.isNotEmpty && merchandise.title != 'Default Title') ...[
-                      SizedBox(width: 10.w),
-                      Flexible(
+                      SizedBox(width: 6.w),
+                      Expanded(
                         child: Text(
                           '| ${merchandise.title}',
                           style: TextStyle(
-                            fontSize: 12.fSize,
+                            fontSize: 11.fSize,
                             color: Colors.grey.shade600,
                           ),
                           maxLines: 1,

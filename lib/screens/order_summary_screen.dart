@@ -96,6 +96,7 @@ class _OrderSummaryScreenState extends State<OrderSummaryScreen> {
   }
 
   void _handleProceedToPay(BuildContext context, Cart cart, Customer customer) {
+    // Use CommonPaymentFlow to handle delivery check and payment selection
     // Use the common payment flow
     CommonPaymentFlow.startPaymentFlow(
       context: context,

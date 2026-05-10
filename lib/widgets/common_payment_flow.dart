@@ -201,15 +201,86 @@ class CommonPaymentFlow extends StatelessWidget {
               AppLogger.info('Navigating to PayU WebView for order: ${state.order.id} with total: ₹${state.totalAmountWithShipping}');
               AppLogger.info('Payment method confirmed as Pre-paid, proceeding to PayU WebView');
 
+              // For cart purchases, use first product from cart
+              // For single product purchases, use the provided product
+              TopProduct paymentProduct;
+              ProductVariant paymentVariant;
+              int paymentQuantity;
+
+              if (product != null && selectedVariant != null) {
+                // Single product purchase
+                paymentProduct = product;
+                paymentVariant = selectedVariant;
+                paymentQuantity = quantity;
+              } else if (effectiveCart != null && effectiveCart.lines.isNotEmpty) {
+                // Cart purchase - convert first cart item to TopProduct and ProductVariant
+                final firstLine = effectiveCart.lines.first;
+                final merchandise = firstLine.merchandise;
+                
+                if (merchandise == null) {
+                  AppLogger.error('Cart merchandise is null');
+                  onError?.call();
+                  return;
+                }
+                
+                // Convert CartMerchandise to ProductVariant
+                // Note: Money types are different between cart_model and top_products_model
+                paymentVariant = ProductVariant(
+                  id: merchandise.id,
+                  title: merchandise.title,
+                  sku: merchandise.sku,
+                  priceV2: Money(
+                    amount: merchandise.priceV2.amount,
+                    currencyCode: merchandise.priceV2.currencyCode,
+                  ),
+                  compareAtPriceV2: merchandise.compareAtPriceV2 != null
+                      ? Money(
+                          amount: merchandise.compareAtPriceV2!.amount,
+                          currencyCode: merchandise.compareAtPriceV2!.currencyCode,
+                        )
+                      : null,
+                  availableForSale: merchandise.availableForSale,
+                );
+                
+                // Create minimal TopProduct for payment
+                paymentProduct = TopProduct(
+                  id: merchandise.product.id,
+                  title: merchandise.product.title,
+                  description: '',
+                  handle: merchandise.product.handle,
+                  images: merchandise.product.imageUrl != null
+                      ? [
+                          ProductImage(
+                            originalSrc: merchandise.product.imageUrl!,
+                            altText: merchandise.product.imageAlt,
+                          )
+                        ]
+                      : [],
+                  variants: [paymentVariant],
+                  productType: '',
+                  vendor: '',
+                  tags: [],
+                  createdAt: '',
+                  updatedAt: '',
+                  onlineStoreUrl: null,
+                );
+                
+                paymentQuantity = firstLine.quantity;
+              } else {
+                AppLogger.error('No product or cart available for payment');
+                onError?.call();
+                return;
+              }
+
               // Use push to receive the result from PayU WebView
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => PayUWebViewScreen(
                     customer: customer,
-                    product: product!,
-                    selectedVariant: selectedVariant!,
-                    quantity: quantity,
+                    product: paymentProduct,
+                    selectedVariant: paymentVariant,
+                    quantity: paymentQuantity,
                     onSuccess: (data) {
                       AppLogger.success('✅ Payment successful from WebView: $data');
                       // Return success result
@@ -219,10 +290,11 @@ class CommonPaymentFlow extends StatelessWidget {
                       });
                     },
                     onFailure: (data) {
-                      AppLogger.error('❌ Payment failed from WebView: $data');
-                      // Return failure result
+                      AppLogger.error('❌ Payment failed/cancelled from WebView: $data');
+                      // Return failure/cancelled result - preserve the actual status
+                      final actualStatus = data['status'] ?? 'failed';
                       Navigator.pop(context, {
-                        'status': 'failed',
+                        'status': actualStatus, // Could be 'failed' or 'cancelled'
                         'payuData': data,
                       });
                     },
@@ -241,8 +313,12 @@ class CommonPaymentFlow extends StatelessWidget {
 
                 _handlePaymentResult(context, result, state.order, paymentFlowCubit, onSuccess, onLoadingStart, onLoadingEnd, product != null);
               } else if (context.mounted) {
-                // User cancelled or closed PayU screen
+                // User cancelled or closed PayU screen without triggering callbacks
                 AppLogger.info('PayU WebView screen closed without result');
+                
+                // Stop loading
+                onLoadingEnd?.call();
+                
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Payment was cancelled'),

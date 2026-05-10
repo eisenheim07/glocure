@@ -32,9 +32,11 @@ class PayUWebViewScreen extends StatefulWidget {
 }
 
 class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
-  late final WebViewController controller;
+  WebViewController? controller;
   bool _isLoading = true;
   bool _paymentCompleted = false;
+  String? _txnId;
+  String? _amount;
 
   @override
   void initState() {
@@ -42,8 +44,20 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     _initializeWebView();
   }
 
-  void _initializeWebView() {
+  @override
+  void dispose() {
+    // Clean up to prevent assertion errors
+    controller = null;
+    super.dispose();
+  }
+
+  void _initializeWebView() async {
     AppLogger.info('🌐 Initializing PayU WebView');
+
+    // Enable cookies for PayU session management
+    final cookieManager = WebViewCookieManager();
+    await cookieManager.clearCookies();
+    AppLogger.info('🍪 Cookies cleared and enabled');
 
     // Generate payment parameters
     final txnId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -52,6 +66,10 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     final productInfo = 'Order - ${widget.product.title}';
     final firstName = widget.customer.firstName ?? 'Customer';
     final email = widget.customer.email ?? 'customer@glocure.com';
+
+    // Store for later use
+    _txnId = txnId;
+    _amount = amount;
 
     // Get phone number
     String phone = '';
@@ -81,17 +99,59 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
       hash: hash,
     );
 
-    controller = WebViewController()
+    final webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.white)
+      ..enableZoom(false)
+      ..setUserAgent('Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
+      ..addJavaScriptChannel(
+        'PayUFlutter',
+        onMessageReceived: (JavaScriptMessage message) {
+          if (!mounted || _paymentCompleted) return;
+          
+          AppLogger.info('📨 JavaScript message: ${message.message}');
+          
+          // Handle payment status from JavaScript
+          if (message.message.startsWith('PAYMENT_')) {
+            final status = message.message.replaceFirst('PAYMENT_', '').toLowerCase();
+            AppLogger.warning('🎯 Payment status detected from JS: $status');
+            
+            if (!_paymentCompleted && mounted) {
+              _paymentCompleted = true;
+              
+              final result = {
+                'status': status == 'success' ? 'success' : 'failed',
+                'url': 'javascript_detected',
+                'params': {},
+                'txnid': _txnId ?? '',
+                'amount': _amount ?? '',
+                'mihpayid': '',
+                'error_Message': status == 'failed' ? 'Payment declined or failed' : '',
+              };
+              
+              if (status == 'success') {
+                widget.onSuccess(result);
+              } else {
+                widget.onFailure(result);
+              }
+            }
+          }
+        },
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (String url) {
-            AppLogger.info('📄 Page started: $url');
+            AppLogger.info('📄 PAYU_SDK_WEBVIEW ===>>> Page started: $url');
             _checkPaymentResult(url);
           },
           onPageFinished: (String url) {
-            AppLogger.info('✅ Page finished: $url');
+            AppLogger.info('✅ PAYU_SDK_WEBVIEW ===>>>  Page finished: $url');
+            
+            // Inject JavaScript to detect PayU's feedback/result pages
+            if (url.contains('api.payu.in/public')) {
+              _injectPaymentDetectionScript();
+            }
+            
             if (mounted) {
               setState(() {
                 _isLoading = false;
@@ -99,16 +159,16 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             }
           },
           onNavigationRequest: (NavigationRequest request) {
-            AppLogger.info('🔗 Navigation request: ${request.url}');
+            AppLogger.info('🔗 PAYU_SDK_WEBVIEW ===>>>  Navigation request: ${request.url}');
 
             // Log glocure.com URLs with parameters
             if (request.url.contains('glocure.com')) {
-              AppLogger.warning('🌐 Glocure URL detected: ${request.url}');
+              AppLogger.warning('🌐 PAYU_SDK_WEBVIEW ===>>>  Glocure URL detected: ${request.url}');
 
               try {
                 final uri = Uri.parse(request.url);
                 if (uri.queryParameters.isNotEmpty) {
-                  AppLogger.info('📋 Query parameters:');
+                  AppLogger.info('📋 PAYU_SDK_WEBVIEW ===>>>  Query parameters:');
                   uri.queryParameters.forEach((key, value) {
                     AppLogger.info('  $key = $value');
                   });
@@ -118,20 +178,21 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
               }
             }
 
-            // Handle UPI and payment app schemes
+            // Handle UPI, payment app schemes, and Android intent URLs
             if (request.url.startsWith('upi://') ||
                 request.url.startsWith('tez://') ||
                 request.url.startsWith('paytmmp://') ||
                 request.url.startsWith('phonepe://') ||
-                request.url.startsWith('gpay://')) {
-              AppLogger.info('🚀 Launching payment app');
+                request.url.startsWith('gpay://') ||
+                request.url.startsWith('intent://')) {
+              AppLogger.info('🚀 PAYU_SDK_WEBVIEW ===>>>  Launching payment app/intent');
               _launchExternalUrl(request.url);
               return NavigationDecision.prevent;
             }
 
             // Check for payment result - ONLY intercept OUR URLs
             if (_isPaymentResultUrl(request.url)) {
-              AppLogger.warning('✋ Payment result URL intercepted');
+              AppLogger.warning('✋ PAYU_SDK_WEBVIEW ===>>>  Payment result URL intercepted');
               _checkPaymentResult(request.url);
               return NavigationDecision.prevent;
             }
@@ -139,11 +200,18 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             return NavigationDecision.navigate;
           },
           onWebResourceError: (WebResourceError error) {
-            AppLogger.error('❌ WebView error: ${error.description}');
+            AppLogger.error('❌ PAYU_SDK_WEBVIEW ===>>>  WebView error: ${error.description}');
           },
         ),
       )
       ..loadHtmlString(html);
+
+    // Update state with initialized controller
+    if (mounted) {
+      setState(() {
+        controller = webViewController;
+      });
+    }
   }
 
   /// Generate PayU payment HTML form
@@ -229,6 +297,83 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     """;
   }
 
+  /// Inject JavaScript to detect PayU's payment result pages
+  void _injectPaymentDetectionScript() {
+    if (controller == null) return;
+    
+    AppLogger.info('💉 Injecting payment detection script');
+    
+    final script = """
+      (function() {
+        console.log('PayU Detection Script Loaded');
+        
+        // Check for "GO BACK" button or failure indicators
+        function checkPaymentStatus() {
+          var bodyText = document.body.innerText || document.body.textContent || '';
+          var bodyHTML = document.body.innerHTML || '';
+          
+          console.log('Checking page content...');
+          
+          // Check for failure/declined indicators
+          if (bodyText.includes('Transaction Failed') || 
+              bodyText.includes('Payment Failed') ||
+              bodyText.includes('Transaction Declined') ||
+              bodyText.includes('Payment Declined') ||
+              bodyText.includes('GO BACK') ||
+              bodyHTML.includes('transaction-failed') ||
+              bodyHTML.includes('payment-failed')) {
+            console.log('Payment failure detected!');
+            if (window.PayUFlutter) {
+              window.PayUFlutter.postMessage('PAYMENT_FAILED');
+            }
+            return true;
+          }
+          
+          // Check for success indicators
+          if (bodyText.includes('Transaction Successful') || 
+              bodyText.includes('Payment Successful') ||
+              bodyText.includes('Success') ||
+              bodyHTML.includes('transaction-success') ||
+              bodyHTML.includes('payment-success')) {
+            console.log('Payment success detected!');
+            if (window.PayUFlutter) {
+              window.PayUFlutter.postMessage('PAYMENT_SUCCESS');
+            }
+            return true;
+          }
+          
+          return false;
+        }
+        
+        // Check immediately
+        setTimeout(checkPaymentStatus, 500);
+        setTimeout(checkPaymentStatus, 1000);
+        setTimeout(checkPaymentStatus, 2000);
+        
+        // Monitor for DOM changes
+        var observer = new MutationObserver(function(mutations) {
+          checkPaymentStatus();
+        });
+        
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+        
+        // Monitor for button clicks
+        document.addEventListener('click', function(e) {
+          console.log('Click detected on:', e.target);
+          setTimeout(checkPaymentStatus, 500);
+        }, true);
+        
+        console.log('PayU Detection Script Active');
+      })();
+    """;
+    
+    controller!.runJavaScript(script);
+  }
+
   /// Check if URL is a payment result URL
   bool _isPaymentResultUrl(String url) {
     // ONLY intercept OUR redirect URLs, not PayU's intermediate pages
@@ -300,21 +445,134 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
       } else {
         widget.onFailure(result);
       }
-      
+
       // Note: Don't pop here - let the callbacks handle navigation
       // The callbacks in CommonPaymentFlow will pop with result
     }
   }
 
-  /// Launch external URL for UPI apps
+  /// Launch external URL for UPI apps and Android intents
   Future<void> _launchExternalUrl(String url) async {
     try {
+      AppLogger.info('🚀 Attempting to launch: $url');
+
+      // For intent URLs, try multiple launch strategies
+      if (url.startsWith('intent://')) {
+        AppLogger.info('🤖 Detected Android intent URL');
+
+        // Strategy 1: Try launching the intent URL directly
+        try {
+          final intentUri = Uri.parse(url);
+          AppLogger.info('📱 Strategy 1: Launching intent directly...');
+
+          final launched = await launchUrl(
+            intentUri,
+            mode: LaunchMode.externalApplication,
+          );
+
+          if (launched) {
+            AppLogger.success('✅ Intent launched successfully!');
+            return;
+          }
+          AppLogger.warning('⚠️ Strategy 1 failed, trying fallback...');
+        } catch (e) {
+          AppLogger.error('Strategy 1 error: $e');
+        }
+
+        // Strategy 2: Extract UPI URL from intent and launch
+        try {
+          AppLogger.info('📱 Strategy 2: Extracting UPI from intent...');
+
+          // Parse intent URL: intent://pay?params#Intent;scheme=upi;package=...;end
+          final intentUri = Uri.parse(url);
+          final path = intentUri.path;
+          final query = intentUri.query;
+          final fragment = intentUri.fragment;
+
+          if (fragment.contains('scheme=upi')) {
+            // Reconstruct as upi:// URL
+            final upiUrl = 'upi:/$path${query.isNotEmpty ? '?$query' : ''}';
+            AppLogger.info('🔄 Converted to UPI: $upiUrl');
+
+            final upiUri = Uri.parse(upiUrl);
+            final launched = await launchUrl(
+              upiUri,
+              mode: LaunchMode.externalApplication,
+            );
+
+            if (launched) {
+              AppLogger.success('✅ UPI URL launched successfully!');
+              return;
+            }
+            AppLogger.warning('⚠️ Strategy 2 failed');
+          }
+        } catch (e) {
+          AppLogger.error('Strategy 2 error: $e');
+        }
+
+        // Strategy 3: Try to extract package name and launch specific app
+        try {
+          AppLogger.info('📱 Strategy 3: Checking for fallback URL...');
+
+          // Look for browser_fallback_url in the intent
+          if (url.contains('browser_fallback_url=')) {
+            final fallbackMatch = RegExp(r'browser_fallback_url=([^;]+)').firstMatch(url);
+            if (fallbackMatch != null) {
+              final fallbackUrl = Uri.decodeComponent(fallbackMatch.group(1)!);
+              AppLogger.info('🔄 Found fallback URL: $fallbackUrl');
+
+              // Don't navigate to fallback - just show message
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please select a different payment method or install the payment app'),
+                    backgroundColor: AppColors.warning,
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+              return;
+            }
+          }
+        } catch (e) {
+          AppLogger.error('Strategy 3 error: $e');
+        }
+
+        // All strategies failed
+        AppLogger.error('❌ All launch strategies failed for intent URL');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to open payment app. Please install the required UPI app.'),
+              backgroundColor: AppColors.error,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
+
+      // Regular UPI/payment app URLs
       final uri = Uri.parse(url);
+      AppLogger.info('📱 Launching regular URL: ${uri.scheme}://');
+
       if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-        AppLogger.success('✅ External app launched');
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (launched) {
+          AppLogger.success('✅ External app launched');
+        } else {
+          AppLogger.warning('⚠️ Launch returned false');
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Unable to open payment app'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }
       } else {
-        AppLogger.warning('⚠️ Cannot launch URL');
+        AppLogger.warning('⚠️ Cannot launch URL: $url');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -326,6 +584,14 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
       }
     } catch (e) {
       AppLogger.error('❌ Failed to launch URL: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -333,6 +599,11 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        // If payment already completed, allow back navigation
+        if (_paymentCompleted) {
+          return true;
+        }
+
         // Show confirmation dialog
         final shouldPop = await showDialog<bool>(
           context: context,
@@ -352,23 +623,78 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             ],
           ),
         );
-        return shouldPop ?? false;
+
+        if (shouldPop == true) {
+          // User confirmed cancellation - call failure callback with cancelled status
+          AppLogger.warning('⚠️ Payment cancelled by user');
+          widget.onFailure({
+            'status': 'cancelled',
+            'url': '',
+            'params': {},
+            'txnid': '',
+            'amount': '',
+            'mihpayid': '',
+            'error_Message': 'Payment cancelled by user',
+          });
+          return true;
+        }
+
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('PayU Payment'),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              // If payment already completed, just pop
+              if (_paymentCompleted) {
+                Navigator.pop(context);
+                return;
+              }
+
+              // Show confirmation dialog
+              final shouldCancel = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Cancel Payment?'),
+                  content: const Text('Are you sure you want to cancel this payment?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('No, Continue'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text('Yes, Cancel'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldCancel == true && mounted) {
+                // User confirmed cancellation - call failure callback with cancelled status
+                AppLogger.warning('⚠️ Payment cancelled by user via back button');
+                widget.onFailure({
+                  'status': 'cancelled',
+                  'url': '',
+                  'params': {},
+                  'txnid': '',
+                  'amount': '',
+                  'mihpayid': '',
+                  'error_Message': 'Payment cancelled by user',
+                });
+                Navigator.pop(context);
+              }
+            },
+          ),
         ),
         body: SafeArea(
-          child: Stack(
-            children: [
-              // WebView
-              WebViewWidget(controller: controller),
-
-              // Loading indicator
-              if (_isLoading)
-                Container(
+          child: controller == null
+              ? Container(
                   color: Colors.white,
                   child: const Center(
                     child: Column(
@@ -379,7 +705,7 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Loading Payment Gateway...',
+                          'Initializing Payment Gateway...',
                           style: TextStyle(
                             fontSize: 16,
                             color: AppColors.textPrimary,
@@ -388,9 +714,37 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                       ],
                     ),
                   ),
+                )
+              : Stack(
+                  children: [
+                    // WebView
+                    WebViewWidget(controller: controller!),
+
+                    // Loading indicator
+                    if (_isLoading)
+                      Container(
+                        color: Colors.white,
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Loading Payment Gateway...',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
         ),
       ),
     );
