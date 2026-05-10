@@ -60,7 +60,9 @@ class ApiService {
     }
 
     // Validate token before making request (skip for login/public APIs)
-    if (!ApiConfig.IS_GUEST_LOGIN && !skipTokenValidation) {
+    AppLogger.info("IS_GUEST_USER ===>>> ${ApiConfig.getUserType().toString()}");
+    AppLogger.info("IS_GUEST_USER ===>>> ${(!ApiConfig.getUserType()).toString()}");
+    if (!ApiConfig.getUserType() && !skipTokenValidation) {
       final isValid = await _validateToken();
       if (!isValid) {
         throw Exception('Token expired. Please login again.');
@@ -139,7 +141,7 @@ class ApiService {
 
     // Validate token before making request
     final isValid = await _validateToken();
-    if (!ApiConfig.IS_GUEST_LOGIN && !isValid) {
+    if (!ApiConfig.getUserType() && !isValid) {
       throw Exception('Token expired. Please login again.');
     }
 

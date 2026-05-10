@@ -51,7 +51,8 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     // Navigate to appropriate screen
-    if (isLoggedIn && isLanguageSelected) {
+    // SKIPPING LANGUAGE SCREEN FOR NOW
+    if (isLoggedIn /*&& isLanguageSelected*/) {
       // User is logged in and has selected language - go to Home
       Navigator.pushReplacement(
         context,

@@ -135,6 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginWithEmail() async {
+    ApiConfig.IS_GUEST_LOGIN = false;
     // Unfocus keyboard and dismiss focus
     FocusScope.of(context).unfocus();
 
@@ -197,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Navigate to appropriate screen
         Future.delayed(const Duration(milliseconds: 500), () {
-          // SKIPING LANGUAGE SCREEN FOR NOW
+          // SKIPPING LANGUAGE SCREEN FOR NOW
           if (true || isLanguageSelected) {
             // Language already selected, go directly to Home
             Navigator.pushReplacement(
@@ -263,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
     ApiConfig.IS_GUEST_LOGIN = true;
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      // SKIPING LANGUAGE SCREEN FOR NOW
+      // SKIPPING LANGUAGE SCREEN FOR NOW
       if (true) {
         Navigator.pushReplacement(
           context,
