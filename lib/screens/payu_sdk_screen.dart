@@ -47,33 +47,34 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
       _isProcessing = true;
     });
 
-    AppLogger.info('PayU SDK Screen: Starting payment initialization');
+    AppLogger.info('PayU_SDK Screen: Starting payment initialization');
 
     _payuService.startPayment(
       context: context,
       order: widget.order,
       customer: widget.customer,
-      totalAmount: widget.totalAmountWithShipping,
+      // totalAmount: widget.totalAmountWithShipping,
+      totalAmount: 1,
       onSuccess: (result) {
-        AppLogger.success('PayU SDK Payment Success: $result');
+        AppLogger.success('PayU_SDK Payment Success: $result');
         if (mounted) {
           _showTimerScreen('success', result);
         }
       },
       onFailure: (result) {
-        AppLogger.error('PayU SDK Payment Failed: $result');
+        AppLogger.error('PayU_SDK Payment Failed: $result');
         if (mounted) {
           _showTimerScreen('failure', result);
         }
       },
       onCancel: (result) {
-        AppLogger.info('PayU SDK Payment Cancelled: $result');
+        AppLogger.info('PayU_SDK Payment Cancelled: $result');
         if (mounted) {
           _showTimerScreen('cancelled', result);
         }
       },
       onError: (result) {
-        AppLogger.error('PayU SDK Error: $result');
+        AppLogger.error('PayU_SDK Error: $result');
         if (mounted) {
           _showTimerScreen('error', result);
         }
@@ -84,7 +85,7 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
   /// Show timer screen and then return result
   Future<void> _showTimerScreen(String status, Map<String, dynamic> result) async {
     AppLogger.info('PayU SDK Screen: Showing timer screen for status: $status');
-    
+
     // Navigate to timer screen and wait for result
     final timerResult = await Navigator.push(
       context,
@@ -95,7 +96,7 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
         ),
       ),
     );
-    
+
     // After timer completes, return the original result
     if (mounted) {
       Navigator.pop(context, result);
@@ -140,15 +141,8 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
               ),
             ),
             SizedBox(height: 8.h),
-            Text(
-              'Please wait while we set up your payment',
-              style: TextStyle(
-                fontSize: 14.fSize,
-                color: AppColors.textMuted,
-                fontFamily: 'Inter',
-              ),
-              textAlign: TextAlign.center,
-            ),
+            Text('Please wait while we set up your payment',
+                style: TextStyle(fontSize: 14.fSize, color: AppColors.textMuted, fontFamily: 'Inter'), textAlign: TextAlign.center),
           ],
         ],
       ),

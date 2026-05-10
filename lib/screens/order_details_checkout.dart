@@ -9,9 +9,10 @@ import '../utils/app_colors.dart';
 import '../utils/format_utils.dart';
 import '../utils/size_utils.dart';
 import '../utils/app_logger.dart';
+import '../widgets/common_payment_flow.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/network_image_loader.dart';
-import '../widgets/common_payment_flow.dart';
+import 'payu_webview/payu_webview_screen.dart';
 
 class OrderDetailsCheckout extends StatefulWidget {
   final Customer customer;
@@ -245,7 +246,7 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
   Widget _buildQuantityControls(OrderDetailsCheckoutLoaded state) {
     final maxQuantity = state.maxQuantity ?? 999;
     final canIncrease = state.quantity < maxQuantity;
-    
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.borderPrimary),
@@ -297,9 +298,7 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
 
           // Increase button
           GestureDetector(
-            onTap: canIncrease 
-                ? () => context.read<OrderDetailsCheckoutCubit>().updateQuantity(state.quantity + 1)
-                : null,
+            onTap: canIncrease ? () => context.read<OrderDetailsCheckoutCubit>().updateQuantity(state.quantity + 1) : null,
             child: Container(
               width: 32.w,
               height: 32.h,
@@ -515,26 +514,63 @@ class _OrderDetailsCheckoutState extends State<OrderDetailsCheckout> {
     AppLogger.info('Starting checkout process for single product');
 
     // Start the common payment flow
-    CommonPaymentFlow.startPaymentFlow(
-      context: context,
-      customer: state.customer,
-      product: state.product,
-      selectedVariant: state.selectedVariant,
-      quantity: state.quantity,
-      onLoadingStart: () {
-        context.read<OrderDetailsCheckoutCubit>().setPaymentLoading(true);
-      },
-      onLoadingEnd: () {
-        if (mounted) {
-          context.read<OrderDetailsCheckoutCubit>().setPaymentLoading(false);
-        }
-      },
-      onSuccess: () {
-        AppLogger.success('Order checkout completed successfully');
-      },
-      onError: () {
-        AppLogger.error('Order checkout failed');
-      },
+    // CommonPaymentFlow.startPaymentFlow(
+    //   context: context,
+    //   customer: state.customer,
+    //   product: state.product,
+    //   selectedVariant: state.selectedVariant,
+    //   quantity: state.quantity,
+    //   onLoadingStart: () {
+    //     context.read<OrderDetailsCheckoutCubit>().setPaymentLoading(true);
+    //   },
+    //   onLoadingEnd: () {
+    //     if (mounted) {
+    //       context.read<OrderDetailsCheckoutCubit>().setPaymentLoading(false);
+    //     }
+    //   },
+    //   onSuccess: () {
+    //     AppLogger.success('Order checkout completed successfully');
+    //   },
+    //   onError: () {
+    //     AppLogger.error('Order checkout failed');
+    //   },
+    // );
+
+    // Navigate to PayU WebView screen with all required data
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PayUWebViewScreen(
+          customer: state.customer,
+          product: state.product,
+          selectedVariant: state.selectedVariant,
+          quantity: state.quantity,
+          onSuccess: (data) {
+            AppLogger.success('✅ Payment successful: $data');
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Payment successful!'),
+                  backgroundColor: AppColors.success,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+          onFailure: (data) {
+            AppLogger.error('❌ Payment failed: $data');
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Payment failed: ${data['error_Message'] ?? 'Please try again'}'),
+                  backgroundColor: AppColors.error,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 

@@ -31,8 +31,8 @@ enum LoginMode { email, otp }
 class _LoginScreenState extends State<LoginScreen> {
   late PageController _pageController;
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController(text: 'testing.khan123@glocure.com');
+  final TextEditingController _passwordController = TextEditingController(text: 'Password@123');
   final List<TextEditingController> _otpControllers = List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _otpFocusNodes = List.generate(4, (_) => FocusNode());
 
