@@ -294,17 +294,15 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
 
       AppLogger.success('📦 Final result: $result');
 
-      // Call appropriate callback
+      // Call appropriate callback FIRST (they will handle navigation)
       if (status == 'success') {
         widget.onSuccess(result);
       } else {
         widget.onFailure(result);
       }
-
-      // Close screen
-      if (mounted) {
-        Navigator.pop(context);
-      }
+      
+      // Note: Don't pop here - let the callbacks handle navigation
+      // The callbacks in CommonPaymentFlow will pop with result
     }
   }
 

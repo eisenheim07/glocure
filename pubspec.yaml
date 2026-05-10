@@ -71,7 +71,6 @@ flutter:
     - assets/images/
     - assets/images/home/
     - assets/images/splash/
-    - assets/html/
 
   fonts:
     - family: Inter

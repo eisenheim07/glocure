@@ -5,7 +5,7 @@ import '../cubits/payment_flow/payment_flow_state.dart';
 import '../models/cart_model.dart' as cart_model;
 import '../models/customer_model.dart';
 import '../models/top_products_model.dart';
-import '../screens/payu_sdk_screen.dart';
+import '../screens/payu_webview/payu_webview_screen.dart';
 import '../screens/payment_status_screen.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_logger.dart';
@@ -47,7 +47,7 @@ class CommonPaymentFlow extends StatelessWidget {
     VoidCallback? onSuccess,
     VoidCallback? onError,
     VoidCallback? onLoadingStart, // New callback for loading start
-    VoidCallback? onLoadingEnd,   // New callback for loading end
+    VoidCallback? onLoadingEnd, // New callback for loading end
   }) async {
     // Validate customer and address
     final defaultAddress = customer.defaultAddress;
@@ -88,7 +88,7 @@ class CommonPaymentFlow extends StatelessWidget {
     // For single product purchases, create a temporary cart for the bottom sheet
     cart_model.Cart? effectiveCart = cart;
     double? calculatedTotalWithShipping;
-    
+
     if (cart == null && product != null && selectedVariant != null) {
       // Calculate item price and shipping charges for single product
       final itemPrice = double.parse(selectedVariant.priceV2.amount) * quantity;
@@ -97,7 +97,8 @@ class CommonPaymentFlow extends StatelessWidget {
       final totalPrice = needsShipping ? itemPrice + shippingCharges : itemPrice;
       calculatedTotalWithShipping = totalPrice;
 
-      AppLogger.info('Single product calculation: Item price: ₹$itemPrice, Shipping: ${needsShipping ? '₹$shippingCharges' : 'FREE'}, Total: ₹$totalPrice');
+      AppLogger.info(
+          'Single product calculation: Item price: ₹$itemPrice, Shipping: ${needsShipping ? '₹$shippingCharges' : 'FREE'}, Total: ₹$totalPrice');
 
       effectiveCart = cart_model.Cart(
         id: 'temp-${DateTime.now().millisecondsSinceEpoch}',
@@ -115,12 +116,12 @@ class CommonPaymentFlow extends StatelessWidget {
                 amount: selectedVariant.priceV2.amount,
                 currencyCode: selectedVariant.priceV2.currencyCode,
               ),
-              compareAtPriceV2: selectedVariant.compareAtPriceV2 != null 
-                ? cart_model.Money(
-                    amount: selectedVariant.compareAtPriceV2!.amount,
-                    currencyCode: selectedVariant.compareAtPriceV2!.currencyCode,
-                  )
-                : null,
+              compareAtPriceV2: selectedVariant.compareAtPriceV2 != null
+                  ? cart_model.Money(
+                      amount: selectedVariant.compareAtPriceV2!.amount,
+                      currencyCode: selectedVariant.compareAtPriceV2!.currencyCode,
+                    )
+                  : null,
               product: cart_model.CartProduct(
                 id: product.id,
                 title: product.title,
@@ -147,8 +148,9 @@ class CommonPaymentFlow extends StatelessWidget {
       const shippingCharges = 99.0;
       final needsShipping = subtotal < 1000;
       calculatedTotalWithShipping = needsShipping ? subtotal + shippingCharges : subtotal;
-      
-      AppLogger.info('Cart calculation: Subtotal: ₹$subtotal, Shipping: ${needsShipping ? '₹$shippingCharges' : 'FREE'}, Total: ₹$calculatedTotalWithShipping');
+
+      AppLogger.info(
+          'Cart calculation: Subtotal: ₹$subtotal, Shipping: ${needsShipping ? '₹$shippingCharges' : 'FREE'}, Total: ₹$calculatedTotalWithShipping');
     }
 
     if (effectiveCart == null) {
@@ -171,13 +173,13 @@ class CommonPaymentFlow extends StatelessWidget {
       onPaymentSelected: (paymentMethod) async {
         AppLogger.info('Payment method selected: $paymentMethod');
         AppLogger.info('Starting payment flow with method: $paymentMethod');
-        
+
         // Create PaymentFlowCubit for this flow
         final paymentFlowCubit = PaymentFlowCubit();
-        
+
         // Store the calculated total for PayU
         final totalForPayU = calculatedTotalWithShipping;
-        
+
         // Trigger loading start callback
         onLoadingStart?.call();
 
@@ -187,7 +189,7 @@ class CommonPaymentFlow extends StatelessWidget {
           if (state is PaymentFlowOrderCreated) {
             // Cancel subscription
             subscription.cancel();
-            
+
             // Trigger loading end callback
             onLoadingEnd?.call();
 
@@ -195,35 +197,52 @@ class CommonPaymentFlow extends StatelessWidget {
 
             // Handle based on payment method
             if (state.paymentMethod == 'Pre-paid') {
-              // Navigate to PayU with push (not pushReplacement) to receive result
-              AppLogger.info('Navigating to PayU for order: ${state.order.id} with total: ₹${state.totalAmountWithShipping}');
-              AppLogger.info('Payment method confirmed as Pre-paid, proceeding to PayU');
-              
-              // Use push to receive the result from PayU SDK
+              // Navigate to PayU WebView with push (not pushReplacement) to receive result
+              AppLogger.info('Navigating to PayU WebView for order: ${state.order.id} with total: ₹${state.totalAmountWithShipping}');
+              AppLogger.info('Payment method confirmed as Pre-paid, proceeding to PayU WebView');
+
+              // Use push to receive the result from PayU WebView
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PayUSDKScreen(
-                    order: state.order,
+                  builder: (context) => PayUWebViewScreen(
                     customer: customer,
-                    totalAmountWithShipping: totalForPayU ?? state.totalAmountWithShipping, // Use calculated total or fallback to state total
+                    product: product!,
+                    selectedVariant: selectedVariant!,
+                    quantity: quantity,
+                    onSuccess: (data) {
+                      AppLogger.success('✅ Payment successful from WebView: $data');
+                      // Return success result
+                      Navigator.pop(context, {
+                        'status': 'success',
+                        'payuData': data,
+                      });
+                    },
+                    onFailure: (data) {
+                      AppLogger.error('❌ Payment failed from WebView: $data');
+                      // Return failure result
+                      Navigator.pop(context, {
+                        'status': 'failed',
+                        'payuData': data,
+                      });
+                    },
                   ),
                 ),
               );
 
               // Handle PayU result
               if (result != null && context.mounted) {
-                AppLogger.info('PayU returned result: $result');
-                
+                AppLogger.info('PayU WebView returned result: $result');
+
                 // Log PayU data if available
                 if (result['payuData'] != null) {
                   AppLogger.info('PayU Data: ${result['payuData']}');
                 }
-                
+
                 _handlePaymentResult(context, result, state.order, paymentFlowCubit, onSuccess, onLoadingStart, onLoadingEnd, product != null);
               } else if (context.mounted) {
                 // User cancelled or closed PayU screen
-                AppLogger.info('PayU screen closed without result');
+                AppLogger.info('PayU WebView screen closed without result');
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Payment was cancelled'),
@@ -254,7 +273,7 @@ class CommonPaymentFlow extends StatelessWidget {
           } else if (state is PaymentFlowError) {
             // Cancel subscription
             subscription.cancel();
-            
+
             // Trigger loading end callback
             onLoadingEnd?.call();
 
@@ -291,7 +310,7 @@ class CommonPaymentFlow extends StatelessWidget {
         } catch (e) {
           // Cancel subscription
           subscription.cancel();
-          
+
           // Trigger loading end callback
           onLoadingEnd?.call();
 
