@@ -40,7 +40,7 @@ class _FAQScreenState extends State<FAQScreen> {
     ),
     FAQItem(
       question: "How can I contact customer support?",
-      answer: "Phone: +91 XXXXX XXXXX\nEmail: support@glocure.com\nWhatsApp & Live Chat: 24/7 available",
+      answer: "Email: info@glocure.com\nWhatsApp & Live Chat: 24/7 available",
     ),
   ];
 

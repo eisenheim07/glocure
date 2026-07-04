@@ -53,8 +53,8 @@ class _PayUSDKScreenState extends State<PayUSDKScreen> {
       context: context,
       order: widget.order,
       customer: widget.customer,
-      // totalAmount: widget.totalAmountWithShipping,
-      totalAmount: 1,
+      totalAmount: widget.totalAmountWithShipping,
+      // totalAmount: 1,
       onSuccess: (result) {
         AppLogger.success('PayU_SDK Payment Success: $result');
         if (mounted) {

@@ -558,57 +558,147 @@ class _OrderCardState extends State<_OrderCard> {
 
           SizedBox(height: 8.h),
 
-          // Total Amount and Items row
-          Row(
-            children: [
-              Column(
+          // Amount section — layout differs based on order total
+          Builder(
+            builder: (context) {
+              final itemAmount = double.tryParse(widget.order.totalPrice) ?? 0;
+              final hasDeliveryCharge = itemAmount <= 999;
+              const deliveryCharge = 99.0;
+              final grandTotal = hasDeliveryCharge ? itemAmount + deliveryCharge : itemAmount;
+
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Total Amount',
-                    style: TextStyle(
-                      fontSize: 11.fSize,
-                      color: const Color(0xFF777777),
-                      fontFamily: 'Inter',
-                    ),
+                  // Top row: amount label + items count
+                  Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            hasDeliveryCharge ? 'Item Amount' : 'Total Amount',
+                            style: TextStyle(
+                              fontSize: 11.fSize,
+                              color: const Color(0xFF777777),
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          SizedBox(height: 3.h),
+                          Text(
+                            formatIndianCurrency(widget.order.totalPrice),
+                            style: TextStyle(
+                              fontSize: 18.fSize,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1A1A1A),
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Items',
+                            style: TextStyle(
+                              fontSize: 11.fSize,
+                              color: const Color(0xFF777777),
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                          SizedBox(height: 3.h),
+                          Text(
+                            '${widget.order.lineItems.length} ${widget.order.lineItems.length == 1 ? 'item' : 'items'}',
+                            style: TextStyle(
+                              fontSize: 14.fSize,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1A1A1A),
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 3.h),
-                  Text(
-                    formatIndianCurrency(widget.order.totalPrice),
-                    style: TextStyle(
-                      fontSize: 18.fSize,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1A1A1A),
-                      fontFamily: 'Inter',
+
+                  // Delivery charges + Total — only when order total ≤ ₹999
+                  if (hasDeliveryCharge) ...[
+                    SizedBox(height: 6.h),
+
+                    // Delivery charges row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.local_shipping_outlined,
+                              size: 13.h,
+                              color: const Color(0xFF777777),
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              'Delivery Charges',
+                              style: TextStyle(
+                                fontSize: 11.fSize,
+                                color: const Color(0xFF777777),
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '+ ₹${deliveryCharge.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 11.fSize,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFFF5C9A),
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+
+                    SizedBox(height: 6.h),
+
+                    // Divider before grand total
+                    Divider(
+                      color: const Color(0xFFE5E5E5).withOpacity(0.5),
+                      thickness: 1,
+                      height: 1,
+                    ),
+
+                    SizedBox(height: 6.h),
+
+                    // Grand total row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Amount',
+                          style: TextStyle(
+                            fontSize: 12.fSize,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1A1A),
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        Text(
+                          '₹${grandTotal.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 14.fSize,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1A1A1A),
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ),
-              const Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Items',
-                    style: TextStyle(
-                      fontSize: 11.fSize,
-                      color: const Color(0xFF777777),
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  SizedBox(height: 3.h),
-                  Text(
-                    '${widget.order.lineItems.length} ${widget.order.lineItems.length == 1 ? 'item' : 'items'}',
-                    style: TextStyle(
-                      fontSize: 14.fSize,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1A1A1A),
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
           ),
 
           SizedBox(height: 8.h),

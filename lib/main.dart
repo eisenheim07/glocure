@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glocure/screens/splash_screen.dart';
 import 'package:glocure/screens/login_screen.dart';
@@ -29,7 +28,6 @@ import 'package:glocure/cubits/signup/signup_cubit.dart';
 import 'package:glocure/cubits/payment_flow/payment_flow_cubit.dart';
 import 'package:glocure/utils/size_utils.dart';
 import 'package:glocure/utils/app_theme.dart';
-import 'package:glocure/utils/app_colors.dart';
 import 'package:glocure/services/connectivity_service.dart';
 
 

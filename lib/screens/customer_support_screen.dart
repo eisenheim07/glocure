@@ -20,7 +20,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   @override
   void initState() {
     super.initState();
-    _phoneController.text = "7893373939";
+    //_phoneController.text = "7893373939";
   }
 
   @override
@@ -140,7 +140,6 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20.h),
-              
               Text(
                 "Phone Number",
                 style: TextStyle(
@@ -167,14 +166,14 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   fillColor: AppColors.inputBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: AppColors.inputBorder,
                       width: 1,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: AppColors.inputBorder,
                       width: 1,
                     ),
@@ -201,9 +200,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   return null;
                 },
               ),
-              
               SizedBox(height: 24.h),
-              
               Text(
                 "Email",
                 style: TextStyle(
@@ -226,14 +223,14 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   fillColor: AppColors.inputBackground,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: AppColors.inputBorder,
                       width: 1,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: AppColors.inputBorder,
                       width: 1,
                     ),
@@ -254,15 +251,15 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
                   }
-                  if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+                  if (!RegExp(
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                      .hasMatch(value)) {
                     return 'Please enter a valid email address';
                   }
                   return null;
                 },
               ),
-              
               const Spacer(),
-              
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -295,7 +292,6 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                         ),
                 ),
               ),
-              
               SizedBox(height: 32.h),
             ],
           ),

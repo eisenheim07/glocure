@@ -61,8 +61,17 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
 
     // Generate payment parameters
     final txnId = DateTime.now().millisecondsSinceEpoch.toString();
-    // TODO: Remove hardcoded amount after testing
-    final amount = '1.00'; // Hardcoded for testing - was: (double.parse(widget.selectedVariant.priceV2.amount) * widget.quantity).toStringAsFixed(2)
+    // Calculate total amount (price * quantity) and format to 2 decimal places
+    String amount = '0';
+    amount =
+        (double.parse(widget.selectedVariant.priceV2.amount) * widget.quantity)
+            .toStringAsFixed(2);
+
+    /// Adding flat shipping charge of 99
+    if (double.parse(amount) < 1000 && double.parse(amount) > 0) {
+      amount = (double.parse(amount) + 99).toStringAsFixed(2);
+    }
+
     final productInfo = 'Order - ${widget.product.title}';
     final firstName = widget.customer.firstName ?? 'Customer';
     final email = widget.customer.email ?? 'customer@glocure.com';
@@ -73,9 +82,11 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
 
     // Get phone number
     String phone = '';
-    if (widget.customer.defaultAddress?.phone != null && widget.customer.defaultAddress!.phone!.isNotEmpty) {
+    if (widget.customer.defaultAddress?.phone != null &&
+        widget.customer.defaultAddress!.phone!.isNotEmpty) {
       phone = widget.customer.defaultAddress!.phone!;
-    } else if (widget.customer.phone != null && widget.customer.phone!.isNotEmpty) {
+    } else if (widget.customer.phone != null &&
+        widget.customer.phone!.isNotEmpty) {
       phone = widget.customer.phone!;
     } else {
       phone = '9999999999';
@@ -83,7 +94,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     phone = phone.replaceAll(RegExp(r'[^\d+]'), '');
 
     // Generate hash
-    final hashString = '${ApiConfig.payuMerchantKey}|$txnId|$amount|$productInfo|$firstName|$email|||||||||||${ApiConfig.payuMerchantSalt}';
+    final hashString =
+        '${ApiConfig.payuMerchantKey}|$txnId|$amount|$productInfo|$firstName|$email|||||||||||${ApiConfig.payuMerchantSalt}';
     final hash = sha512.convert(utf8.encode(hashString)).toString();
 
     AppLogger.info('💳 Payment details: txnId=$txnId, amount=₹$amount');
@@ -103,22 +115,24 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.white)
       ..enableZoom(false)
-      ..setUserAgent('Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
+      ..setUserAgent(
+          'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36')
       ..addJavaScriptChannel(
         'PayUFlutter',
         onMessageReceived: (JavaScriptMessage message) {
           if (!mounted || _paymentCompleted) return;
-          
+
           AppLogger.info('📨 JavaScript message: ${message.message}');
-          
+
           // Handle payment status from JavaScript
           if (message.message.startsWith('PAYMENT_')) {
-            final status = message.message.replaceFirst('PAYMENT_', '').toLowerCase();
+            final status =
+                message.message.replaceFirst('PAYMENT_', '').toLowerCase();
             AppLogger.warning('🎯 Payment status detected from JS: $status');
-            
+
             if (!_paymentCompleted && mounted) {
               _paymentCompleted = true;
-              
+
               final result = {
                 'status': status == 'success' ? 'success' : 'failed',
                 'url': 'javascript_detected',
@@ -126,9 +140,10 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                 'txnid': _txnId ?? '',
                 'amount': _amount ?? '',
                 'mihpayid': '',
-                'error_Message': status == 'failed' ? 'Payment declined or failed' : '',
+                'error_Message':
+                    status == 'failed' ? 'Payment declined or failed' : '',
               };
-              
+
               if (status == 'success') {
                 widget.onSuccess(result);
               } else {
@@ -146,12 +161,12 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
           },
           onPageFinished: (String url) {
             AppLogger.info('✅ PAYU_SDK_WEBVIEW ===>>>  Page finished: $url');
-            
+
             // Inject JavaScript to detect PayU's feedback/result pages
             if (url.contains('api.payu.in/public')) {
               _injectPaymentDetectionScript();
             }
-            
+
             if (mounted) {
               setState(() {
                 _isLoading = false;
@@ -159,16 +174,19 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             }
           },
           onNavigationRequest: (NavigationRequest request) {
-            AppLogger.info('🔗 PAYU_SDK_WEBVIEW ===>>>  Navigation request: ${request.url}');
+            AppLogger.info(
+                '🔗 PAYU_SDK_WEBVIEW ===>>>  Navigation request: ${request.url}');
 
             // Log glocure.com URLs with parameters
             if (request.url.contains('glocure.com')) {
-              AppLogger.warning('🌐 PAYU_SDK_WEBVIEW ===>>>  Glocure URL detected: ${request.url}');
+              AppLogger.warning(
+                  '🌐 PAYU_SDK_WEBVIEW ===>>>  Glocure URL detected: ${request.url}');
 
               try {
                 final uri = Uri.parse(request.url);
                 if (uri.queryParameters.isNotEmpty) {
-                  AppLogger.info('📋 PAYU_SDK_WEBVIEW ===>>>  Query parameters:');
+                  AppLogger.info(
+                      '📋 PAYU_SDK_WEBVIEW ===>>>  Query parameters:');
                   uri.queryParameters.forEach((key, value) {
                     AppLogger.info('  $key = $value');
                   });
@@ -185,14 +203,16 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                 request.url.startsWith('phonepe://') ||
                 request.url.startsWith('gpay://') ||
                 request.url.startsWith('intent://')) {
-              AppLogger.info('🚀 PAYU_SDK_WEBVIEW ===>>>  Launching payment app/intent');
+              AppLogger.info(
+                  '🚀 PAYU_SDK_WEBVIEW ===>>>  Launching payment app/intent');
               _launchExternalUrl(request.url);
               return NavigationDecision.prevent;
             }
 
             // Check for payment result - ONLY intercept OUR URLs
             if (_isPaymentResultUrl(request.url)) {
-              AppLogger.warning('✋ PAYU_SDK_WEBVIEW ===>>>  Payment result URL intercepted');
+              AppLogger.warning(
+                  '✋ PAYU_SDK_WEBVIEW ===>>>  Payment result URL intercepted');
               _checkPaymentResult(request.url);
               return NavigationDecision.prevent;
             }
@@ -200,7 +220,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
             return NavigationDecision.navigate;
           },
           onWebResourceError: (WebResourceError error) {
-            AppLogger.error('❌ PAYU_SDK_WEBVIEW ===>>>  WebView error: ${error.description}');
+            AppLogger.error(
+                '❌ PAYU_SDK_WEBVIEW ===>>>  WebView error: ${error.description}');
           },
         ),
       )
@@ -224,7 +245,9 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     required String phone,
     required String hash,
   }) {
-    final baseUrl = ApiConfig.payuIsProduction ? 'https://secure.payu.in/_payment' : 'https://test.payu.in/_payment';
+    final baseUrl = ApiConfig.payuIsProduction
+        ? 'https://secure.payu.in/_payment'
+        : 'https://test.payu.in/_payment';
 
     return """
 <!DOCTYPE html>
@@ -300,9 +323,9 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
   /// Inject JavaScript to detect PayU's payment result pages
   void _injectPaymentDetectionScript() {
     if (controller == null) return;
-    
+
     AppLogger.info('💉 Injecting payment detection script');
-    
+
     final script = """
       (function() {
         console.log('PayU Detection Script Loaded');
@@ -370,7 +393,7 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
         console.log('PayU Detection Script Active');
       })();
     """;
-    
+
     controller!.runJavaScript(script);
   }
 
@@ -386,7 +409,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
     }
 
     // DO NOT intercept PayU's intermediate pages
-    if (url.contains('payu.in/response') || url.contains('payu.in/merchant/postservice')) {
+    if (url.contains('payu.in/response') ||
+        url.contains('payu.in/merchant/postservice')) {
       AppLogger.info('⏭️ PayU intermediate page - letting it continue');
       return false;
     }
@@ -423,7 +447,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
         status = 'failed';
         AppLogger.info('❌ Status: FAILURE (URL contains failure)');
       } else if (params['status'] != null) {
-        status = params['status']!.toLowerCase() == 'success' ? 'success' : 'failed';
+        status =
+            params['status']!.toLowerCase() == 'success' ? 'success' : 'failed';
         AppLogger.info('💰 Status from param: $status');
       }
 
@@ -516,7 +541,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
 
           // Look for browser_fallback_url in the intent
           if (url.contains('browser_fallback_url=')) {
-            final fallbackMatch = RegExp(r'browser_fallback_url=([^;]+)').firstMatch(url);
+            final fallbackMatch =
+                RegExp(r'browser_fallback_url=([^;]+)').firstMatch(url);
             if (fallbackMatch != null) {
               final fallbackUrl = Uri.decodeComponent(fallbackMatch.group(1)!);
               AppLogger.info('🔄 Found fallback URL: $fallbackUrl');
@@ -525,7 +551,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Please select a different payment method or install the payment app'),
+                    content: Text(
+                        'Please select a different payment method or install the payment app'),
                     backgroundColor: AppColors.warning,
                     duration: Duration(seconds: 3),
                   ),
@@ -543,7 +570,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Unable to open payment app. Please install the required UPI app.'),
+              content: Text(
+                  'Unable to open payment app. Please install the required UPI app.'),
               backgroundColor: AppColors.error,
               duration: Duration(seconds: 4),
             ),
@@ -557,7 +585,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
       AppLogger.info('📱 Launching regular URL: ${uri.scheme}://');
 
       if (await canLaunchUrl(uri)) {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched =
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
         if (launched) {
           AppLogger.success('✅ External app launched');
         } else {
@@ -576,7 +605,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Unable to open payment app. Please install a UPI app.'),
+              content:
+                  Text('Unable to open payment app. Please install a UPI app.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -609,7 +639,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Cancel Payment?'),
-            content: const Text('Are you sure you want to cancel this payment?'),
+            content:
+                const Text('Are you sure you want to cancel this payment?'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
@@ -660,7 +691,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Cancel Payment?'),
-                  content: const Text('Are you sure you want to cancel this payment?'),
+                  content: const Text(
+                      'Are you sure you want to cancel this payment?'),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -677,7 +709,8 @@ class _PayUWebViewScreenState extends State<PayUWebViewScreen> {
 
               if (shouldCancel == true && mounted) {
                 // User confirmed cancellation - call failure callback with cancelled status
-                AppLogger.warning('⚠️ Payment cancelled by user via back button');
+                AppLogger.warning(
+                    '⚠️ Payment cancelled by user via back button');
                 widget.onFailure({
                   'status': 'cancelled',
                   'url': '',

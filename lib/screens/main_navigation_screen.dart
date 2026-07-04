@@ -98,6 +98,17 @@ class MainNavigationScreenState extends State<MainNavigationScreen> with Widgets
     // And once more after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showStatusBar();
+
+      // If launched directly to orders tab (e.g. from payment success),
+      // trigger data load since _onNavItemTapped won't fire for the initial index
+      if (widget.initialIndex == 3) {
+        try {
+          context.read<OrdersCubit>().showPendingTab();
+          print('MainNavigationScreen: Triggered showPendingTab() for initialIndex=3');
+        } catch (e) {
+          print('MainNavigationScreen: Error triggering orders on init: $e');
+        }
+      }
     });
   }
 

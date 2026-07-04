@@ -31,9 +31,12 @@ enum LoginMode { email, otp }
 class _LoginScreenState extends State<LoginScreen> {
   late PageController _pageController;
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController(text: 'testing.khan123@glocure.com');
-  final TextEditingController _passwordController = TextEditingController(text: 'Password@123');
-  final List<TextEditingController> _otpControllers = List.generate(4, (_) => TextEditingController());
+  // final TextEditingController _emailController = TextEditingController(text: 'testing.khan123@glocure.com');
+  // final TextEditingController _passwordController = TextEditingController(text: 'Password@123');
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final List<TextEditingController> _otpControllers =
+      List.generate(4, (_) => TextEditingController());
   final List<FocusNode> _otpFocusNodes = List.generate(4, (_) => FocusNode());
 
   int _currentPage = 0;
@@ -149,7 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // Email regex validation
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (!emailRegex.hasMatch(email)) {
       _showSnackBar('Please enter a valid email address');
       return;
@@ -174,6 +178,16 @@ class _LoginScreenState extends State<LoginScreen> {
         result['accessToken'],
         result['expiresAt'],
       );
+
+      // Fetch and save customer ID immediately so orders screen works
+      // without requiring the user to visit cart/product screens first
+      try {
+        await ApiService().getCustomer(result['accessToken']);
+        print('✅ Customer ID saved after login');
+      } catch (customerError) {
+        print('⚠️ Failed to save customer ID after login: $customerError');
+        // Non-blocking — don't fail the login flow
+      }
 
       // Create or get cart ID after successful login
       try {
@@ -209,14 +223,16 @@ class _LoginScreenState extends State<LoginScreen> {
             // First time login, go to Language Selection
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const LanguageSelectionScreen()),
+              MaterialPageRoute(
+                  builder: (_) => const LanguageSelectionScreen()),
             );
           }
         });
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Login failed: ${e.toString().replaceAll('Exception: ', '')}');
+        _showSnackBar(
+            'Login failed: ${e.toString().replaceAll('Exception: ', '')}');
       }
     } finally {
       if (mounted) {
@@ -234,7 +250,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (phone.length != _selectedCountry.maxLength) {
-      _showSnackBar('Please enter a valid ${_selectedCountry.maxLength}-digit phone number');
+      _showSnackBar(
+          'Please enter a valid ${_selectedCountry.maxLength}-digit phone number');
       return;
     }
 
@@ -288,7 +305,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       builder: (context) {
         return Container(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
           child: SafeArea(
             top: false,
             child: Column(
@@ -304,7 +322,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 7.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 17.w, vertical: 7.h),
                   child: Text(
                     'Select Country',
                     style: TextStyle(
@@ -331,9 +350,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pop(context);
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 14.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 17.w, vertical: 14.h),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.secondary : AppColors.white,
+                            color: isSelected
+                                ? AppColors.secondary
+                                : AppColors.white,
                           ),
                           child: Row(
                             children: [
@@ -347,7 +369,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   country.name,
                                   style: TextStyle(
                                     fontSize: 14.fSize,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
                                     color: AppColors.black,
                                   ),
                                 ),
@@ -356,7 +380,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 country.dialCode,
                                 style: TextStyle(
                                   fontSize: 14.fSize,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                                   color: AppColors.gray600,
                                 ),
                               ),
@@ -446,10 +472,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 SizedBox(
                                   height: constraints.maxHeight * 0.25,
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 34.w),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 34.w),
                                     child: SmartImage(
-                                      key: ValueKey(_currentPage % _bannerImages.length),
-                                      source: _bannerImages[_currentPage % _bannerImages.length],
+                                      key: ValueKey(
+                                          _currentPage % _bannerImages.length),
+                                      source: _bannerImages[
+                                          _currentPage % _bannerImages.length],
                                       width: double.infinity,
                                       height: double.infinity,
                                       fit: BoxFit.contain,
@@ -460,7 +489,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Column(
                                   children: [
                                     Text(
-                                      _bannerTexts[_currentPage % _bannerTexts.length]['title']!,
+                                      _bannerTexts[_currentPage %
+                                          _bannerTexts.length]['title']!,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 20.fSize,
@@ -470,7 +500,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      _bannerTexts[_currentPage % _bannerTexts.length]['subtitle']!,
+                                      _bannerTexts[_currentPage %
+                                          _bannerTexts.length]['subtitle']!,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 20.fSize,
@@ -488,14 +519,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                   children: List.generate(
                                     _bannerImages.length,
                                     (i) {
-                                      final isActive = (_currentPage % _bannerImages.length) == i;
+                                      final isActive = (_currentPage %
+                                              _bannerImages.length) ==
+                                          i;
                                       return Container(
-                                        margin: EdgeInsets.symmetric(horizontal: 3.w),
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 3.w),
                                         width: isActive ? 24 : 8,
                                         height: 3.h,
                                         decoration: BoxDecoration(
-                                          color: isActive ? AppColors.primaryLight : AppColors.white.withValues(alpha: 0.4),
-                                          borderRadius: BorderRadius.circular(2.r),
+                                          color: isActive
+                                              ? AppColors.primaryLight
+                                              : AppColors.white
+                                                  .withValues(alpha: 0.4),
+                                          borderRadius:
+                                              BorderRadius.circular(2.r),
                                         ),
                                       );
                                     },
@@ -545,16 +583,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                           });
                                         },
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10.h),
                                           decoration: BoxDecoration(
-                                            color: _loginMode == LoginMode.email ? Colors.white : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(9.r),
-                                            boxShadow: _loginMode == LoginMode.email
+                                            color: _loginMode == LoginMode.email
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(9.r),
+                                            boxShadow: _loginMode ==
+                                                    LoginMode.email
                                                 ? [
                                                     BoxShadow(
-                                                      color: Colors.black.withOpacity(0.05),
+                                                      color: Colors.black
+                                                          .withOpacity(0.05),
                                                       blurRadius: 4,
-                                                      offset: const Offset(0, 2),
+                                                      offset:
+                                                          const Offset(0, 2),
                                                     ),
                                                   ]
                                                 : null,
@@ -565,7 +610,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                             style: TextStyle(
                                               fontSize: 12.fSize,
                                               fontWeight: FontWeight.w600,
-                                              color: _loginMode == LoginMode.email ? AppColors.primary : AppColors.gray400,
+                                              color:
+                                                  _loginMode == LoginMode.email
+                                                      ? AppColors.primary
+                                                      : AppColors.gray400,
                                             ),
                                           ),
                                         ),
@@ -580,16 +628,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                           });
                                         },
                                         child: Container(
-                                          padding: EdgeInsets.symmetric(vertical: 10.h),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 10.h),
                                           decoration: BoxDecoration(
-                                            color: _loginMode == LoginMode.otp ? Colors.white : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(9.r),
-                                            boxShadow: _loginMode == LoginMode.otp
+                                            color: _loginMode == LoginMode.otp
+                                                ? Colors.white
+                                                : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(9.r),
+                                            boxShadow: _loginMode ==
+                                                    LoginMode.otp
                                                 ? [
                                                     BoxShadow(
-                                                      color: Colors.black.withOpacity(0.05),
+                                                      color: Colors.black
+                                                          .withOpacity(0.05),
                                                       blurRadius: 4,
-                                                      offset: const Offset(0, 2),
+                                                      offset:
+                                                          const Offset(0, 2),
                                                     ),
                                                   ]
                                                 : null,
@@ -600,7 +655,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                             style: TextStyle(
                                               fontSize: 12.fSize,
                                               fontWeight: FontWeight.w600,
-                                              color: _loginMode == LoginMode.otp ? AppColors.primary : AppColors.gray400,
+                                              color: _loginMode == LoginMode.otp
+                                                  ? AppColors.primary
+                                                  : AppColors.gray400,
                                             ),
                                           ),
                                         ),
@@ -616,24 +673,32 @@ class _LoginScreenState extends State<LoginScreen> {
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                                 child: SizedBox(
-                                  height: MediaQuery.of(context).size.height * 0.35, // 35% of screen height
+                                  height: MediaQuery.of(context).size.height *
+                                      0.35, // 35% of screen height
                                   child: AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 300),
                                     switchInCurve: Curves.easeInOut,
                                     switchOutCurve: Curves.easeInOut,
-                                    layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                                    layoutBuilder: (Widget? currentChild,
+                                        List<Widget> previousChildren) {
                                       return Stack(
                                         alignment: Alignment.center,
                                         children: <Widget>[
                                           ...previousChildren,
-                                          if (currentChild != null) currentChild,
+                                          if (currentChild != null)
+                                            currentChild,
                                         ],
                                       );
                                     },
-                                    transitionBuilder: (Widget child, Animation<double> animation) {
+                                    transitionBuilder: (Widget child,
+                                        Animation<double> animation) {
                                       // Determine if this is the entering or exiting widget
                                       final isEntering = child.key ==
-                                          ValueKey(_loginMode == LoginMode.email ? 'email_form' : (_isOtpSent ? 'otp_form' : 'phone_form'));
+                                          ValueKey(_loginMode == LoginMode.email
+                                              ? 'email_form'
+                                              : (_isOtpSent
+                                                  ? 'otp_form'
+                                                  : 'phone_form'));
 
                                       Offset beginOffset;
                                       Offset endOffset;
@@ -673,7 +738,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     },
                                     child: _loginMode == LoginMode.email
                                         ? _buildEmailPasswordForm()
-                                        : (!_isOtpSent ? _buildPhoneNumberForm() : _buildOtpVerificationForm()),
+                                        : (!_isOtpSent
+                                            ? _buildPhoneNumberForm()
+                                            : _buildOtpVerificationForm()),
                                   ),
                                 ),
                               ),
@@ -759,7 +826,10 @@ class _LoginScreenState extends State<LoginScreen> {
           GestureDetector(
             onTap: () {
               ApiConfig.IS_GUEST_LOGIN = true;
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MainNavigationScreen()));
             },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
@@ -905,7 +975,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_down, size: 17.h, color: Color(0xFF666666)),
+                  Icon(Icons.keyboard_arrow_down,
+                      size: 17.h, color: Color(0xFF666666)),
                 ],
               ),
             ),
@@ -932,7 +1003,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFFCCCCCC),
                 ),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
                 counterText: '',
               ),
               style: TextStyle(
@@ -981,7 +1053,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFFCCCCCC),
                 ),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
                 counterText: '',
                 suffixIcon: _emailController.text.isNotEmpty
                     ? IconButton(
@@ -1031,7 +1104,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFFCCCCCC),
                 ),
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 14.w, vertical: 15.h),
                 counterText: '',
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -1151,7 +1225,10 @@ class _LoginScreenState extends State<LoginScreen> {
               GestureDetector(
                 onTap: () {
                   ApiConfig.IS_GUEST_LOGIN = true;
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainNavigationScreen()));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MainNavigationScreen()));
                 },
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
@@ -1188,7 +1265,9 @@ class _LoginScreenState extends State<LoginScreen> {
             color: const Color(0xFFF5F5F5),
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: _otpControllers[index].text.isNotEmpty ? const Color(0xFFFF5C9A) : const Color(0xFFE0E0E0),
+              color: _otpControllers[index].text.isNotEmpty
+                  ? const Color(0xFFFF5C9A)
+                  : const Color(0xFFE0E0E0),
               width: 2.w,
             ),
           ),
