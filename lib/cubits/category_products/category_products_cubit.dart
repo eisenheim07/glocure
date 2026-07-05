@@ -88,10 +88,16 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
 
       emit(CategoryProductsLoading());
 
+      // Map CREATED_AT to CREATED (Shopify's valid value)
+      String? apiSortKey = sortKey;
+      if (sortKey == 'CREATED_AT') {
+        apiSortKey = 'CREATED';
+      }
+
       final response = await _apiService.getCollectionProducts(
         handle: handle,
         first: 20,
-        sortKey: sortKey,
+        sortKey: apiSortKey,
         reverse: reverse,
         filters: filters,
       );
@@ -309,11 +315,17 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
         // Re-apply current sort and filter on the full list
         _products = _applySortAndFilter(_allDiscountedProducts);
       } else {
+        // Map CREATED_AT to CREATED (Shopify's valid value)
+        String? apiSortKey = _sortKey;
+        if (_sortKey == 'CREATED_AT') {
+          apiSortKey = 'CREATED';
+        }
+
         final response = await _apiService.getCollectionProducts(
           handle: _handle,
           first: 20,
           after: _endCursor,
-          sortKey: _sortKey,
+          sortKey: apiSortKey,
           reverse: _reverse,
           filters: _filters,
         );

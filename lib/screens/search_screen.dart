@@ -371,81 +371,87 @@ class _SearchScreenContentState extends State<_SearchScreenContent> {
 
   /// Build search shimmer loading
   Widget _buildSearchShimmer() {
-    return Padding(
-      padding: EdgeInsets.all(14.w),
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12.w,
-          mainAxisSpacing: 14.h,
-          childAspectRatio: 0.70,
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: 14.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _buildShimmerCard()),
+              SizedBox(width: 12.w),
+              Expanded(child: _buildShimmerCard()),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Shimmer.fromColors(
+      baseColor: AppColors.shimmerBase,
+      highlightColor: AppColors.shimmerHighlight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(15.r),
         ),
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          return Shimmer.fromColors(
-            baseColor: AppColors.shimmerBase,
-            highlightColor: AppColors.shimmerHighlight,
-            child: Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image shimmer
+            Container(
+              height: 140.h,
+              width: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(15.r),
+                color: AppColors.shimmerBase,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15.r),
+                  topRight: Radius.circular(15.r),
+                ),
               ),
+            ),
+
+            // Content shimmer
+            Padding(
+              padding: EdgeInsets.all(8.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image shimmer
                   Container(
-                    height: 140.h,
                     width: double.infinity,
+                    height: 12.h,
                     decoration: BoxDecoration(
                       color: AppColors.shimmerBase,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15.r),
-                        topRight: Radius.circular(15.r),
-                      ),
+                      borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
-                  
-                  // Content shimmer
-                  Padding(
-                    padding: EdgeInsets.all(8.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 12.h,
-                          decoration: BoxDecoration(
-                            color: AppColors.shimmerBase,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Container(
-                          width: 80.w,
-                          height: 10.h,
-                          decoration: BoxDecoration(
-                            color: AppColors.shimmerBase,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        Container(
-                          width: 60.w,
-                          height: 14.h,
-                          decoration: BoxDecoration(
-                            color: AppColors.shimmerBase,
-                            borderRadius: BorderRadius.circular(4.r),
-                          ),
-                        ),
-                      ],
+                  SizedBox(height: 6.h),
+                  Container(
+                    width: 80.w,
+                    height: 10.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.shimmerBase,
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    width: 60.w,
+                    height: 14.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.shimmerBase,
+                      borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
@@ -507,35 +513,50 @@ class _SearchResultsGrid extends StatelessWidget {
       );
     }
 
-    return ListView(
+    return ListView.builder(
       controller: scrollController,
-      padding: const EdgeInsets.all(16),
-      children: [
-        Wrap(
-          spacing: 12.h,
-          runSpacing: 16.h,
-          children: products.map((product) {
-            return SizedBox(
-              width: (MediaQuery.of(context).size.width - 44.h) / 2,
-              child: _ProductCard(product: product),
-            );
-          }).toList(),
-        ),
-        if (hasNextPage)
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Center(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+      itemCount: (products.length / 2).ceil() + (hasNextPage ? 1 : 0),
+      itemBuilder: (context, index) {
+        // Show loading indicator at the end if has next page
+        if (index == (products.length / 2).ceil() && hasNextPage) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
               child: SizedBox(
                 width: 20.w,
                 height: 20.h,
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Color(0xFFFF5C9A),
                 ),
               ),
             ),
+          );
+        }
+
+        final leftIndex = index * 2;
+        final rightIndex = leftIndex + 1;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 14.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _ProductCard(product: products[leftIndex]),
+              ),
+              SizedBox(width: 12.w),
+              if (rightIndex < products.length)
+                Expanded(
+                  child: _ProductCard(product: products[rightIndex]),
+                )
+              else
+                const Spacer(),
+            ],
           ),
-      ],
+        );
+      },
     );
   }
 }
@@ -674,118 +695,122 @@ class _ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                child: SizedBox(
-                  height: 140.h,
-                  width: double.infinity,
-                  child: imageUrl != null && imageUrl.isNotEmpty
-                      ? NetworkImageLoader(
-                          imageUrl: imageUrl,
-                          width: double.infinity,
-                          height: 140.h,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: AppColors.gray200,
-                          child: const Center(
-                            child: Icon(Icons.image_outlined, color: AppColors.textMuted),
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                  child: SizedBox(
+                    height: 140.h,
+                    width: double.infinity,
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? NetworkImageLoader(
+                            imageUrl: imageUrl,
+                            width: double.infinity,
+                            height: 140.h,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            color: AppColors.gray200,
+                            child: const Center(
+                              child: Icon(Icons.image_outlined, color: AppColors.textMuted),
+                            ),
                           ),
-                        ),
+                  ),
                 ),
-              ),
-              if (discount != null)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00C853),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '-$discount%',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
+                if (discount != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00C853),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '-$discount%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          Container(
-            height: 1,
-            color: const Color(0xFFF0F0F0),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  product.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  product.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.gray600,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              ],
+            ),
+            Container(
+              height: 1,
+              color: const Color(0xFFF0F0F0),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      price,
+                      product.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    if (compareAtPrice != null) ...[
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          compareAtPrice,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.gray500,
-                            decoration: TextDecoration.lineThrough,
-                            decorationColor: AppColors.gray500,
-                          ),
+                    const SizedBox(height: 4),
+                    Flexible(
+                      child: Text(
+                        product.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.gray600,
+                          height: 1.3,
                         ),
                       ),
-                    ],
+                    ),
+                    const Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          price,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        if (compareAtPrice != null) ...[
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              compareAtPrice,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.gray500,
+                                decoration: TextDecoration.lineThrough,
+                                decorationColor: AppColors.gray500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
