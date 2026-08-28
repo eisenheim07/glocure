@@ -24,10 +24,8 @@ class SignupCubit extends Cubit<SignupState> {
       if (result['success'] == true) {
         emit(SignupSuccess(message: 'Account created successfully! Please login to continue.'));
       } else {
-        final errors = result['errors'] as List<String>? ?? [];
-        final errorMessage = errors.isNotEmpty 
-            ? errors.join(', ') 
-            : 'Failed to create account. Please try again.';
+        final errors = result['errors'] ?? [];
+        final errorMessage = errors.isNotEmpty ? errors.join(', ') : 'Failed to create account. Please try again.';
         emit(SignupError(message: errorMessage));
       }
     } catch (e) {
